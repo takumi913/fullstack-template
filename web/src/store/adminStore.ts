@@ -70,7 +70,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       } else {
         set({ error: response.message });
       }
-    } catch (err) {
+    } catch {
       set({ error: "获取统计数据失败" });
     } finally {
       set({ loading: false });

@@ -39,7 +39,7 @@ export const useWalletStore = create<WalletState>()((set) => ({
       } else {
         set({ error: response.message || "获取余额失败" });
       }
-    } catch (error) {
+    } catch {
       set({ error: "网络错误，请稍后重试" });
     } finally {
       set({ isLoading: false });
@@ -59,7 +59,7 @@ export const useWalletStore = create<WalletState>()((set) => ({
       } else {
         set({ error: response.message || "获取交易记录失败" });
       }
-    } catch (error) {
+    } catch {
       set({ error: "网络错误，请稍后重试" });
     } finally {
       set({ isLoading: false });
@@ -89,7 +89,7 @@ export const useWalletStore = create<WalletState>()((set) => ({
         set({ error: response.message || "创建支付订单失败" });
         return null;
       }
-    } catch (error) {
+    } catch {
       set({ error: "网络错误，请稍后重试" });
       return null;
     } finally {

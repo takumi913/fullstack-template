@@ -132,7 +132,7 @@ export default function RemoveWatermarkPage() {
         // Continue polling
         setTimeout(() => pollTask(taskId), 2000);
       }
-    } catch (err) {
+    } catch {
       setError("Failed to check task status");
       setStatus("error");
     }
@@ -156,9 +156,9 @@ export default function RemoveWatermarkPage() {
       } else {
         throw new Error("No task ID received");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to start processing");
+      setError(err instanceof Error ? err.message : "Failed to start processing");
       setStatus("error");
     }
   };
@@ -184,7 +184,7 @@ export default function RemoveWatermarkPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (e) {
+    } catch {
       window.open(resultUrl, "_blank");
     }
   };
