@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Cookie } from "lucide-react";
 import SEO from "@/components/SEO";
 
 export default function CookiesPage() {
@@ -10,58 +10,39 @@ export default function CookiesPage() {
         description="Learn about how MDZZ Toolbox uses cookies. We use minimal cookies to improve your experience."
         canonicalUrl="/cookies"
       />
-      <div
-        className="min-h-screen pt-[66px]"
-        style={{ backgroundColor: "var(--color-pixel-cream)" }}
-      >
-        <div className="max-w-[800px] mx-auto px-4 py-12">
-          {/* Back Button - 像素风格 */}
-          <div className="mb-8">
+      <div className="min-h-screen pt-[66px] pb-20 bg-background">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          {/* Back Button */}
+          <div className="mb-8 pt-8">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 pixel-border-sm px-4 py-2 font-bold text-sm uppercase hover:translate-x-1 hover:translate-y-1 transition-transform"
-              style={{ backgroundColor: "var(--color-pixel-mint)" }}
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Link>
           </div>
 
-          {/* Page Title - 像素风格 */}
+          {/* Page Title */}
           <div className="text-center mb-12">
-            <div
-              className="inline-block pixel-border-sm px-4 py-2 mb-4"
-              style={{ backgroundColor: "var(--color-pixel-yellow)" }}
-            >
-              <span className="font-bold text-sm uppercase">🍪 Legal</span>
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-6">
+              <Cookie className="w-6 h-6" />
             </div>
-            <h1
-              className="pixel-title text-4xl md:text-5xl mb-4"
-              style={{ color: "var(--color-pixel-black)" }}
-            >
-              COOKIE POLICY
+            <h1 className="text-4xl font-bold tracking-tight text-foreground mb-4">
+              Cookie Policy
             </h1>
-            <p className="text-sm font-medium" style={{ color: "#666" }}>
+            <p className="text-muted-foreground">
               Last updated: {new Date().toLocaleDateString("en-US")}
             </p>
           </div>
 
-          {/* Content - 像素风格 */}
+          {/* Content */}
           <div className="space-y-6">
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                WHAT ARE COOKIES?
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                What are Cookies?
               </h2>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: "#454545" }}
-              >
+              <p className="text-muted-foreground leading-relaxed">
                 Cookies are small text files stored on your device when you
                 visit a website. They are widely used to make websites work or
                 work more efficiently, as well as to provide information to the
@@ -69,20 +50,11 @@ export default function CookiesPage() {
               </p>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                HOW WE USE COOKIES
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                How We Use Cookies
               </h2>
-              <div
-                className="text-sm leading-relaxed space-y-4"
-                style={{ color: "#454545" }}
-              >
+              <div className="text-muted-foreground leading-relaxed space-y-4">
                 <p>We use Cookies to:</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>Keep you logged in</li>
@@ -94,62 +66,35 @@ export default function CookiesPage() {
               </div>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                TYPES OF COOKIES
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                Types of Cookies
               </h2>
-              <div
-                className="text-sm leading-relaxed space-y-6"
-                style={{ color: "#454545" }}
-              >
-                <div
-                  className="pixel-border-sm p-4"
-                  style={{ backgroundColor: "var(--color-pixel-cream)" }}
-                >
-                  <h3
-                    className="font-bold mb-2"
-                    style={{ color: "var(--color-pixel-black)" }}
-                  >
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
+                  <h3 className="font-semibold text-foreground mb-2">
                     Essential Cookies
                   </h3>
-                  <p>
+                  <p className="text-sm text-muted-foreground">
                     These Cookies are necessary for the basic functioning of the
                     website, including user authentication and security
                     features.
                   </p>
                 </div>
-                <div
-                  className="pixel-border-sm p-4"
-                  style={{ backgroundColor: "var(--color-pixel-cream)" }}
-                >
-                  <h3
-                    className="font-bold mb-2"
-                    style={{ color: "var(--color-pixel-black)" }}
-                  >
+                <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
+                  <h3 className="font-semibold text-foreground mb-2">
                     Functional Cookies
                   </h3>
-                  <p>
+                  <p className="text-sm text-muted-foreground">
                     These Cookies allow the website to remember your choices and
                     provide enhanced personalized features.
                   </p>
                 </div>
-                <div
-                  className="pixel-border-sm p-4"
-                  style={{ backgroundColor: "var(--color-pixel-cream)" }}
-                >
-                  <h3
-                    className="font-bold mb-2"
-                    style={{ color: "var(--color-pixel-black)" }}
-                  >
+                <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
+                  <h3 className="font-semibold text-foreground mb-2">
                     Analytics Cookies
                   </h3>
-                  <p>
+                  <p className="text-sm text-muted-foreground">
                     These Cookies help us understand how visitors interact with
                     the website by collecting and reporting information
                     anonymously.
@@ -158,20 +103,11 @@ export default function CookiesPage() {
               </div>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                MANAGING COOKIES
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                Managing Cookies
               </h2>
-              <div
-                className="text-sm leading-relaxed space-y-4"
-                style={{ color: "#454545" }}
-              >
+              <div className="text-muted-foreground leading-relaxed space-y-4">
                 <p>You can control and manage Cookies in the following ways:</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>Delete or block Cookies through browser settings</li>
@@ -179,35 +115,23 @@ export default function CookiesPage() {
                   <li>Use browser's privacy mode</li>
                   <li>Use third-party Cookie management tools</li>
                 </ul>
-                <p
-                  className="mt-4 font-medium"
-                  style={{ color: "var(--color-pixel-coral)" }}
-                >
+                <p className="mt-4 text-sm font-medium text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 p-4 rounded-lg border border-amber-100 dark:border-amber-900/50">
                   Please note that disabling certain Cookies may affect the
                   functionality of the website.
                 </p>
               </div>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                CONTACT US
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                Contact Us
               </h2>
-              <div
-                className="text-sm leading-relaxed"
-                style={{ color: "#454545" }}
-              >
+              <div className="text-muted-foreground leading-relaxed">
                 <p>
                   If you have any questions about our Cookie Policy, please
                   contact us:
                 </p>
-                <p className="mt-4 font-bold">Email: support@mdzz.uk</p>
+                <p className="mt-4 font-medium text-foreground">Email: support@mdzz.uk</p>
               </div>
             </section>
           </div>

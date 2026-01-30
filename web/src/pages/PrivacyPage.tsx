@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import SEO from "@/components/SEO";
 
 export default function PrivacyPage() {
@@ -10,58 +10,39 @@ export default function PrivacyPage() {
         description="Learn how MDZZ Toolbox protects your privacy. All image processing is done locally in your browser - we never upload or store your files."
         canonicalUrl="/privacy"
       />
-      <div
-        className="min-h-screen pt-[66px]"
-        style={{ backgroundColor: "var(--color-pixel-cream)" }}
-      >
-        <div className="max-w-[800px] mx-auto px-4 py-12">
-          {/* Back Button - 像素风格 */}
-          <div className="mb-8">
+      <div className="min-h-screen pt-[66px] pb-20 bg-background">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          {/* Back Button */}
+          <div className="mb-8 pt-8">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 pixel-border-sm px-4 py-2 font-bold text-sm uppercase hover:translate-x-1 hover:translate-y-1 transition-transform"
-              style={{ backgroundColor: "var(--color-pixel-mint)" }}
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Link>
           </div>
 
-          {/* Page Title - 像素风格 */}
+          {/* Page Title */}
           <div className="text-center mb-12">
-            <div
-              className="inline-block pixel-border-sm px-4 py-2 mb-4"
-              style={{ backgroundColor: "var(--color-pixel-teal)" }}
-            >
-              <span className="font-bold text-sm uppercase">🔒 Legal</span>
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-6">
+              <ShieldCheck className="w-6 h-6" />
             </div>
-            <h1
-              className="pixel-title text-4xl md:text-5xl mb-4"
-              style={{ color: "var(--color-pixel-black)" }}
-            >
-              PRIVACY POLICY
+            <h1 className="text-4xl font-bold tracking-tight text-foreground mb-4">
+              Privacy Policy
             </h1>
-            <p className="text-sm font-medium" style={{ color: "#666" }}>
+            <p className="text-muted-foreground">
               Last updated: {new Date().toLocaleDateString("en-US")}
             </p>
           </div>
 
-          {/* Content - 像素风格 */}
+          {/* Content */}
           <div className="space-y-6">
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                1. INFORMATION COLLECTION
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                1. Information Collection
               </h2>
-              <div
-                className="text-sm leading-relaxed space-y-4"
-                style={{ color: "#454545" }}
-              >
+              <div className="text-muted-foreground leading-relaxed space-y-4">
                 <p>
                   We collect information you provide when using our services,
                   including but not limited to:
@@ -74,20 +55,11 @@ export default function PrivacyPage() {
               </div>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                2. INFORMATION USAGE
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                2. Information Usage
               </h2>
-              <div
-                className="text-sm leading-relaxed space-y-4"
-                style={{ color: "#454545" }}
-              >
+              <div className="text-muted-foreground leading-relaxed space-y-4">
                 <p>We use the collected information to:</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>Provide and improve our services</li>
@@ -98,20 +70,11 @@ export default function PrivacyPage() {
               </div>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                3. INFORMATION PROTECTION
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                3. Information Protection
               </h2>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: "#454545" }}
-              >
+              <p className="text-muted-foreground leading-relaxed">
                 We employ industry-standard security measures to protect your
                 personal information, including encrypted storage, access
                 control, and regular security audits. We do not sell, trade, or
@@ -119,20 +82,11 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                4. COOKIE USAGE
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                4. Cookie Usage
               </h2>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: "#454545" }}
-              >
+              <p className="text-muted-foreground leading-relaxed">
                 We use Cookies and similar technologies to improve user
                 experience, analyze website usage, and provide personalized
                 content. You can control the use of Cookies through your browser
@@ -140,20 +94,11 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                5. YOUR RIGHTS
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                5. Your Rights
               </h2>
-              <div
-                className="text-sm leading-relaxed space-y-4"
-                style={{ color: "#454545" }}
-              >
+              <div className="text-muted-foreground leading-relaxed space-y-4">
                 <p>You have the right to:</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>Access and update your personal information</li>
@@ -164,25 +109,16 @@ export default function PrivacyPage() {
               </div>
             </section>
 
-            <section
-              className="pixel-card p-6"
-              style={{ backgroundColor: "white" }}
-            >
-              <h2
-                className="pixel-title text-xl mb-4"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                6. CONTACT US
+            <section className="modern-card p-8">
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                6. Contact Us
               </h2>
-              <div
-                className="text-sm leading-relaxed"
-                style={{ color: "#454545" }}
-              >
+              <div className="text-muted-foreground leading-relaxed">
                 <p>
                   If you have any questions about this Privacy Policy or need to
                   exercise your rights, please contact us via:
                 </p>
-                <p className="mt-4 font-bold">Email: support@mdzz.uk</p>
+                <p className="mt-4 font-medium text-foreground">Email: support@mdzz.uk</p>
               </div>
             </section>
           </div>
