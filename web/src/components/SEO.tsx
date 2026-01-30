@@ -12,8 +12,8 @@ interface SEOProps {
 }
 
 const SITE_NAME = "MDZZ Toolbox";
-const DEFAULT_OG_IMAGE = "/og-image.png";
-const BASE_URL = "https://mdzz.uk"; // 替换为实际域名
+const DEFAULT_OG_IMAGE = "/og-image.svg";
+const BASE_URL = "https://mdzz.uk";
 
 export const SEO: React.FC<SEOProps> = ({
   title,
