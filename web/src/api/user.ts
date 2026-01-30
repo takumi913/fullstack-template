@@ -5,6 +5,9 @@ import type { ApiResponse } from "../lib/client";
 // 登录类型枚举
 export type LoginType = "local" | "google";
 
+// 用户角色枚举
+export type UserRole = "user" | "admin";
+
 // 用户信息接口
 export interface User {
   id: string;
@@ -12,6 +15,7 @@ export interface User {
   email: string;
   avatar_url: string;
   login_type: LoginType;
+  role: UserRole;
   bio: string;
   created_at?: string;
   updated_at?: string;

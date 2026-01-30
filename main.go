@@ -31,7 +31,15 @@ func main() {
 	}
 
 	// 执行数据库迁移
-	if err := database.AutoMigrate(&model.User{}); err != nil {
+	if err := database.AutoMigrate(
+		&model.User{},
+		&model.Wallet{},
+		&model.Transaction{},
+		&model.Payment{},
+		&model.AITask{},
+		&model.AIProvider{},
+		&model.AIModel{},
+	); err != nil {
 		log.Fatal("数据库迁移失败:", err)
 	}
 
@@ -39,6 +47,20 @@ func main() {
 	userRepo := repo.NewUserRepo()
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
+
+	walletRepo := repo.NewWalletRepo()
+	stripeService := service.NewStripeService()
+	walletService := service.NewWalletService(walletRepo, userRepo, stripeService)
+	walletHandler := handler.NewWalletHandler(walletService)
+
+	aiTaskRepo := repo.NewAITaskRepo()
+	replicateService := service.NewReplicateService(aiTaskRepo, walletService)
+	aiHandler := handler.NewAIHandler(replicateService)
+
+	adminRepo := repo.NewAdminRepo()
+	aiProviderRepo := repo.NewAIProviderRepo()
+	adminService := service.NewAdminService(adminRepo, aiProviderRepo)
+	adminHandler := handler.NewAdminHandler(adminService)
 
 	// 创建Echo实例
 	e := echo.New()
@@ -81,7 +103,7 @@ func main() {
 	}))
 
 	// 设置API路由
-	api.SetupRoutes(e, userHandler)
+	api.SetupRoutes(e, userHandler, walletHandler, aiHandler, adminHandler)
 
 	// 设置静态文件服务
 	setupStaticFiles(e)

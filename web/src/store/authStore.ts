@@ -1,6 +1,7 @@
 // 用户认证状态管理
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { onUnauthorized } from "@/lib/auth-events";
 import { userApi } from "@/api";
 import type { User } from "@/api";
 
@@ -56,3 +57,8 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// 注册 401 未授权回调
+onUnauthorized(() => {
+  useAuthStore.getState().clearAuth();
+});

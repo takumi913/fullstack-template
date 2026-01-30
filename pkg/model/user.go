@@ -17,6 +17,7 @@ type User struct {
 	AvatarURL string         `json:"avatar_url" gorm:"size:500;comment:用户头像URL"`
 	GoogleID  *string        `json:"-" gorm:"uniqueIndex;size:100;comment:Google用户ID"`
 	LoginType LoginType      `json:"login_type" gorm:"type:varchar(20);not null;default:'local';comment:登录类型"`
+	Role      UserRole       `json:"role" gorm:"type:varchar(20);not null;default:'user';comment:用户角色"`
 	Bio       string         `json:"bio" gorm:"type:text"`
 	IsBanned  bool           `json:"is_banned" gorm:"default:false;comment:用户是否被封禁"`
 	BannedAt  *time.Time     `json:"banned_at,omitempty" gorm:"comment:封禁时间"`
@@ -32,6 +33,14 @@ type LoginType string
 const (
 	LoginTypeLocal  LoginType = "local"  // 本地注册登录
 	LoginTypeGoogle LoginType = "google" // Google第三方登录
+)
+
+// UserRole 用户角色枚举.
+type UserRole string
+
+const (
+	UserRoleUser  UserRole = "user"  // 普通用户
+	UserRoleAdmin UserRole = "admin" // 管理员
 )
 
 // TableName 指定表名.
@@ -59,6 +68,7 @@ type UserResponse struct {
 	Email     string    `json:"email"`
 	AvatarURL string    `json:"avatar_url"`
 	LoginType LoginType `json:"login_type"`
+	Role      UserRole  `json:"role"`
 	Bio       string    `json:"bio"`
 }
 
@@ -81,6 +91,7 @@ func (u *User) ToResponse() UserResponse {
 		Email:     u.Email,
 		AvatarURL: u.AvatarURL,
 		LoginType: u.LoginType,
+		Role:      u.Role,
 		Bio:       u.Bio,
 	}
 }

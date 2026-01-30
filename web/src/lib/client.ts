@@ -1,6 +1,7 @@
 // HTTP客户端配置，基于axios
 import axios from "axios";
 import type { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+import { triggerUnauthorized } from "./auth-events";
 
 // API基础URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
@@ -53,11 +54,8 @@ client.interceptors.response.use(
           break;
         case 401:
           message = "未授权，请重新登录";
-          // 处理登录过期逻辑 - 不再需要清除token，因为使用了cookie
-          // 动态导入避免循环依赖
-          import("../store/authStore").then(({ useAuthStore }) => {
-            useAuthStore.getState().clearAuth();
-          });
+          // 触发未授权事件，由 authStore 处理清除逻辑
+          triggerUnauthorized();
           break;
         case 403:
           message = "权限不足";
