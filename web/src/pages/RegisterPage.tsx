@@ -148,40 +148,25 @@ export default function RegisterPage() {
         canonicalUrl="/register"
         noindex={true}
       />
-      <div
-        className="min-h-screen pt-[66px] flex items-center justify-center"
-        style={{ backgroundColor: "var(--color-pixel-cream)" }}
-      >
+      <div className="min-h-screen pt-[66px] flex items-center justify-center bg-background">
         <div className="w-full max-w-md mx-4">
-          <div className="pixel-card p-8" style={{ backgroundColor: "white" }}>
-            {/* Header - 像素风格 */}
+          <div className="modern-card p-8 bg-card">
+            {/* Header */}
             <div className="text-center mb-8">
-              <div
-                className="inline-block pixel-border-sm px-4 py-2 mb-4"
-                style={{ backgroundColor: "var(--color-pixel-mint)" }}
-              >
-                <span className="font-bold text-sm uppercase">
-                  ✨ New Here?
-                </span>
-              </div>
-              <h1
-                className="pixel-title text-3xl mb-2"
-                style={{ color: "var(--color-pixel-black)" }}
-              >
-                CREATE ACCOUNT
+              <h1 className="text-2xl font-bold tracking-tight text-foreground mb-2">
+                Create an account
               </h1>
-              <p className="text-sm" style={{ color: "#666" }}>
-                Sign up to get started
+              <p className="text-sm text-muted-foreground">
+                Enter your email below to create your account
               </p>
             </div>
 
-            {/* Form - 像素风格 */}
+            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <label
                   htmlFor="username"
-                  className="block text-sm font-bold uppercase mb-2"
-                  style={{ color: "var(--color-pixel-black)" }}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Username
                 </label>
@@ -194,20 +179,14 @@ export default function RegisterPage() {
                   onChange={handleInputChange}
                   required
                   disabled={loading}
-                  className="w-full px-4 py-3 text-sm transition-all focus:outline-none focus:translate-x-0.5 focus:translate-y-0.5"
-                  style={{
-                    backgroundColor: "var(--color-pixel-cream)",
-                    border: "3px solid var(--color-pixel-black)",
-                    boxShadow: "3px 3px 0px var(--color-pixel-black)",
-                  }}
+                  className="modern-input"
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <label
                   htmlFor="email"
-                  className="block text-sm font-bold uppercase mb-2"
-                  style={{ color: "var(--color-pixel-black)" }}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Email
                 </label>
@@ -215,25 +194,19 @@ export default function RegisterPage() {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="name@example.com"
                   value={formData.email}
                   onChange={handleInputChange}
                   required
                   disabled={loading}
-                  className="w-full px-4 py-3 text-sm transition-all focus:outline-none focus:translate-x-0.5 focus:translate-y-0.5"
-                  style={{
-                    backgroundColor: "var(--color-pixel-cream)",
-                    border: "3px solid var(--color-pixel-black)",
-                    boxShadow: "3px 3px 0px var(--color-pixel-black)",
-                  }}
+                  className="modern-input"
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <label
                   htmlFor="password"
-                  className="block text-sm font-bold uppercase mb-2"
-                  style={{ color: "var(--color-pixel-black)" }}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Password
                 </label>
@@ -246,20 +219,14 @@ export default function RegisterPage() {
                   onChange={handleInputChange}
                   required
                   disabled={loading}
-                  className="w-full px-4 py-3 text-sm transition-all focus:outline-none focus:translate-x-0.5 focus:translate-y-0.5"
-                  style={{
-                    backgroundColor: "var(--color-pixel-cream)",
-                    border: "3px solid var(--color-pixel-black)",
-                    boxShadow: "3px 3px 0px var(--color-pixel-black)",
-                  }}
+                  className="modern-input"
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-sm font-bold uppercase mb-2"
-                  style={{ color: "var(--color-pixel-black)" }}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Confirm Password
                 </label>
@@ -271,23 +238,12 @@ export default function RegisterPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   disabled={loading}
-                  className="w-full px-4 py-3 text-sm transition-all focus:outline-none focus:translate-x-0.5 focus:translate-y-0.5"
-                  style={{
-                    backgroundColor: "var(--color-pixel-cream)",
-                    border: "3px solid var(--color-pixel-black)",
-                    boxShadow: "3px 3px 0px var(--color-pixel-black)",
-                  }}
+                  className="modern-input"
                 />
               </div>
 
               {error && (
-                <div
-                  className="text-sm font-bold p-3 pixel-border-sm"
-                  style={{
-                    backgroundColor: "var(--color-pixel-coral)",
-                    color: "white",
-                  }}
-                >
+                <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium">
                   {error}
                 </div>
               )}
@@ -295,29 +251,19 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 font-bold uppercase text-sm transition-all hover:translate-x-1 hover:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed pixel-border-sm"
-                style={{
-                  backgroundColor: "var(--color-pixel-teal)",
-                  color: "white",
-                }}
+                className="w-full modern-btn-primary"
               >
-                {loading ? "Creating account..." : "Create Account →"}
+                {loading ? "Creating account..." : "Create Account"}
               </button>
             </form>
 
-            {/* Divider - 像素风格 */}
+            {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div
-                  className="w-full"
-                  style={{ borderTop: "2px dashed var(--color-pixel-black)" }}
-                ></div>
+                <span className="w-full border-t border-border" />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span
-                  className="px-4 font-bold uppercase text-xs"
-                  style={{ backgroundColor: "white", color: "#666" }}
-                >
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
                   Or continue with
                 </span>
               </div>
@@ -326,13 +272,12 @@ export default function RegisterPage() {
             {/* Google Login */}
             <div className="flex justify-center mb-6" ref={googleButtonRef} />
 
-            {/* Login Link - 像素风格 */}
-            <div className="text-center text-sm">
-              <span style={{ color: "#666" }}>Already have an account? </span>
+            {/* Login Link */}
+            <div className="text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
               <Link
                 to="/login"
-                className="font-bold uppercase hover:underline transition-all"
-                style={{ color: "var(--color-pixel-coral)" }}
+                className="font-medium text-primary hover:underline"
               >
                 Sign in
               </Link>
