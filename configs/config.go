@@ -16,6 +16,10 @@ type Config struct {
 	Database DatabaseConfig `json:"database"`
 	// Session配置
 	Session SessionConfig `json:"session"`
+	// Stripe配置
+	Stripe StripeConfig `json:"stripe"`
+	// Replicate配置
+	Replicate ReplicateConfig `json:"replicate"`
 }
 
 // ServerConfig 服务器配置.
@@ -40,6 +44,24 @@ type DatabaseConfig struct {
 type SessionConfig struct {
 	Secret     string `json:"secret"`      // Session密钥
 	ExpireHour int    `json:"expire_hour"` // 过期时间(小时)
+}
+
+// StripeConfig Stripe支付配置.
+type StripeConfig struct {
+	SecretKey     string `json:"secret_key"`     // Stripe Secret Key
+	WebhookSecret string `json:"webhook_secret"` // Webhook签名密钥
+	SuccessURL    string `json:"success_url"`    // 支付成功跳转URL
+	CancelURL     string `json:"cancel_url"`     // 支付取消跳转URL
+}
+
+// ReplicateConfig Replicate AI配置.
+type ReplicateConfig struct {
+	APIToken            string `json:"api_token"`       // Replicate API Token
+	TranslateModel      string `json:"translate_model"` // 图片翻译模型
+	WatermarkModel      string `json:"watermark_model"` // 水印去除模型
+	WebhookURL          string `json:"webhook_url"`     // Webhook回调URL
+	TranslateCostPerUse int    `json:"translate_cost"`  // 翻译每次消耗积分
+	WatermarkCostPerUse int    `json:"watermark_cost"`  // 水印去除每次消耗积分
 }
 
 // AppConfig 全局配置实例.
@@ -71,6 +93,20 @@ func Init() error {
 		Session: SessionConfig{
 			Secret:     getEnv("SESSION_SECRET", "your-secret-key"),
 			ExpireHour: getEnvAsInt("SESSION_EXPIRE_HOUR", 24),
+		},
+		Stripe: StripeConfig{
+			SecretKey:     getEnv("STRIPE_SECRET_KEY", ""),
+			WebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET", ""),
+			SuccessURL:    getEnv("STRIPE_SUCCESS_URL", "http://localhost:5173/dashboard?payment=success"),
+			CancelURL:     getEnv("STRIPE_CANCEL_URL", "http://localhost:5173/dashboard?payment=cancelled"),
+		},
+		Replicate: ReplicateConfig{
+			APIToken:            getEnv("REPLICATE_API_TOKEN", ""),
+			TranslateModel:      getEnv("REPLICATE_TRANSLATE_MODEL", "tencentarc/photomaker:ddfc2b08d209f9fa8c1uj"),
+			WatermarkModel:      getEnv("REPLICATE_WATERMARK_MODEL", "sczhou/codeformer:7de2ea26c616d5bf2245ad0d5e24f0ff9a6204578a5c876db53142edd9d2cd56"),
+			WebhookURL:          getEnv("REPLICATE_WEBHOOK_URL", ""),
+			TranslateCostPerUse: getEnvAsInt("REPLICATE_TRANSLATE_COST", 10),
+			WatermarkCostPerUse: getEnvAsInt("REPLICATE_WATERMARK_COST", 5),
 		},
 	}
 
