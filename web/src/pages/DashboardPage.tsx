@@ -1,9 +1,21 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
-import { User, Settings, LogOut } from "lucide-react";
+import { useWalletStore } from "@/store/walletStore";
+import { User, LogOut, Plus, Image, Languages, ArrowRight } from "lucide-react";
 import SEO from "@/components/SEO";
+import { WalletCard, WalletStats, RecentTransactions, TopupModal } from "@/components/wallet";
 
 export default function DashboardPage() {
   const { user, logout } = useAuthStore();
+  const { fetchBalance, fetchTransactions, fetchPricing } = useWalletStore();
+  const [isTopupModalOpen, setIsTopupModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchBalance();
+    fetchTransactions();
+    fetchPricing();
+  }, [fetchBalance, fetchTransactions, fetchPricing]);
 
   const handleLogout = () => {
     logout();
@@ -13,186 +25,146 @@ export default function DashboardPage() {
     <>
       <SEO
         title="Dashboard"
-        description="Your MDZZ Toolbox dashboard. Manage your account and access all tools."
+        description="Your MDZZ dashboard. Manage your account, credits, and access all AI tools."
         canonicalUrl="/dashboard"
         noindex={true}
       />
-      <div className="min-h-screen bg-[#fafafa] pt-[66px]">
-        <div className="max-w-[1200px] mx-auto px-4 py-12">
-          {/* Welcome Section */}
-          <div className="bg-white rounded-2xl shadow-sm p-8 mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-[#1e1e1e] mb-2">
-                  Welcome back, {user?.username || "User"}!
-                </h1>
-                <p className="text-[#666]">
-                  Here's what's happening with your account today.
-                </p>
-              </div>
-              <div className="hidden md:flex items-center gap-4">
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-[#666] hover:text-[#1e1e1e] border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </button>
-              </div>
+
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Welcome back, {user?.username || "User"}!
+              </h1>
+              <p className="text-gray-500 mt-1">
+                Manage your credits and access AI tools
+              </p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{
-                    background:
-                      "linear-gradient(225deg, #f37e8d 0%, #e352f5 48%, #a3ccfb 100%)",
-                  }}
-                >
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-[#666] text-sm">Account Status</p>
-                  <p className="text-[#1e1e1e] text-xl font-semibold">Active</p>
-                </div>
-              </div>
-            </div>
+          {/* Main Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column - Wallet */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Wallet Card */}
+              <WalletCard />
 
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                  <svg
-                    className="w-6 h-6 text-green-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-[#666] text-sm">Images Processed</p>
-                  <p className="text-[#1e1e1e] text-xl font-semibold">0</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <Settings className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-[#666] text-sm">Plan</p>
-                  <p className="text-[#1e1e1e] text-xl font-semibold">Free</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* User Info Card */}
-          <div className="bg-white rounded-2xl shadow-sm p-8">
-            <h2 className="text-xl font-semibold text-[#1e1e1e] mb-6">
-              Account Information
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                <span className="text-[#666]">Username</span>
-                <span className="text-[#1e1e1e] font-medium">
-                  {user?.username || "-"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                <span className="text-[#666]">Email</span>
-                <span className="text-[#1e1e1e] font-medium">
-                  {user?.email || "-"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-[#666]">Member Since</span>
-                <span className="text-[#1e1e1e] font-medium">
-                  {user?.created_at
-                    ? new Date(user.created_at).toLocaleDateString()
-                    : "-"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold text-[#1e1e1e] mb-6">
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a
-                href="/"
-                className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow group"
+              {/* Add Credits Button */}
+              <button
+                onClick={() => setIsTopupModalOpen(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-dashed border-gray-200 rounded-xl text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
               >
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{
-                      background:
-                        "linear-gradient(225deg, #f37e8d 0%, #e352f5 48%, #a3ccfb 100%)",
-                    }}
-                  >
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-[#1e1e1e] font-semibold group-hover:text-[#7b4aff] transition-colors">
-                      Remove Watermark
-                    </p>
-                    <p className="text-[#666] text-sm">
-                      Start removing watermarks from your images
-                    </p>
-                  </div>
-                </div>
-              </a>
+                <Plus className="w-5 h-5" />
+                Add Credits
+              </button>
 
-              <div className="bg-white rounded-2xl shadow-sm p-6 opacity-60">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
+              {/* Stats */}
+              <WalletStats />
+            </div>
+
+            {/* Right Column - Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Quick Actions */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  AI Tools
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Link
+                    to="/remove-watermark"
+                    className="group p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white">
+                        <Image className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                            Remove Watermark
+                          </h3>
+                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition-colors" />
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Remove watermarks, logos, and unwanted objects
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/translate-image"
+                    className="group p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center text-white">
+                        <Languages className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                            Translate Image
+                          </h3>
+                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Translate text in images, manga, and comics
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Recent Transactions */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Recent Transactions
+                  </h2>
+                </div>
+                <RecentTransactions />
+              </div>
+
+              {/* Account Info */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  Account Information
+                </h2>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                    <span className="text-gray-500">Username</span>
+                    <span className="font-medium text-gray-900">
+                      {user?.username || "-"}
+                    </span>
                   </div>
-                  <div>
-                    <p className="text-[#1e1e1e] font-semibold">
-                      More Features
-                    </p>
-                    <p className="text-[#666] text-sm">Coming soon...</p>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                    <span className="text-gray-500">Email</span>
+                    <span className="font-medium text-gray-900">
+                      {user?.email || "-"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-50">
+                    <span className="text-gray-500">Login Type</span>
+                    <span className="font-medium text-gray-900 capitalize">
+                      {user?.login_type || "-"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-gray-500">Account Status</span>
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                      <User className="w-3 h-3" />
+                      Active
+                    </span>
                   </div>
                 </div>
               </div>
@@ -200,6 +172,12 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Topup Modal */}
+      <TopupModal
+        isOpen={isTopupModalOpen}
+        onClose={() => setIsTopupModalOpen(false)}
+      />
     </>
   );
 }

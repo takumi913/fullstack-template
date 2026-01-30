@@ -6,7 +6,7 @@ import {
   Sparkles,
   Zap,
   Shield,
-  Clock,
+  Clock
 } from "lucide-react";
 import { memo } from "react";
 import SEO from "@/components/SEO";
@@ -26,66 +26,66 @@ const homeStructuredData = {
   },
 };
 
-// 像素风格工具卡片组件
+// 工具卡片组件
 const ToolCard = memo(function ToolCard({
   icon: Icon,
   title,
   description,
   path,
   isNew,
-  color,
 }: {
   icon: React.ElementType;
   title: string;
   description: string;
   path: string;
   isNew?: boolean;
-  color: string;
 }) {
   return (
-    <Link to={path} className="pixel-card p-6 block">
-      <div className="flex items-start gap-4">
-        <div className={`pixel-icon-box-md ${color}`}>
-          <Icon className="w-7 h-7 text-pixel-black" strokeWidth={2.5} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <h3 className="pixel-title text-lg text-pixel-black">{title}</h3>
-            {isNew && <span className="pixel-tag-new">New!</span>}
+    <Link to={path} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 block h-full group relative overflow-hidden">
+      <div className="flex flex-col h-full">
+        <div className="flex items-start justify-between mb-4">
+          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center group-hover:bg-sky-100 transition-colors">
+            <Icon className="w-6 h-6" strokeWidth={2} />
           </div>
-          <p className="text-sm text-gray-600 font-medium leading-relaxed">
+          {isNew && (
+            <span className="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-600 text-xs font-medium">
+              New
+            </span>
+          )}
+        </div>
+
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-sky-600 transition-colors">{title}</h3>
+          <p className="text-gray-500 text-sm leading-relaxed">
             {description}
           </p>
         </div>
-        <div className="pixel-icon-box-sm bg-pixel-yellow shrink-0 group-hover:bg-pixel-coral transition-colors">
-          <ArrowRight className="w-5 h-5 text-pixel-black" strokeWidth={2.5} />
+
+        <div className="mt-4 flex items-center text-sm font-medium text-sky-600 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+          Try it now <ArrowRight className="w-4 h-4 ml-1" />
         </div>
       </div>
     </Link>
   );
 });
 
-// 像素风格特性卡片
+// 特性卡片
 const FeatureItem = memo(function FeatureItem({
   icon: Icon,
   title,
   description,
-  color,
 }: {
   icon: React.ElementType;
   title: string;
   description: string;
-  color: string;
 }) {
   return (
-    <div className="text-center group">
-      <div
-        className={`pixel-icon-box-lg ${color} mx-auto mb-4 group-hover:translate-y-[-4px] transition-transform`}
-      >
-        <Icon className="w-8 h-8 text-pixel-black" strokeWidth={2.5} />
+    <div className="flex flex-col items-center text-center p-4">
+      <div className="mb-4 w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-sky-600">
+        <Icon className="w-6 h-6" strokeWidth={2} />
       </div>
-      <h3 className="pixel-title text-base text-pixel-black mb-2">{title}</h3>
-      <p className="text-sm text-gray-600 font-medium">{description}</p>
+      <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
+      <p className="text-sm text-gray-500 leading-relaxed max-w-xs">{description}</p>
     </div>
   );
 });
@@ -94,21 +94,19 @@ const FeatureItem = memo(function FeatureItem({
 const tools = [
   {
     icon: ImageOff,
-    title: "Watermark Remover",
+    title: "Remove Watermark",
     description:
-      "Remove watermarks, logos, text, and unwanted objects from images with AI technology.",
-    path: "/tools/watermark-remover",
+      "Remove watermarks, logos, text, and unwanted objects from images using advanced AI technology.",
+    path: "/remove-watermark",
     isNew: true,
-    color: "bg-pixel-mint",
   },
   {
     icon: FileImage,
-    title: "Image Converter",
+    title: "Translate Image",
     description:
-      "Convert images between JPG, PNG, WebP, GIF, BMP, and more formats instantly.",
-    path: "/tools/image-converter",
+      "Translate text within images while preserving the original visual layout and style.",
+    path: "/translate-image",
     isNew: true,
-    color: "bg-pixel-sky",
   },
 ];
 
@@ -116,27 +114,23 @@ const features = [
   {
     icon: Sparkles,
     title: "100% Free",
-    description: "All tools are completely free to use with no hidden costs.",
-    color: "bg-pixel-yellow",
+    description: "Completely free access to all tools. No hidden costs or subscriptions.",
   },
   {
     icon: Shield,
-    title: "100% Local",
+    title: "Privacy First",
     description:
-      "All processing is done locally in your browser for maximum privacy.",
-    color: "bg-pixel-mint",
+      "All processing happens locally in your browser. Your files never leave your device.",
   },
   {
     icon: Zap,
     title: "No Registration",
-    description: "Use our tools instantly without creating an account.",
-    color: "bg-pixel-coral",
+    description: "Start using our tools instantly. No account creation or login required.",
   },
   {
     icon: Clock,
-    title: "Fast & Secure",
-    description: "Quick processing with your privacy always protected.",
-    color: "bg-pixel-lavender",
+    title: "Lightning Fast",
+    description: "Optimized performance ensures your tasks are completed in seconds.",
   },
 ];
 
@@ -150,168 +144,125 @@ export default function HomePage() {
         canonicalUrl="/"
         structuredData={homeStructuredData}
       />
-      <div className="min-h-screen pixel-bg-cream pixel-bg-grid pt-[70px]">
+      <div className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="py-16 md:py-20 relative overflow-hidden">
-          {/* Floating pixel decorations */}
-          <div className="absolute top-12 left-8 w-4 h-4 bg-pixel-yellow border-2 border-pixel-black pixel-float" />
-          <div className="absolute top-24 right-16 w-3 h-3 bg-pixel-coral border-2 border-pixel-black pixel-bounce" />
-          <div className="absolute bottom-16 left-1/4 w-3 h-3 bg-pixel-mint border-2 border-pixel-black" />
-          <div
-            className="absolute top-32 left-1/3 w-2 h-2 bg-pixel-lavender border-2 border-pixel-black pixel-float"
-            style={{ animationDelay: "1s" }}
-          />
+        <section className="relative overflow-hidden bg-gradient-to-b from-sky-50 to-white py-24 md:py-32">
+          {/* Decorative blurs */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-sky-100 rounded-full blur-3xl opacity-50" />
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-100 rounded-full blur-3xl opacity-50" />
+          </div>
 
-          <div className="max-w-[1200px] mx-auto px-4 text-center relative">
-            {/* Main Title */}
-            <div className="relative inline-block mb-8">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <span className="pixel-star text-pixel-yellow">✦</span>
-                <span className="pixel-tag-yellow">Free Online</span>
-                <span className="pixel-star text-pixel-coral">✦</span>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-black text-pixel-black uppercase tracking-tight leading-none">
-                Toolbox
-              </h1>
-              {/* Underline decoration */}
-              <div className="mt-3 mx-auto w-48 h-2 bg-pixel-coral border-2 border-pixel-black" />
+          <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-100 text-xs font-medium text-sky-700 mb-8">
+              <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+              Free Online Tools
             </div>
 
-            {/* Speech bubble description */}
-            <div className="max-w-2xl mx-auto mb-10">
-              <div className="pixel-bubble">
-                <p className="text-lg md:text-xl font-bold text-pixel-black">
-                  A collection of <span className="text-pixel-coral">free</span>
-                  , easy-to-use online tools for image processing.{" "}
-                  <span className="text-pixel-teal">
-                    No registration required!
-                  </span>
-                </p>
-              </div>
-            </div>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 mb-6">
+              Creative Tools for <br className="hidden md:block" />
+              <span className="text-sky-600">Everyone</span>
+            </h1>
 
-            {/* Feature tags */}
-            <div className="flex justify-center gap-3 flex-wrap">
-              <span className="pixel-tag-yellow">★ FREE</span>
-              <span className="pixel-tag-mint">★ FAST</span>
-              <span className="pixel-tag-lavender">★ SECURE</span>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+              A collection of free, privacy-focused online tools for your daily needs.
+              No registration required, just open and use.
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-4">
+              <a href="#tools" className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-xl transition-colors shadow-lg shadow-sky-200">
+                Explore Tools
+              </a>
+              <a href="https://github.com/mdzz-studio" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-xl border border-gray-200 transition-colors">
+                View on GitHub
+              </a>
             </div>
           </div>
         </section>
 
         {/* Tools Section */}
-        <section id="tools" className="py-16 relative">
-          <div className="max-w-[1200px] mx-auto px-4">
-            {/* Section Title */}
-            <div className="text-center mb-12">
-              <div className="inline-block pixel-border bg-pixel-coral px-6 py-3 -rotate-1 mb-4">
-                <h2 className="pixel-title text-2xl md:text-3xl text-white">
-                  Our Free Tools
-                </h2>
-              </div>
-              <p className="text-gray-600 font-medium max-w-xl mx-auto mt-6">
-                Choose from our collection of powerful tools designed to help
-                you with your multimedia needs.
+        <section id="tools" className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">Available Tools</h2>
+              <p className="text-gray-600 max-w-xl mx-auto">
+                Powerful utilities designed to simplify your workflow.
               </p>
             </div>
 
-            {/* Tool Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tools.map((tool, index) => (
                 <ToolCard key={index} {...tool} />
               ))}
+
+              {/* Coming Soon Card */}
+              <div className="p-6 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 opacity-70 flex flex-col items-center justify-center text-center min-h-[200px]">
+                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                  <Sparkles className="w-5 h-5 text-gray-400" />
+                </div>
+                <h3 className="font-semibold text-gray-500">More Coming Soon</h3>
+                <p className="text-sm text-gray-400 mt-1">We are building more tools</p>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section className="py-16 relative">
-          {/* Top stripe decoration */}
-          <div className="pixel-divider-decorated absolute top-0 left-0 right-0" />
-
-          <div className="max-w-[1200px] mx-auto px-4 pt-8">
-            <div className="text-center mb-12">
-              <div className="inline-block pixel-border bg-pixel-teal px-6 py-3 rotate-1">
-                <h2 className="pixel-title text-2xl md:text-3xl text-pixel-black">
-                  Why Choose Us?
-                </h2>
-              </div>
+        <section className="py-24 bg-sky-50/50">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">Why Use MDZZ Toolbox?</h2>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {features.map((feature, index) => (
                 <FeatureItem key={index} {...feature} />
               ))}
             </div>
           </div>
-
-          {/* Bottom stripe decoration */}
-          <div className="pixel-divider-decorated absolute bottom-0 left-0 right-0" />
         </section>
 
         {/* How It Works Section */}
-        <section className="py-20 relative">
-          <div className="max-w-[1200px] mx-auto px-4">
-            <div className="text-center mb-12">
-              <div className="inline-block pixel-border bg-pixel-lavender px-6 py-3 -rotate-1">
-                <h2 className="pixel-title text-2xl md:text-3xl text-pixel-black">
-                  How It Works
-                </h2>
-              </div>
+        <section className="py-24 bg-white">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">How It Works</h2>
+              <p className="text-gray-600">Simple steps to get your work done.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  num: "01",
-                  title: "Choose a Tool",
-                  desc: "Select the tool you need from our collection of free online utilities.",
-                  color: "bg-pixel-coral",
-                },
-                {
-                  num: "02",
-                  title: "Upload File",
-                  desc: "Upload your image or video file to start processing immediately.",
-                  color: "bg-pixel-yellow",
-                },
-                {
-                  num: "03",
-                  title: "Download",
-                  desc: "Download your processed file instantly. It's that simple!",
-                  color: "bg-pixel-mint",
-                },
-              ].map((step, index) => (
-                <div key={index} className="relative">
-                  {/* Connection line */}
-                  {index < 2 && (
-                    <div className="hidden md:block absolute top-10 -right-4 w-8">
-                      <div className="pixel-divider-dashed h-1" />
-                      <div
-                        className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 
-                      border-t-[6px] border-t-transparent 
-                      border-b-[6px] border-b-transparent 
-                      border-l-[8px] border-l-pixel-black"
-                      />
-                    </div>
-                  )}
+            <div className="relative">
+              {/* Connecting line for desktop */}
+              <div className="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-sky-100 -z-10 transform -translate-y-1/2" />
 
-                  <div className="pixel-card p-6 text-center relative pt-10">
-                    {/* Number badge */}
-                    <div
-                      className={`pixel-number ${step.color} absolute -top-5 left-1/2 -translate-x-1/2`}
-                    >
-                      {step.num}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                {[
+                  {
+                    step: "01",
+                    title: "Select Tool",
+                    desc: "Choose the tool that fits your needs from our collection.",
+                  },
+                  {
+                    step: "02",
+                    title: "Upload & Process",
+                    desc: "Upload your files. Processing happens locally on your device.",
+                  },
+                  {
+                    step: "03",
+                    title: "Download",
+                    desc: "Get your results instantly. Secure and fast.",
+                  },
+                ].map((item, index) => (
+                  <div key={index} className="flex flex-col items-center text-center bg-sky-50/50 md:bg-transparent p-6 md:p-0 rounded-2xl md:rounded-none">
+                    <div className="w-12 h-12 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-lg mb-6 shadow-lg shadow-sky-200 z-10">
+                      {item.step}
                     </div>
-
-                    <h3 className="pixel-title text-lg text-pixel-black mb-3 mt-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 font-medium">
-                      {step.desc}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+                      {item.desc}
                     </p>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </section>
