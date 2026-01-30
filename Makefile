@@ -1,19 +1,12 @@
 # Go + React 全栈项目 Makefile
 # 提供统一的项目管理命令
 
-.PHONY: help install lint lint-go lint-web build clean dev run docker-build docker-run postmortem-onboarding postmortem-check postmortem-accept postmortem-list
-
 # 默认目标
 help: ## 显示帮助信息
 	@echo "Go + React 全栈项目管理命令:"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v -E '^(postmortem|lint|build-go|build-web)' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""
-	@echo "示例:"
-	@echo "  make install    # 安装依赖"
-	@echo "  make lint       # 运行代码检查"
-	@echo "  make build      # 构建项目"
-	@echo "  make run        # 运行项目"
 
 # 安装依赖
 install: ## 安装项目依赖
@@ -106,18 +99,6 @@ docker-build: ## 构建 Docker 镜像
 	./scripts/build.sh
 	docker build -t go-react-template .
 
-docker-run: ## 运行 Docker 容器
-	@echo "🐳 运行 Docker 容器..."
-	docker run -p 8080:8080 --name go-react-template-container go-react-template
-
-docker-compose-up: ## 使用 docker-compose 启动
-	@echo "🐳 使用 docker-compose 启动..."
-	docker-compose up --build
-
-docker-compose-down: ## 停止 docker-compose 服务
-	@echo "🐳 停止 docker-compose 服务..."
-	docker-compose down
-
 # 工具安装
 install-tools: ## 安装开发工具
 	@echo "🔧 安装开发工具..."
@@ -143,10 +124,6 @@ check-tools: ## 检查开发工具是否安装
 	@printf "  %-15s " "Docker:"; docker --version 2>/dev/null | cut -d' ' -f3 | tr -d ',' || echo "❌ 未安装"
 	@printf "  %-15s " "docker-compose:"; docker-compose --version 2>/dev/null | cut -d' ' -f3 | tr -d ',' || echo "❌ 未安装"
 	@echo "\n💡 安装缺失工具: make install-tools"
-
-# 完整的 CI 流程
-ci: install lint test build ## 运行完整的 CI 流程
-	@echo "✅ CI 流程完成"
 
 # Postmortem 相关命令
 postmortem-onboarding: ## 分析历史 fix commits 生成 postmortem
