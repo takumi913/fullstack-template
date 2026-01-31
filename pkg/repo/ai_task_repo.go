@@ -12,7 +12,6 @@ import (
 type AITaskRepo interface {
 	Create(task *model.AITask) error
 	GetByID(id string) (*model.AITask, error)
-	GetByReplicateID(replicateID string) (*model.AITask, error)
 	Update(task *model.AITask) error
 	GetByUserID(userID string, page, pageSize int, taskType model.AITaskType, status model.AITaskStatus) ([]model.AITask, int64, error)
 }
@@ -39,17 +38,6 @@ func (r *aiTaskRepo) GetByID(id string) (*model.AITask, error) {
 	var task model.AITask
 
 	if err := r.db.Where("id = ?", id).First(&task).Error; err != nil {
-		return nil, err
-	}
-
-	return &task, nil
-}
-
-// GetByReplicateID 根据Replicate ID获取AI任务.
-func (r *aiTaskRepo) GetByReplicateID(replicateID string) (*model.AITask, error) {
-	var task model.AITask
-
-	if err := r.db.Where("replicate_id = ?", replicateID).First(&task).Error; err != nil {
 		return nil, err
 	}
 

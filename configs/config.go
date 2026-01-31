@@ -20,10 +20,10 @@ type Config struct {
 	Stripe StripeConfig `json:"stripe"`
 	// Creem配置
 	Creem CreemConfig `json:"creem"`
-	// Replicate配置
-	Replicate ReplicateConfig `json:"replicate"`
 	// Bltcy配置
 	Bltcy BltcyConfig `json:"bltcy"`
+	// Grok配置
+	Grok GrokConfig `json:"grok"`
 }
 
 // ServerConfig 服务器配置.
@@ -67,18 +67,15 @@ type CreemConfig struct {
 	TestMode      bool   `json:"test_mode"`      // 是否测试模式
 }
 
-// ReplicateConfig Replicate AI配置.
-type ReplicateConfig struct {
-	APIToken            string `json:"api_token"`       // Replicate API Token
-	TranslateModel      string `json:"translate_model"` // 图片翻译模型
-	WatermarkModel      string `json:"watermark_model"` // 水印去除模型
-	WebhookURL          string `json:"webhook_url"`     // Webhook回调URL
-	TranslateCostPerUse int    `json:"translate_cost"`  // 翻译每次消耗积分
-	WatermarkCostPerUse int    `json:"watermark_cost"`  // 水印去除每次消耗积分
-}
-
 // BltcyConfig Bltcy AI配置（OpenAI兼容）.
 type BltcyConfig struct {
+	APIKey  string `json:"api_key"`  // API Key
+	BaseURL string `json:"base_url"` // API Base URL
+	Model   string `json:"model"`    // 模型名称
+}
+
+// GrokConfig Grok AI配置（OpenAI兼容）.
+type GrokConfig struct {
 	APIKey  string `json:"api_key"`  // API Key
 	BaseURL string `json:"base_url"` // API Base URL
 	Model   string `json:"model"`    // 模型名称
@@ -127,18 +124,15 @@ func Init() error {
 			SuccessURL:    getEnv("CREEM_SUCCESS_URL", "http://localhost:5173/dashboard?payment=success"),
 			TestMode:      getEnv("CREEM_TEST_MODE", "true") == "true",
 		},
-		Replicate: ReplicateConfig{
-			APIToken:            getEnv("REPLICATE_API_TOKEN", ""),
-			TranslateModel:      getEnv("REPLICATE_TRANSLATE_MODEL", "tencentarc/photomaker:ddfc2b08d209f9fa8c1uj"),
-			WatermarkModel:      getEnv("REPLICATE_WATERMARK_MODEL", "sczhou/codeformer:7de2ea26c616d5bf2245ad0d5e24f0ff9a6204578a5c876db53142edd9d2cd56"),
-			WebhookURL:          getEnv("REPLICATE_WEBHOOK_URL", ""),
-			TranslateCostPerUse: getEnvAsInt("REPLICATE_TRANSLATE_COST", 10),
-			WatermarkCostPerUse: getEnvAsInt("REPLICATE_WATERMARK_COST", 5),
-		},
 		Bltcy: BltcyConfig{
 			APIKey:  getEnv("BLTCY_API_KEY", ""),
 			BaseURL: getEnv("BLTCY_BASE_URL", "https://api.bltcy.ai/v1"),
 			Model:   getEnv("BLTCY_MODEL", "nano-banana"),
+		},
+		Grok: GrokConfig{
+			APIKey:  getEnv("GROK_API_KEY", ""),
+			BaseURL: getEnv("GROK_BASE_URL", "https://gork2api.zeabur.app"),
+			Model:   getEnv("GROK_MODEL", "grok-4.1"),
 		},
 	}
 

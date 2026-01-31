@@ -2,7 +2,6 @@
 package handler
 
 import (
-	"io"
 	"net/http"
 
 	"go-react-template/pkg/middleware"
@@ -15,19 +14,19 @@ import (
 
 // AIHandler AI任务HTTP处理器.
 type AIHandler struct {
-	replicateService  service.ReplicateService
-	cloudflareService service.CloudflareService
-	bltcyService      service.BltcyService
-	aiProviderRepo    repo.AIProviderRepo
+	grokService    service.GrokService
+	bltcyService   service.BltcyService
+	aiTaskService  service.AITaskService
+	aiProviderRepo repo.AIProviderRepo
 }
 
 // NewAIHandler 创建AI任务HTTP处理器实例.
-func NewAIHandler(replicateService service.ReplicateService, cloudflareService service.CloudflareService, bltcyService service.BltcyService, aiProviderRepo repo.AIProviderRepo) *AIHandler {
+func NewAIHandler(grokService service.GrokService, bltcyService service.BltcyService, aiTaskService service.AITaskService, aiProviderRepo repo.AIProviderRepo) *AIHandler {
 	return &AIHandler{
-		replicateService:  replicateService,
-		cloudflareService: cloudflareService,
-		bltcyService:      bltcyService,
-		aiProviderRepo:    aiProviderRepo,
+		grokService:    grokService,
+		bltcyService:   bltcyService,
+		aiTaskService:  aiTaskService,
+		aiProviderRepo: aiProviderRepo,
 	}
 }
 
@@ -44,68 +43,64 @@ func (h *AIHandler) TranslateImage(c echo.Context) error {
 		})
 	}
 
-	// 如果指定了 model_id，查询 Provider 类型进行路由
-	if req.ModelID != "" {
-		m, err := h.aiProviderRepo.GetModelByID(req.ModelID)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]any{
-				"code":    1,
-				"data":    nil,
-				"message": "模型不存在",
-			})
-		}
-
-		// 根据 Provider 名称路由到不同服务
-		if m.Provider != nil && m.Provider.Name == "cloudflare" {
-			result, err := h.cloudflareService.CreateTranslateTask(userID, &req, m.Provider, m)
-			if err != nil {
-				return c.JSON(http.StatusBadRequest, map[string]any{
-					"code":    1,
-					"data":    nil,
-					"message": err.Error(),
-				})
-			}
-
-			return c.JSON(http.StatusOK, map[string]any{
-				"code":    0,
-				"data":    result,
-				"message": "处理成功",
-			})
-		}
-
-		// Bltcy Provider（OpenAI兼容）
-		if m.Provider != nil && m.Provider.Name == "bltcy" {
-			result, err := h.bltcyService.CreateTranslateTask(userID, &req, m.Provider, m)
-			if err != nil {
-				return c.JSON(http.StatusBadRequest, map[string]any{
-					"code":    1,
-					"data":    nil,
-					"message": err.Error(),
-				})
-			}
-
-			return c.JSON(http.StatusOK, map[string]any{
-				"code":    0,
-				"data":    result,
-				"message": "处理成功",
-			})
-		}
+	// 必须指定 model_id
+	if req.ModelID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"code":    1,
+			"data":    nil,
+			"message": "请选择模型",
+		})
 	}
 
-	// 默认使用 Replicate 服务
-	result, err := h.replicateService.CreateTranslateTask(userID, &req)
+	m, err := h.aiProviderRepo.GetModelByID(req.ModelID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
 			"code":    1,
 			"data":    nil,
-			"message": err.Error(),
+			"message": "模型不存在",
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]any{
-		"code":    0,
-		"data":    result,
-		"message": "任务创建成功",
+	// 根据 Provider 名称路由到不同服务
+	if m.Provider != nil && m.Provider.Name == "grok" {
+		result, err := h.grokService.CreateTranslateTask(userID, &req, m.Provider, m)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"code":    1,
+				"data":    nil,
+				"message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]any{
+			"code":    0,
+			"data":    result,
+			"message": "处理成功",
+		})
+	}
+
+	// Bltcy Provider（OpenAI兼容）
+	if m.Provider != nil && m.Provider.Name == "bltcy" {
+		result, err := h.bltcyService.CreateTranslateTask(userID, &req, m.Provider, m)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"code":    1,
+				"data":    nil,
+				"message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]any{
+			"code":    0,
+			"data":    result,
+			"message": "处理成功",
+		})
+	}
+
+	return c.JSON(http.StatusBadRequest, map[string]any{
+		"code":    1,
+		"data":    nil,
+		"message": "不支持的服务提供商",
 	})
 }
 
@@ -122,68 +117,64 @@ func (h *AIHandler) RemoveWatermark(c echo.Context) error {
 		})
 	}
 
-	// 如果指定了 model_id，查询 Provider 类型进行路由
-	if req.ModelID != "" {
-		m, err := h.aiProviderRepo.GetModelByID(req.ModelID)
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]any{
-				"code":    1,
-				"data":    nil,
-				"message": "模型不存在",
-			})
-		}
-
-		// 根据 Provider 名称路由到不同服务
-		if m.Provider != nil && m.Provider.Name == "cloudflare" {
-			result, err := h.cloudflareService.CreateWatermarkTask(userID, &req, m.Provider, m)
-			if err != nil {
-				return c.JSON(http.StatusBadRequest, map[string]any{
-					"code":    1,
-					"data":    nil,
-					"message": err.Error(),
-				})
-			}
-
-			return c.JSON(http.StatusOK, map[string]any{
-				"code":    0,
-				"data":    result,
-				"message": "处理成功",
-			})
-		}
-
-		// Bltcy Provider（OpenAI兼容）
-		if m.Provider != nil && m.Provider.Name == "bltcy" {
-			result, err := h.bltcyService.CreateWatermarkTask(userID, &req, m.Provider, m)
-			if err != nil {
-				return c.JSON(http.StatusBadRequest, map[string]any{
-					"code":    1,
-					"data":    nil,
-					"message": err.Error(),
-				})
-			}
-
-			return c.JSON(http.StatusOK, map[string]any{
-				"code":    0,
-				"data":    result,
-				"message": "处理成功",
-			})
-		}
+	// 必须指定 model_id
+	if req.ModelID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"code":    1,
+			"data":    nil,
+			"message": "请选择模型",
+		})
 	}
 
-	// 默认使用 Replicate 服务
-	result, err := h.replicateService.CreateWatermarkTask(userID, &req)
+	m, err := h.aiProviderRepo.GetModelByID(req.ModelID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
 			"code":    1,
 			"data":    nil,
-			"message": err.Error(),
+			"message": "模型不存在",
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]any{
-		"code":    0,
-		"data":    result,
-		"message": "任务创建成功",
+	// 根据 Provider 名称路由到不同服务
+	if m.Provider != nil && m.Provider.Name == "grok" {
+		result, err := h.grokService.CreateWatermarkTask(userID, &req, m.Provider, m)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"code":    1,
+				"data":    nil,
+				"message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]any{
+			"code":    0,
+			"data":    result,
+			"message": "处理成功",
+		})
+	}
+
+	// Bltcy Provider（OpenAI兼容）
+	if m.Provider != nil && m.Provider.Name == "bltcy" {
+		result, err := h.bltcyService.CreateWatermarkTask(userID, &req, m.Provider, m)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]any{
+				"code":    1,
+				"data":    nil,
+				"message": err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusOK, map[string]any{
+			"code":    0,
+			"data":    result,
+			"message": "处理成功",
+		})
+	}
+
+	return c.JSON(http.StatusBadRequest, map[string]any{
+		"code":    1,
+		"data":    nil,
+		"message": "不支持的服务提供商",
 	})
 }
 
@@ -198,7 +189,7 @@ func (h *AIHandler) GetTask(c echo.Context) error {
 		})
 	}
 
-	result, err := h.replicateService.PollTaskStatus(taskID)
+	result, err := h.aiTaskService.GetTask(taskID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]any{
 			"code":    1,
@@ -234,7 +225,7 @@ func (h *AIHandler) GetTasks(c echo.Context) error {
 		})
 	}
 
-	tasks, total, err := h.replicateService.GetUserTasks(userID, &req)
+	tasks, total, err := h.aiTaskService.GetUserTasks(userID, &req)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]any{
 			"code":    1,
@@ -252,25 +243,5 @@ func (h *AIHandler) GetTasks(c echo.Context) error {
 			"page_size": req.PageSize,
 		},
 		"message": "获取成功",
-	})
-}
-
-// POST /api/v1/webhook/replicate.
-func (h *AIHandler) ReplicateWebhook(c echo.Context) error {
-	payload, err := io.ReadAll(c.Request().Body)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]any{
-			"error": "无法读取请求体",
-		})
-	}
-
-	if err := h.replicateService.ProcessWebhook(payload); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]any{
-			"error": err.Error(),
-		})
-	}
-
-	return c.JSON(http.StatusOK, map[string]any{
-		"received": true,
 	})
 }

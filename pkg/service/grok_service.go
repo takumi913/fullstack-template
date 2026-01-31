@@ -9,46 +9,35 @@ import (
 	"go-react-template/configs"
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/repo"
-
-	"github.com/shopspring/decimal"
 )
 
-// BltcyService Bltcy AI服务接口（OpenAI兼容）.
-type BltcyService interface {
+// GrokService Grok AI服务接口（OpenAI兼容）.
+type GrokService interface {
 	CreateTranslateTask(userID string, req *model.TranslateImageRequest, provider *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error)
 	CreateWatermarkTask(userID string, req *model.RemoveWatermarkRequest, provider *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error)
 }
 
-// bltcyService Bltcy AI服务实现.
-type bltcyService struct {
-	taskRepo      repo.AITaskRepo
-	walletService WalletService
-	httpClient    *http.Client
+// grokService Grok AI服务实现.
+type grokService struct {
+	taskRepo   repo.AITaskRepo
+	httpClient *http.Client
 }
 
-// NewBltcyService 创建Bltcy AI服务实例.
-func NewBltcyService(taskRepo repo.AITaskRepo, walletService WalletService) BltcyService {
-	return &bltcyService{
-		taskRepo:      taskRepo,
-		walletService: walletService,
+// NewGrokService 创建Grok AI服务实例.
+func NewGrokService(taskRepo repo.AITaskRepo) GrokService {
+	return &grokService{
+		taskRepo: taskRepo,
 		httpClient: &http.Client{
 			Timeout: 120 * time.Second,
 		},
 	}
 }
 
-// CreateTranslateTask 创建图片翻译任务.
-func (s *bltcyService) CreateTranslateTask(userID string, req *model.TranslateImageRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
-	cfg := configs.AppConfig.Bltcy
+// CreateTranslateTask 创建图片翻译任务（免费，同步处理）.
+func (s *grokService) CreateTranslateTask(userID string, req *model.TranslateImageRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
+	cfg := configs.AppConfig.Grok
 	if cfg.APIKey == "" {
-		return nil, errors.New("Bltcy API未配置")
-	}
-
-	// 检查并扣除积分
-	if m.CreditsPerUse > 0 {
-		if err := s.walletService.Consume(userID, intToDecimal(m.CreditsPerUse), "图片翻译 - "+m.DisplayName, ""); err != nil {
-			return nil, errors.New("积分不足: " + err.Error())
-		}
+		return nil, errors.New("Grok API未配置")
 	}
 
 	prompt := "Translate text in this image from " + req.SourceLang + " to " + req.TargetLang
@@ -76,7 +65,7 @@ func (s *bltcyService) CreateTranslateTask(userID string, req *model.TranslateIm
 		Model:   cfg.Model,
 	}
 
-	outputURL, err := CallOpenAICompatImageEdit(s.httpClient, compatCfg, req.ImageURL, prompt, m.Name, "Bltcy")
+	outputURL, err := CallOpenAICompatImageEdit(s.httpClient, compatCfg, req.ImageURL, prompt, m.Name, "Grok")
 	if err != nil {
 		task.Status = model.AITaskStatusFailed
 		task.ErrorMessage = err.Error()
@@ -98,18 +87,11 @@ func (s *bltcyService) CreateTranslateTask(userID string, req *model.TranslateIm
 	return &resp, nil
 }
 
-// CreateWatermarkTask 创建水印去除任务.
-func (s *bltcyService) CreateWatermarkTask(userID string, req *model.RemoveWatermarkRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
-	cfg := configs.AppConfig.Bltcy
+// CreateWatermarkTask 创建水印去除任务（免费，同步处理）.
+func (s *grokService) CreateWatermarkTask(userID string, req *model.RemoveWatermarkRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
+	cfg := configs.AppConfig.Grok
 	if cfg.APIKey == "" {
-		return nil, errors.New("Bltcy API未配置")
-	}
-
-	// 检查并扣除积分
-	if m.CreditsPerUse > 0 {
-		if err := s.walletService.Consume(userID, intToDecimal(m.CreditsPerUse), "水印去除 - "+m.DisplayName, ""); err != nil {
-			return nil, errors.New("积分不足: " + err.Error())
-		}
+		return nil, errors.New("Grok API未配置")
 	}
 
 	prompt := "Remove watermark from this image"
@@ -135,7 +117,7 @@ func (s *bltcyService) CreateWatermarkTask(userID string, req *model.RemoveWater
 		Model:   cfg.Model,
 	}
 
-	outputURL, err := CallOpenAICompatImageEdit(s.httpClient, compatCfg, req.ImageURL, prompt, m.Name, "Bltcy")
+	outputURL, err := CallOpenAICompatImageEdit(s.httpClient, compatCfg, req.ImageURL, prompt, m.Name, "Grok")
 	if err != nil {
 		task.Status = model.AITaskStatusFailed
 		task.ErrorMessage = err.Error()
@@ -155,9 +137,4 @@ func (s *bltcyService) CreateWatermarkTask(userID string, req *model.RemoveWater
 	resp := task.ToResponse()
 
 	return &resp, nil
-}
-
-// intToDecimal 将int转换为decimal.Decimal.
-func intToDecimal(i int) decimal.Decimal {
-	return decimal.NewFromInt(int64(i))
 }

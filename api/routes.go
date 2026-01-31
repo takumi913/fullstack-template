@@ -117,9 +117,8 @@ func setupAdminRoutes(api *echo.Group, adminHandler *handler.AdminHandler) {
 }
 
 // setupWebhookRoutes 设置 Webhook 路由（无需认证，但需验证签名）.
-func setupWebhookRoutes(api *echo.Group, walletHandler *handler.WalletHandler, aiHandler *handler.AIHandler) {
+func setupWebhookRoutes(api *echo.Group, walletHandler *handler.WalletHandler, _ *handler.AIHandler) {
 	webhook := api.Group("/webhook")
 	webhook.POST("/stripe", walletHandler.StripeWebhook)
 	webhook.POST("/creem", walletHandler.CreemWebhook)
-	webhook.POST("/replicate", aiHandler.ReplicateWebhook)
 }

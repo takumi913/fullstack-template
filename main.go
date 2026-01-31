@@ -60,10 +60,10 @@ func main() {
 	adminHandler := handler.NewAdminHandler(adminService)
 
 	aiTaskRepo := repo.NewAITaskRepo()
-	replicateService := service.NewReplicateService(aiTaskRepo, walletService)
-	cloudflareService := service.NewCloudflareService(aiTaskRepo)
+	grokService := service.NewGrokService(aiTaskRepo)
 	bltcyService := service.NewBltcyService(aiTaskRepo, walletService)
-	aiHandler := handler.NewAIHandler(replicateService, cloudflareService, bltcyService, aiProviderRepo)
+	aiTaskService := service.NewAITaskService(aiTaskRepo)
+	aiHandler := handler.NewAIHandler(grokService, bltcyService, aiTaskService, aiProviderRepo)
 
 	// 创建Echo实例
 	e := echo.New()
