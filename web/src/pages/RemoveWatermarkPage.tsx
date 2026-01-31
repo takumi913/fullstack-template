@@ -16,18 +16,10 @@ import {
 } from "lucide-react";
 import SEO from "@/components/SEO";
 import { aiApi } from "@/api/ai";
+import { adminApi, type PublicAIModel } from "@/api/admin";
 
 // Types
 type ProcessingStatus = "idle" | "uploading" | "processing" | "success" | "error";
-
-// 支持的模型列表
-const SUPPORTED_MODELS = [
-  { id: "grok", name: "Grok", icon: "🤖" },
-  { id: "gemini", name: "Gemini", icon: "✨" },
-  { id: "claude", name: "Claude", icon: "🧠" },
-  { id: "gpt4", name: "GPT-4", icon: "💡" },
-  { id: "flux", name: "Flux", icon: "⚡" },
-] as const;
 
 const watermarkRemoverStructuredData = [
   {
@@ -81,10 +73,30 @@ export default function RemoveWatermarkPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<ProcessingStatus>("idle");
-  const [model, setModel] = useState("grok");
+  const [modelId, setModelId] = useState<string>("");
+  const [models, setModels] = useState<PublicAIModel[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch models on mount
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await adminApi.getPublicModels("image");
+        if (response.code === 0 && response.data) {
+          setModels(response.data);
+          // Set default model (first one or the one marked as default)
+          if (response.data.length > 0) {
+            setModelId(response.data[0].id);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch models:", err);
+      }
+    };
+    fetchModels();
+  }, []);
 
   // Clean up object URLs
   useEffect(() => {
@@ -146,10 +158,10 @@ export default function RemoveWatermarkPage() {
 
     try {
       const base64 = await fileToBase64(file);
-      const response = await aiApi.removeWatermark({ image_url: base64 });
-      
-      // Note: Model selection is currently handled in frontend state only
-      // Backend integration for model selection will be added in future updates
+      const response = await aiApi.removeWatermark({
+        image_url: base64,
+        model_id: modelId || undefined,
+      });
       
       if (response.data && response.data.id) {
         pollTask(response.data.id);
@@ -283,20 +295,24 @@ export default function RemoveWatermarkPage() {
                 // Upload Zone (Landing State)
                 <div className="flex flex-col gap-3">
                   {/* Model Selector placed above upload zone */}
-                  <div className="flex justify-center">
-                    <div className="bg-white px-3 py-2 rounded-lg border border-sky-100 shadow-sm inline-flex items-center gap-2">
-                      <span className="text-sm text-gray-500">Model:</span>
-                      <select
-                        value={model}
-                        onChange={(e) => setModel(e.target.value)}
-                        className="text-sm font-medium bg-transparent border-none focus:ring-0 cursor-pointer text-sky-600"
-                      >
-                        {SUPPORTED_MODELS.map((m) => (
-                          <option key={m.id} value={m.id}>{m.icon} {m.name}</option>
-                        ))}
-                      </select>
+                  {models.length > 0 && (
+                    <div className="flex justify-center">
+                      <div className="bg-white px-3 py-2 rounded-lg border border-sky-100 shadow-sm inline-flex items-center gap-2">
+                        <span className="text-sm text-gray-500">Model:</span>
+                        <select
+                          value={modelId}
+                          onChange={(e) => setModelId(e.target.value)}
+                          className="text-sm font-medium bg-transparent border-none focus:ring-0 cursor-pointer text-sky-600"
+                        >
+                          {models.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.display_name} {m.credits_per_use === 0 ? "(Free)" : `(${m.credits_per_use} credits)`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div
                     onClick={() => fileInputRef.current?.click()}
@@ -336,18 +352,22 @@ export default function RemoveWatermarkPage() {
                     </button>
 
                     <div className="flex items-center gap-3 w-full sm:w-auto">
-                      <div className="flex-1 sm:flex-none">
-                        <select
-                          value={model}
-                          onChange={(e) => setModel(e.target.value)}
-                          disabled={status === 'processing'}
-                          className="text-sm font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-sky-500 focus:border-transparent cursor-pointer"
-                        >
-                          {SUPPORTED_MODELS.map((m) => (
-                            <option key={m.id} value={m.id}>{m.icon} {m.name}</option>
-                          ))}
-                        </select>
-                      </div>
+                      {models.length > 0 && (
+                        <div className="flex-1 sm:flex-none">
+                          <select
+                            value={modelId}
+                            onChange={(e) => setModelId(e.target.value)}
+                            disabled={status === 'processing'}
+                            className="text-sm font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-sky-500 focus:border-transparent cursor-pointer"
+                          >
+                            {models.map((m) => (
+                              <option key={m.id} value={m.id}>
+                                {m.display_name} {m.credits_per_use === 0 ? "(Free)" : `(${m.credits_per_use} credits)`}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
                       <button
                         onClick={handleProcess}

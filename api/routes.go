@@ -69,18 +69,24 @@ func setupProtectedRoutes(api *echo.Group, userHandler *handler.UserHandler, wal
 	userRoutes.PUT("/profile", userHandler.UpdateProfile)           // 更新个人资料
 	userRoutes.POST("/change-password", userHandler.ChangePassword) // 更改密码
 
-	// 钱包路由
-	walletRoutes := protected.Group("/wallet")
+	// 任务列表需要认证（只能查看自己的任务）
+	aiProtected := protected.Group("/ai")
+	aiProtected.GET("/tasks", aiHandler.GetTasks) // 获取任务列表
+
+	// 可选认证路由组（支持匿名用户）
+	optional := api.Group("", middleware.OptionalSession())
+
+	// 钱包路由（支持匿名用户充值和查询余额）
+	walletRoutes := optional.Group("/wallet")
 	walletRoutes.GET("", walletHandler.GetBalance)                   // 获取钱包余额
 	walletRoutes.GET("/transactions", walletHandler.GetTransactions) // 获取交易记录
 	walletRoutes.POST("/topup", walletHandler.Topup)                 // 充值
 
-	// AI 任务路由
-	aiRoutes := protected.Group("/ai")
+	// AI 任务路由（支持匿名用户）
+	aiRoutes := optional.Group("/ai")
 	aiRoutes.POST("/translate-image", aiHandler.TranslateImage)   // 图片翻译
 	aiRoutes.POST("/remove-watermark", aiHandler.RemoveWatermark) // 水印去除
 	aiRoutes.GET("/task/:id", aiHandler.GetTask)                  // 获取任务详情
-	aiRoutes.GET("/tasks", aiHandler.GetTasks)                    // 获取任务列表
 }
 
 // setupAdminRoutes 设置管理员路由（需要认证 + 管理员权限）.

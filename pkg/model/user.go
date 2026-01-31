@@ -31,8 +31,9 @@ type User struct {
 type LoginType string
 
 const (
-	LoginTypeLocal  LoginType = "local"  // 本地注册登录
-	LoginTypeGoogle LoginType = "google" // Google第三方登录
+	LoginTypeLocal     LoginType = "local"     // 本地注册登录
+	LoginTypeGoogle    LoginType = "google"    // Google第三方登录
+	LoginTypeAnonymous LoginType = "anonymous" // 匿名用户
 )
 
 // UserRole 用户角色枚举.

@@ -3,6 +3,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"go-react-template/pkg/model"
@@ -19,6 +20,7 @@ type WalletService interface {
 	CreateTopupPayment(userID string, req *model.TopupRequest) (*model.TopupResponse, error)
 	ProcessPaymentSuccess(externalID string, provider model.PaymentProvider) error
 	ProcessStripeWebhook(payload []byte, signature string) error
+	ProcessCreemWebhook(payload []byte, signature string) error
 	Consume(userID string, amount decimal.Decimal, description string, reference string) error
 	GetPricingTiers() []model.PricingTier
 }
@@ -28,14 +30,16 @@ type walletService struct {
 	walletRepo    repo.WalletRepo
 	userRepo      repo.UserRepo
 	stripeService StripeService
+	creemService  CreemService
 }
 
 // NewWalletService 创建钱包业务逻辑实例.
-func NewWalletService(walletRepo repo.WalletRepo, userRepo repo.UserRepo, stripeService StripeService) WalletService {
+func NewWalletService(walletRepo repo.WalletRepo, userRepo repo.UserRepo, stripeService StripeService, creemService CreemService) WalletService {
 	return &walletService{
 		walletRepo:    walletRepo,
 		userRepo:      userRepo,
 		stripeService: stripeService,
+		creemService:  creemService,
 	}
 }
 
@@ -48,8 +52,11 @@ func (s *walletService) GetOrCreateWallet(userID string) (*model.WalletResponse,
 		return &resp, nil
 	}
 
-	if _, err := s.userRepo.GetByID(userID); err != nil {
-		return nil, errors.New("用户不存在")
+	// 匿名用户（以 anon- 开头）不需要检查用户是否存在
+	if !strings.HasPrefix(userID, "anon-") {
+		if _, err := s.userRepo.GetByID(userID); err != nil {
+			return nil, errors.New("用户不存在")
+		}
 	}
 
 	wallet = &model.Wallet{
@@ -142,6 +149,15 @@ func (s *walletService) CreateTopupPayment(userID string, req *model.TopupReques
 	)
 
 	switch req.Provider {
+	case model.PaymentProviderCreem:
+		if s.creemService == nil {
+			return nil, errors.New("Creem服务未配置")
+		}
+
+		externalID, checkoutURL, err = s.creemService.CreateCheckoutSession(payment, userEmail)
+		if err != nil {
+			return nil, errors.New("创建Creem支付失败: " + err.Error())
+		}
 	case model.PaymentProviderStripe:
 		if s.stripeService == nil {
 			return nil, errors.New("Stripe服务未配置")
@@ -151,8 +167,6 @@ func (s *walletService) CreateTopupPayment(userID string, req *model.TopupReques
 		if err != nil {
 			return nil, errors.New("创建Stripe支付失败: " + err.Error())
 		}
-	case model.PaymentProviderCreem:
-		return nil, errors.New("Creem支付暂未开放")
 	default:
 		return nil, errors.New("不支持的支付方式")
 	}
@@ -177,6 +191,74 @@ func (s *walletService) ProcessPaymentSuccess(externalID string, provider model.
 		return errors.New("支付订单不存在")
 	}
 
+	return s.processPaymentCompletion(payment, provider)
+}
+
+// ProcessStripeWebhook 处理Stripe Webhook事件.
+func (s *walletService) ProcessStripeWebhook(payload []byte, signature string) error {
+	if s.stripeService == nil {
+		return errors.New("Stripe服务未配置")
+	}
+
+	event, err := s.stripeService.ValidateWebhookSignature(payload, signature)
+	if err != nil {
+		return errors.New("Webhook签名验证失败: " + err.Error())
+	}
+
+	if event.Type == "checkout.session.completed" {
+		sessionID, ok := event.Data.Object["id"].(string)
+		if !ok {
+			return errors.New("无法获取session ID")
+		}
+
+		return s.ProcessPaymentSuccess(sessionID, model.PaymentProviderStripe)
+	}
+
+	return nil
+}
+
+// ProcessCreemWebhook 处理Creem Webhook事件.
+func (s *walletService) ProcessCreemWebhook(payload []byte, signature string) error {
+	if s.creemService == nil {
+		return errors.New("Creem服务未配置")
+	}
+
+	event, err := s.creemService.ValidateWebhookSignature(payload, signature)
+	if err != nil {
+		return errors.New("Webhook签名验证失败: " + err.Error())
+	}
+
+	if event.EventType == "checkout.completed" {
+		// 从 metadata 中获取 payment_id
+		if obj, ok := event.Object["metadata"].(map[string]interface{}); ok {
+			if paymentID, ok := obj["payment_id"].(string); ok {
+				return s.ProcessPaymentSuccessByPaymentID(paymentID, model.PaymentProviderCreem)
+			}
+		}
+
+		// 尝试从 request_id 获取
+		if requestID, ok := event.Object["request_id"].(string); ok && requestID != "" {
+			return s.ProcessPaymentSuccessByPaymentID(requestID, model.PaymentProviderCreem)
+		}
+
+		return errors.New("无法获取payment ID")
+	}
+
+	return nil
+}
+
+// ProcessPaymentSuccessByPaymentID 通过内部 payment ID 处理支付成功.
+func (s *walletService) ProcessPaymentSuccessByPaymentID(paymentID string, provider model.PaymentProvider) error {
+	payment, err := s.walletRepo.GetPaymentByID(paymentID)
+	if err != nil {
+		return errors.New("支付订单不存在")
+	}
+
+	return s.processPaymentCompletion(payment, provider)
+}
+
+// processPaymentCompletion 处理支付完成的公共逻辑.
+func (s *walletService) processPaymentCompletion(payment *model.Payment, provider model.PaymentProvider) error {
 	if payment.Status != model.PaymentStatusPending {
 		return nil
 	}
@@ -220,29 +302,6 @@ func (s *walletService) ProcessPaymentSuccess(externalID string, provider model.
 
 		return txRepo.UpdatePayment(payment)
 	})
-}
-
-// ProcessStripeWebhook 处理Stripe Webhook事件.
-func (s *walletService) ProcessStripeWebhook(payload []byte, signature string) error {
-	if s.stripeService == nil {
-		return errors.New("Stripe服务未配置")
-	}
-
-	event, err := s.stripeService.ValidateWebhookSignature(payload, signature)
-	if err != nil {
-		return errors.New("Webhook签名验证失败: " + err.Error())
-	}
-
-	if event.Type == "checkout.session.completed" {
-		sessionID, ok := event.Data.Object["id"].(string)
-		if !ok {
-			return errors.New("无法获取session ID")
-		}
-
-		return s.ProcessPaymentSuccess(sessionID, model.PaymentProviderStripe)
-	}
-
-	return nil
 }
 
 // Consume 消费积分.

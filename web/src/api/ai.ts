@@ -28,11 +28,13 @@ export interface TranslateImageRequest {
   image_url: string;
   source_lang: string;
   target_lang: string;
+  model_id?: string; // 可选，指定使用的模型
 }
 
 // 水印去除请求
 export interface RemoveWatermarkRequest {
   image_url: string;
+  model_id?: string; // 可选，指定使用的模型
 }
 
 // AI 任务列表响应

@@ -18,8 +18,12 @@ type Config struct {
 	Session SessionConfig `json:"session"`
 	// Stripe配置
 	Stripe StripeConfig `json:"stripe"`
+	// Creem配置
+	Creem CreemConfig `json:"creem"`
 	// Replicate配置
 	Replicate ReplicateConfig `json:"replicate"`
+	// Bltcy配置
+	Bltcy BltcyConfig `json:"bltcy"`
 }
 
 // ServerConfig 服务器配置.
@@ -54,6 +58,15 @@ type StripeConfig struct {
 	CancelURL     string `json:"cancel_url"`     // 支付取消跳转URL
 }
 
+// CreemConfig Creem支付配置.
+type CreemConfig struct {
+	APIKey        string `json:"api_key"`        // Creem API Key
+	WebhookSecret string `json:"webhook_secret"` // Webhook签名密钥
+	ProductID     string `json:"product_id"`     // 产品ID
+	SuccessURL    string `json:"success_url"`    // 支付成功跳转URL
+	TestMode      bool   `json:"test_mode"`      // 是否测试模式
+}
+
 // ReplicateConfig Replicate AI配置.
 type ReplicateConfig struct {
 	APIToken            string `json:"api_token"`       // Replicate API Token
@@ -62,6 +75,13 @@ type ReplicateConfig struct {
 	WebhookURL          string `json:"webhook_url"`     // Webhook回调URL
 	TranslateCostPerUse int    `json:"translate_cost"`  // 翻译每次消耗积分
 	WatermarkCostPerUse int    `json:"watermark_cost"`  // 水印去除每次消耗积分
+}
+
+// BltcyConfig Bltcy AI配置（OpenAI兼容）.
+type BltcyConfig struct {
+	APIKey  string `json:"api_key"`  // API Key
+	BaseURL string `json:"base_url"` // API Base URL
+	Model   string `json:"model"`    // 模型名称
 }
 
 // AppConfig 全局配置实例.
@@ -100,6 +120,13 @@ func Init() error {
 			SuccessURL:    getEnv("STRIPE_SUCCESS_URL", "http://localhost:5173/dashboard?payment=success"),
 			CancelURL:     getEnv("STRIPE_CANCEL_URL", "http://localhost:5173/dashboard?payment=cancelled"),
 		},
+		Creem: CreemConfig{
+			APIKey:        getEnv("CREEM_API_KEY", ""),
+			WebhookSecret: getEnv("CREEM_WEBHOOK_SECRET", ""),
+			ProductID:     getEnv("CREEM_PRODUCT_ID", ""),
+			SuccessURL:    getEnv("CREEM_SUCCESS_URL", "http://localhost:5173/dashboard?payment=success"),
+			TestMode:      getEnv("CREEM_TEST_MODE", "true") == "true",
+		},
 		Replicate: ReplicateConfig{
 			APIToken:            getEnv("REPLICATE_API_TOKEN", ""),
 			TranslateModel:      getEnv("REPLICATE_TRANSLATE_MODEL", "tencentarc/photomaker:ddfc2b08d209f9fa8c1uj"),
@@ -107,6 +134,11 @@ func Init() error {
 			WebhookURL:          getEnv("REPLICATE_WEBHOOK_URL", ""),
 			TranslateCostPerUse: getEnvAsInt("REPLICATE_TRANSLATE_COST", 10),
 			WatermarkCostPerUse: getEnvAsInt("REPLICATE_WATERMARK_COST", 5),
+		},
+		Bltcy: BltcyConfig{
+			APIKey:  getEnv("BLTCY_API_KEY", ""),
+			BaseURL: getEnv("BLTCY_BASE_URL", "https://api.bltcy.ai/v1"),
+			Model:   getEnv("BLTCY_MODEL", "nano-banana"),
 		},
 	}
 

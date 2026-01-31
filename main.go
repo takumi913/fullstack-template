@@ -50,17 +50,20 @@ func main() {
 
 	walletRepo := repo.NewWalletRepo()
 	stripeService := service.NewStripeService()
-	walletService := service.NewWalletService(walletRepo, userRepo, stripeService)
+	creemService := service.NewCreemService()
+	walletService := service.NewWalletService(walletRepo, userRepo, stripeService, creemService)
 	walletHandler := handler.NewWalletHandler(walletService)
-
-	aiTaskRepo := repo.NewAITaskRepo()
-	replicateService := service.NewReplicateService(aiTaskRepo, walletService)
-	aiHandler := handler.NewAIHandler(replicateService)
 
 	adminRepo := repo.NewAdminRepo()
 	aiProviderRepo := repo.NewAIProviderRepo()
 	adminService := service.NewAdminService(adminRepo, aiProviderRepo)
 	adminHandler := handler.NewAdminHandler(adminService)
+
+	aiTaskRepo := repo.NewAITaskRepo()
+	replicateService := service.NewReplicateService(aiTaskRepo, walletService)
+	cloudflareService := service.NewCloudflareService(aiTaskRepo)
+	bltcyService := service.NewBltcyService(aiTaskRepo, walletService)
+	aiHandler := handler.NewAIHandler(replicateService, cloudflareService, bltcyService, aiProviderRepo)
 
 	// 创建Echo实例
 	e := echo.New()

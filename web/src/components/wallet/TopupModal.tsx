@@ -11,7 +11,7 @@ interface TopupModalProps {
 export function TopupModal({ isOpen, onClose }: TopupModalProps) {
   const { pricingTiers, topup, isLoading } = useWalletStore();
   const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<"stripe" | "creem">("stripe");
+  const [selectedProvider, setSelectedProvider] = useState<"stripe" | "creem">("creem");
 
   const handleTopup = async () => {
     if (!selectedTier) return;
@@ -114,17 +114,6 @@ export function TopupModal({ isOpen, onClose }: TopupModalProps) {
           <p className="text-sm font-medium text-gray-700 mb-2">Payment Method</p>
           <div className="flex gap-3">
             <button
-              onClick={() => setSelectedProvider("stripe")}
-              className={`flex-1 p-3 rounded-xl border-2 transition-all ${
-                selectedProvider === "stripe"
-                  ? "border-indigo-600 bg-indigo-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <div className="font-medium text-gray-900">Stripe</div>
-              <div className="text-xs text-gray-500">Cards, Apple Pay</div>
-            </button>
-            <button
               onClick={() => setSelectedProvider("creem")}
               className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                 selectedProvider === "creem"
@@ -133,7 +122,19 @@ export function TopupModal({ isOpen, onClose }: TopupModalProps) {
               }`}
             >
               <div className="font-medium text-gray-900">Creem</div>
-              <div className="text-xs text-gray-500">Crypto, USDT</div>
+              <div className="text-xs text-gray-500">Cards, Crypto</div>
+            </button>
+            <button
+              onClick={() => setSelectedProvider("stripe")}
+              disabled
+              className={`flex-1 p-3 rounded-xl border-2 transition-all opacity-50 cursor-not-allowed ${
+                selectedProvider === "stripe"
+                  ? "border-indigo-600 bg-indigo-50"
+                  : "border-gray-200"
+              }`}
+            >
+              <div className="font-medium text-gray-900">Stripe</div>
+              <div className="text-xs text-gray-500">Coming soon</div>
             </button>
           </div>
         </div>

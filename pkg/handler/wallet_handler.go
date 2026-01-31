@@ -26,14 +26,7 @@ func NewWalletHandler(walletService service.WalletService) *WalletHandler {
 
 // GET /api/v1/wallet.
 func (h *WalletHandler) GetBalance(c echo.Context) error {
-	userID, err := middleware.ExtractUserIDFromSession(c)
-	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"code":    1,
-			"data":    nil,
-			"message": "未授权访问",
-		})
-	}
+	userID := middleware.GetUserIDFromSession(c)
 
 	wallet, err := h.walletService.GetBalance(userID)
 	if err != nil {
@@ -53,14 +46,7 @@ func (h *WalletHandler) GetBalance(c echo.Context) error {
 
 // GET /api/v1/wallet/transactions.
 func (h *WalletHandler) GetTransactions(c echo.Context) error {
-	userID, err := middleware.ExtractUserIDFromSession(c)
-	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"code":    1,
-			"data":    nil,
-			"message": "未授权访问",
-		})
-	}
+	userID := middleware.GetUserIDFromSession(c)
 
 	var req model.TransactionListRequest
 	if err := c.Bind(&req); err != nil {
@@ -94,14 +80,7 @@ func (h *WalletHandler) GetTransactions(c echo.Context) error {
 
 // POST /api/v1/wallet/topup.
 func (h *WalletHandler) Topup(c echo.Context) error {
-	userID, err := middleware.ExtractUserIDFromSession(c)
-	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"code":    1,
-			"data":    nil,
-			"message": "未授权访问",
-		})
-	}
+	userID := middleware.GetUserIDFromSession(c)
 
 	var req model.TopupRequest
 	if err := c.Bind(&req); err != nil {
@@ -171,6 +150,29 @@ func (h *WalletHandler) StripeWebhook(c echo.Context) error {
 
 // POST /api/v1/webhook/creem.
 func (h *WalletHandler) CreemWebhook(c echo.Context) error {
+	// 读取请求体
+	payload, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "无法读取请求体",
+		})
+	}
+
+	// 获取 Creem 签名头
+	signature := c.Request().Header.Get("creem-signature")
+	if signature == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "缺少签名头",
+		})
+	}
+
+	// 处理 Webhook
+	if err := h.walletService.ProcessCreemWebhook(payload, signature); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"received": true,
 	})

@@ -21,6 +21,7 @@ import SEO from '@/components/SEO';
 import { useAITaskStore } from "@/store/aiTaskStore";
 import { useWalletStore } from "@/store/walletStore";
 import { SUPPORTED_LANGUAGES } from "@/api/ai";
+import { adminApi, type PublicAIModel } from "@/api/admin";
 
 const getPageConfig = () => {
   return {
@@ -51,15 +52,6 @@ const imageTranslatorStructuredData = [
       'Free online image translator. Translate text in images from any language using AI technology.',
   },
 ];
-
-// 支持的模型列表
-const SUPPORTED_MODELS = [
-  { id: "grok", name: "Grok", icon: "🤖" },
-  { id: "gemini", name: "Gemini", icon: "✨" },
-  { id: "claude", name: "Claude", icon: "🧠" },
-  { id: "gpt4", name: "GPT-4", icon: "💡" },
-  { id: "flux", name: "Flux", icon: "⚡" },
-] as const;
 
 const FAQItem = ({
   question,
@@ -97,7 +89,8 @@ export default function TranslateImagePage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [sourceLang, setSourceLang] = useState("auto");
   const [targetLang, setTargetLang] = useState("en");
-  const [model, setModel] = useState("grok");
+  const [modelId, setModelId] = useState<string>("");
+  const [models, setModels] = useState<PublicAIModel[]>([]);
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -105,6 +98,25 @@ export default function TranslateImagePage() {
   // Stores
   const { currentTask, isLoading, isPolling, error: taskError, translateImage, startPolling, clearCurrentTask, clearError } = useAITaskStore();
   const { fetchBalance } = useWalletStore();
+
+  // Fetch models on mount
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await adminApi.getPublicModels("image");
+        if (response.code === 0 && response.data) {
+          setModels(response.data);
+          // Set default model (first one or the one marked as default)
+          if (response.data.length > 0) {
+            setModelId(response.data[0].id);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch models:", err);
+      }
+    };
+    fetchModels();
+  }, []);
 
   // Cleanup
   useEffect(() => {
@@ -147,6 +159,7 @@ export default function TranslateImagePage() {
         image_url: base64,
         source_lang: sourceLang,
         target_lang: targetLang,
+        model_id: modelId || undefined,
       });
 
       if (task) {
@@ -157,7 +170,7 @@ export default function TranslateImagePage() {
     } catch (err) {
       console.error("Translation error:", err);
     }
-  }, [file, sourceLang, targetLang, translateImage, startPolling, fetchBalance]);
+  }, [file, sourceLang, targetLang, modelId, translateImage, startPolling, fetchBalance]);
 
   const handleDownload = useCallback(() => {
     if (!currentTask?.output_url) return;
@@ -278,18 +291,22 @@ export default function TranslateImagePage() {
                   {/* Model & Language Selector placed above upload zone */}
                   <div className="flex justify-center items-center gap-3 flex-wrap">
                     {/* Model Selector */}
-                    <div className="bg-white px-3 py-2 rounded-lg border border-sky-100 shadow-sm inline-flex items-center gap-2">
-                      <span className="text-sm text-gray-500">Model:</span>
-                      <select
-                        value={model}
-                        onChange={(e) => setModel(e.target.value)}
-                        className="text-sm font-medium bg-transparent border-none focus:ring-0 cursor-pointer text-sky-600"
-                      >
-                        {SUPPORTED_MODELS.map((m) => (
-                          <option key={m.id} value={m.id}>{m.icon} {m.name}</option>
-                        ))}
-                      </select>
-                    </div>
+                    {models.length > 0 && (
+                      <div className="bg-white px-3 py-2 rounded-lg border border-sky-100 shadow-sm inline-flex items-center gap-2">
+                        <span className="text-sm text-gray-500">Model:</span>
+                        <select
+                          value={modelId}
+                          onChange={(e) => setModelId(e.target.value)}
+                          className="text-sm font-medium bg-transparent border-none focus:ring-0 cursor-pointer text-sky-600"
+                        >
+                          {models.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.display_name} {m.credits_per_use === 0 ? "(Free)" : `(${m.credits_per_use} credits)`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     {/* Language Selector */}
                     <div className="bg-white p-1.5 rounded-lg border border-sky-100 shadow-sm flex items-center gap-2">
@@ -354,16 +371,20 @@ export default function TranslateImagePage() {
 
                     <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
                       {/* Model Selector */}
-                      <select
-                        value={model}
-                        onChange={(e) => setModel(e.target.value)}
-                        disabled={isProcessing}
-                        className="text-sm font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-sky-500 focus:border-transparent cursor-pointer"
-                      >
-                        {SUPPORTED_MODELS.map((m) => (
-                          <option key={m.id} value={m.id}>{m.icon} {m.name}</option>
-                        ))}
-                      </select>
+                      {models.length > 0 && (
+                        <select
+                          value={modelId}
+                          onChange={(e) => setModelId(e.target.value)}
+                          disabled={isProcessing}
+                          className="text-sm font-medium bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-sky-500 focus:border-transparent cursor-pointer"
+                        >
+                          {models.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.display_name} {m.credits_per_use === 0 ? "(Free)" : `(${m.credits_per_use} credits)`}
+                            </option>
+                          ))}
+                        </select>
+                      )}
 
                       {/* Language Selector */}
                       <div className="flex-1 sm:flex-none flex items-center gap-2 bg-gray-50 p-1.5 rounded-lg border border-gray-100">

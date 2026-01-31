@@ -37,6 +37,7 @@ type AITask struct {
 	ReplicateID  string       `json:"replicate_id" gorm:"type:varchar(100);index"` // Replicate预测ID
 	SourceLang   string       `json:"source_lang" gorm:"type:varchar(10)"`         // 源语言 (翻译任务)
 	TargetLang   string       `json:"target_lang" gorm:"type:varchar(10)"`         // 目标语言 (翻译任务)
+	ModelID      string       `json:"model_id" gorm:"type:char(36);index"`         // 使用的模型ID
 	CreditsCost  int          `json:"credits_cost" gorm:"default:0"`               // 消耗积分
 	ErrorMessage string       `json:"error_message" gorm:"type:text"`              // 错误信息
 	ProcessedAt  *time.Time   `json:"processed_at"`                                // 开始处理时间
@@ -99,11 +100,13 @@ type TranslateImageRequest struct {
 	ImageURL   string `json:"image_url" validate:"required"`
 	SourceLang string `json:"source_lang" validate:"required"`
 	TargetLang string `json:"target_lang" validate:"required"`
+	ModelID    string `json:"model_id"` // 可选，指定使用的模型
 }
 
 // RemoveWatermarkRequest 水印去除请求.
 type RemoveWatermarkRequest struct {
 	ImageURL string `json:"image_url" validate:"required"`
+	ModelID  string `json:"model_id"` // 可选，指定使用的模型
 }
 
 // AITaskListRequest AI任务列表请求.

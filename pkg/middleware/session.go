@@ -7,6 +7,7 @@ import (
 	"go-react-template/configs"
 	"go-react-template/pkg/model"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
 )
@@ -131,9 +132,39 @@ func (s *SessionMiddleware) OptionalSessionAuth() echo.MiddlewareFunc {
 						c.Set("user_id", userID)
 						c.Set("username", username)
 						c.Set("email", email)
+						c.Set("is_anonymous", false)
+
+						return next(c)
 					}
 				}
 			}
+
+			// 未登录用户，检查或创建匿名用户 ID
+			anonSession, err := s.Store.Get(c.Request(), "anonymous-session")
+			if err == nil {
+				if anonID, ok := anonSession.Values["anonymous_id"].(string); ok && anonID != "" {
+					c.Set("user_id", anonID)
+					c.Set("is_anonymous", true)
+
+					return next(c)
+				}
+			}
+
+			// 创建新的匿名用户 ID
+			anonID := "anon-" + uuid.New().String()
+			anonSession.Values["anonymous_id"] = anonID
+			anonSession.Options = &sessions.Options{
+				Path:     "/",
+				MaxAge:   365 * 24 * 3600, // 1年
+				HttpOnly: true,
+				Secure:   false,
+				SameSite: http.SameSiteLaxMode,
+			}
+
+			_ = anonSession.Save(c.Request(), c.Response()) //nolint:errcheck
+
+			c.Set("user_id", anonID)
+			c.Set("is_anonymous", true)
 
 			return next(c)
 		}
