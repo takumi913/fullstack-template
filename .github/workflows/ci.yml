@@ -62,7 +62,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -75,14 +75,14 @@ jobs:
           path: |
             web/node_modules
             ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('web/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('web/pnpm-lock.yaml', 'web/package.json') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
       - name: Install frontend dependencies
         run: |
           cd web
-          pnpm install --no-frozen-lockfile
+          pnpm install --no-frozen-lockfile --prefer-offline
 
       - name: Run frontend lint
         run: |
