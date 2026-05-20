@@ -43,7 +43,7 @@
 - **国际化**: i18next
 - **主题切换**: next-themes
 - **通知组件**: Sonner
-- **包管理器**: pnpm
+- **包管理器**: Bun
 
 ## 3. 项目结构 (Project Structure) 📂
 
@@ -1522,7 +1522,7 @@ export const LanguageSwitcher: React.FC = () => {
 #### 7.1.2 前端开发工具
 
 - **Node.js**: 18+ 版本
-- **Pnpm**: 包管理器
+- **Bun**: JavaScript 运行时和包管理器
 - **TypeScript**: 类型安全的 JavaScript
 - **Vite**: 快速的构建工具
 - **ESLint**: 代码质量检查

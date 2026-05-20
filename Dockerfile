@@ -1,5 +1,5 @@
 # 第一阶段：前端构建阶段
-FROM node:20-alpine AS frontend-builder
+FROM oven/bun:1.3.2-alpine AS frontend-builder
 
 # 设置工作目录
 WORKDIR /app
@@ -8,13 +8,13 @@ WORKDIR /app
 COPY web/package.json .
 
 # 安装前端依赖
-RUN npm install -g pnpm && pnpm install
+RUN bun install --frozen-lockfile
 
 # 复制前端源码
 COPY web/ ./
 
 # 构建前端
-RUN pnpm run build
+RUN bun run build
 
 # 第二阶段：后端构建阶段
 FROM golang:1.24-alpine AS backend-builder

@@ -1,7 +1,7 @@
 import { useParams, Navigate, Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import { ArrowLeft, Clock, Share2 } from "lucide-react";
-import { blogPosts } from "./BlogPage";
+import { blogPosts } from "./blog-data";
 
 export default function BlogPostPage() {
   const { slug } = useParams();

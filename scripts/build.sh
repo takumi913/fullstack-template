@@ -20,7 +20,7 @@ rm -f "$PROJECT_ROOT/server"
 # 构建前端
 echo "🔨 构建前端 React 项目..."
 cd "$PROJECT_ROOT/web"
-pnpm run build
+bun run build
 
 if [ ! -d "dist" ]; then
     echo "❌ 前端构建失败，dist 目录不存在"

@@ -30,7 +30,7 @@
 - 📘 **TypeScript** - 类型安全
 - 🎨 **Tailwind CSS** - 现代化样式框架
 - 🔧 **Vite** - 快速构建工具
-- 📦 **Pnpm** - 高性能包管理器
+- 📦 **Bun** - 高性能 JavaScript 运行时和包管理器
 - 🧩 **组件库** - Radix UI + shadcn/ui
 
 ### 开发工具
@@ -46,7 +46,7 @@
 ### 环境要求
 
 - **Go** >= 1.24
-- **Pnpm**
+- **Bun**
 - **golangci-lint** (可选，用于代码检查)
 
 ### 安装依赖
@@ -61,7 +61,7 @@ make install
 
 # 或手动安装
 go mod download
-cd web && pnpm install
+cd web && bun install --frozen-lockfile
 ```
 
 ### 开发模式
@@ -74,7 +74,7 @@ make dev
 make dev-go
 
 # 或分别启动
-cd web && pnpm run dev    # 前端
+cd web && bun run dev     # 前端
 air                      # 后端（热重载）
 go run main.go           # 后端（传统方式）
 ```
