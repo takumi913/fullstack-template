@@ -1,18 +1,8 @@
 name: Post-release Postmortem Generation
 
 on:
-  release:
-    types:
-      - published
-
   workflow_dispatch:
-    inputs:
-      previous_tag:
-        description: 'Previous release tag (e.g., v1.0.0)'
-        required: false
-      current_tag:
-        description: 'Current release tag (e.g., v1.1.0)'
-        required: false
+
 
 permissions:
   contents: write
@@ -26,6 +16,7 @@ env:
 jobs:
   post-release:
     runs-on: ubuntu-latest
+    if: false  # disabled intentionally
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
