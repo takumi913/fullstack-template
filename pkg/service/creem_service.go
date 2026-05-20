@@ -141,7 +141,7 @@ func (s *creemService) CreateCheckoutSession(payment *model.Payment, userEmail s
 func (s *creemService) ValidateWebhookSignature(payload []byte, signature string) (*CreemWebhookEvent, error) {
 	webhookSecret := configs.AppConfig.Creem.WebhookSecret
 	if webhookSecret == "" {
-		return nil, errors.New("Creem Webhook密钥未配置")
+		return nil, errors.New("creem Webhook密钥未配置")
 	}
 
 	// 计算 HMAC-SHA256 签名

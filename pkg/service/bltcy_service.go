@@ -41,7 +41,7 @@ func NewBltcyService(taskRepo repo.AITaskRepo, walletService WalletService) Bltc
 func (s *bltcyService) CreateTranslateTask(userID string, req *model.TranslateImageRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
 	cfg := configs.AppConfig.Bltcy
 	if cfg.APIKey == "" {
-		return nil, errors.New("Bltcy API未配置")
+		return nil, errors.New("bltcy API未配置")
 	}
 
 	// 检查并扣除积分
@@ -102,7 +102,7 @@ func (s *bltcyService) CreateTranslateTask(userID string, req *model.TranslateIm
 func (s *bltcyService) CreateWatermarkTask(userID string, req *model.RemoveWatermarkRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
 	cfg := configs.AppConfig.Bltcy
 	if cfg.APIKey == "" {
-		return nil, errors.New("Bltcy API未配置")
+		return nil, errors.New("bltcy API未配置")
 	}
 
 	// 检查并扣除积分

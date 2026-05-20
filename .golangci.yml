@@ -1,266 +1,180 @@
-# golangci-lint 配置文件
-# 详细配置说明: https://golangci-lint.run/usage/configuration/
+version: "2"
 
 run:
-  # 超时时间
   timeout: 5m
-  # Go 版本
   go: "1.25"
 
-# 输出配置
 output:
-  # 输出格式
   formats:
-    - format: colored-line-number
-  # 打印 linter 名称
-  print-linter-name: true
-  # 使检查结果可重现
-  sort-results: true
+    text:
+      path: stdout
+      colors: true
+      print-linter-name: true
 
-# 启用的 linters
 linters:
   enable:
-    # 默认启用的 linters
-    - errcheck      # 检查未处理的错误
-    - gosimple      # 简化代码建议
-    - govet         # Go 官方 vet 工具
-    - ineffassign   # 检查无效赋值
-    - staticcheck   # 静态分析工具
-    - typecheck     # 类型检查
-    - unused        # 检查未使用的代码
-
-    # 额外启用的 linters
-    - gofmt         # 检查代码格式
-    - goimports     # 检查 import 格式
-    - misspell      # 检查拼写错误
-    - unconvert     # 检查不必要的类型转换
-    - unparam       # 检查未使用的函数参数
-    - gocritic      # Go 代码审查工具
-    - gocyclo       # 检查圈复杂度
-    - dupl          # 检查重复代码
-    - goconst       # 检查可以定义为常量的字符串
-    - godot         # 检查注释是否以句号结尾
-    - gosec         # 安全检查
-    - prealloc      # 检查可以预分配的切片
-    - revive        # 快速、可配置、可扩展的 Go linter
-    - whitespace    # 检查多余的空白字符
-    - wsl           # 检查空行使用
-
-# linters 设置
-linters-settings:
-  # errcheck 设置
-  errcheck:
-    # 检查类型断言
-    check-type-assertions: true
-    # 检查空白标识符
-    check-blank: true
-    # 排除的函数
-    exclude-functions:
-      - fmt.Fprintf
-      - fmt.Fprintln
-      - fmt.Fprint
-      - io/ioutil.ReadFile
-      - io/ioutil.ReadAll
-
-  # govet 设置
-  govet:
-    # 启用所有检查
-    enable-all: true
-    # 禁用特定检查
-    disable:
-      - fieldalignment  # 字段对齐检查可能过于严格
-      - shadow          # 影子变量检查
-
-  # gocyclo 设置
-  gocyclo:
-    # 圈复杂度阈值
-    min-complexity: 15
-
-  # dupl 设置
-  dupl:
-    # 重复代码的最小行数
-    threshold: 100
-
-  # goconst 设置
-  goconst:
-    # 字符串最小长度
-    min-len: 3
-    # 最小出现次数
-    min-occurrences: 3
-    # 忽略测试文件
-    ignore-tests: true
-
-  # misspell 设置
-  misspell:
-    # 语言设置
-    locale: US
-    # 忽略的单词
-    ignore-words:
-      - someword
-
-  # revive 设置
-  revive:
-    # 规则配置
+    - dupl
+    - errcheck
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - prealloc
+    - revive
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+    - wsl_v5
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Fprint
+        - io/ioutil.ReadFile
+        - io/ioutil.ReadAll
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+    gocyclo:
+      min-complexity: 15
+    dupl:
+      threshold: 100
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+    misspell:
+      locale: US
+      ignore-rules:
+        - someword
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: if-return
+        - name: increment-decrement
+        - name: var-naming
+        - name: var-declaration
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: indent-error-flow
+        - name: errorf
+        - name: empty-block
+        - name: superfluous-else
+        - name: unused-parameter
+        - name: unreachable-code
+        - name: redefines-builtin-id
+    gosec:
+      includes:
+        - G101
+        - G102
+        - G103
+        - G104
+        - G106
+        - G107
+        - G108
+        - G109
+        - G110
+      excludes:
+        - G204
+    prealloc:
+      simple: true
+      range-loops: true
+      for-loops: false
+    whitespace:
+      multi-if: false
+      multi-func: false
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
+  exclusions:
+    generated: lax
+    paths:
+      - web
+      - static
+      - vendor
+      - .git
+      - ".*_test.go$"
     rules:
-      - name: blank-imports
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: dot-imports
-      - name: error-return
-      - name: error-strings
-      - name: error-naming
-      - name: exported
-      - name: if-return
-      - name: increment-decrement
-      - name: var-naming
-      - name: var-declaration
-      - name: package-comments
-      - name: range
-      - name: receiver-naming
-      - name: time-naming
-      - name: unexported-return
-      - name: indent-error-flow
-      - name: errorf
-      - name: empty-block
-      - name: superfluous-else
-      - name: unused-parameter
-      - name: unreachable-code
-      - name: redefines-builtin-id
+      - path: '(.+)\.go$'
+        text: Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
+      - path: '(.+)\.go$'
+        text: (possible misuse of unsafe.Pointer|should have signature)
+      - path: '(.+)\.go$'
+        text: ineffective break statement. Did you mean to break out of the outer loop
+      - path: '(.+)\.go$'
+        text: Use of unsafe calls should be audited
+      - path: '(.+)\.go$'
+        text: Subprocess launch(ed with variable|ing should be audited)
+      - path: '(.+)\.go$'
+        text: G104
+      - path: '(.+)\.go$'
+        text: (comment on exported (method|function|type|const)|should have( a package)? comment|comment should be of the form)
+      - path: _test\.go
+        linters:
+          - dupl
+          - errcheck
+          - goconst
+          - gocyclo
+          - gosec
+      - path: main\.go
+        linters:
+          - gocyclo
+      - path: pkg/handler/.*\.go
+        linters:
+          - dupl
+      - text: "weak cryptographic primitive"
+        linters:
+          - gosec
+      - text: "exported .* should have comment.*or be unexported"
+        linters:
+          - revive
+      - text: "package comment should be of the form"
+        linters:
+          - revive
 
-  # gosec 设置
-  gosec:
-    # 包含的规则
-    includes:
-      - G101 # 查找硬编码的凭据
-      - G102 # 绑定到所有接口
-      - G103 # 审计不安全块的使用
-      - G104 # 审计未检查的错误
-      - G106 # 审计 ssh.InsecureIgnoreHostKey 的使用
-      - G107 # Url 作为污点输入提供给 HTTP 请求
-      - G108 # 分析自动生成的 HTTP/2 设置
-      - G109 # 潜在的整数溢出
-      - G110 # 潜在的 DoS 漏洞
-    # 排除的规则
-    excludes:
-      - G204 # 审计命令执行
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - web
+      - static
+      - vendor
+      - .git
+      - ".*_test.go$"
+      - \.pb\.go
 
-  # prealloc 设置
-  prealloc:
-    # 简单循环检查
-    simple: true
-    # 范围循环检查
-    range-loops: true
-    # for 循环检查
-    for-loops: false
-
-  # whitespace 设置
-  whitespace:
-    # 多行 if 语句
-    multi-if: false
-    # 多行函数
-    multi-func: false
-
-# 问题配置
 issues:
-  # 排除使用默认排除规则
-  exclude-use-default: false
-
-  # 排除的目录
-  exclude-dirs:
-    - web
-    - static
-    - vendor
-    - .git
-
-  # 排除的文件
-  exclude-files:
-    - ".*_test.go$"
-
-  # 排除的规则
-  exclude:
-    # errcheck: Almost all programs ignore errors on these functions and in most cases it's ok
-    - Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
-
-    # govet: Common false positives
-    - (possible misuse of unsafe.Pointer|should have signature)
-
-    # staticcheck: Developers tend to write in C-style with an explicit 'break' in a 'switch', so it's ok to ignore
-    - ineffective break statement. Did you mean to break out of the outer loop
-
-    # gosec: Too many false-positives on 'unsafe' usage
-    - Use of unsafe calls should be audited
-
-    # gosec: Too many false-positives for parametrized shell calls
-    - Subprocess launch(ed with variable|ing should be audited)
-
-    # gosec: Duplicated errcheck checks
-    - G104
-
-    # gocritic: Too many false-positives. Will be enabled gradually
-    - (comment on exported (method|function|type|const)|should have( a package)? comment|comment should be of the form)
-
-  # 排除的规则（按 linter）
-  exclude-rules:
-    # 排除测试文件的某些检查
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - errcheck
-        - dupl
-        - gosec
-        - goconst
-
-    # 排除 main.go 的某些检查
-    - path: main\.go
-      linters:
-        - gocyclo
-
-    # 排除 handler 文件的重复代码检查（Login 和 GoogleLogin 结构相似是合理的）
-    - path: pkg/handler/.*\.go
-      linters:
-        - dupl
-
-    # 排除生成的文件
-    - path: \.pb\.go
-      linters:
-        - gofmt
-        - goimports
-        - govet
-
-    # 排除特定的错误消息
-    - text: "weak cryptographic primitive"
-      linters:
-        - gosec
-
-    # 排除 "exported .* should have comment" 错误
-    - text: "exported .* should have comment.*or be unexported"
-      linters:
-        - revive
-
-    # 排除 "package comment should be of the form" 错误
-    - text: "package comment should be of the form"
-      linters:
-        - revive
-
-  # 最大问题数量，0 表示无限制
   max-issues-per-linter: 0
-
-  # 最大相同问题数量，0 表示无限制
   max-same-issues: 0
-
-  # 显示只在新代码中的问题
   new: false
-
-  # 修复发现的问题
   fix: false
 
-# 严重性配置
 severity:
-  # 默认严重性
-  default-severity: error
-  # 大小写敏感
-  case-sensitive: false
-  # 规则配置
+  default: error
   rules:
     - linters:
         - dupl
