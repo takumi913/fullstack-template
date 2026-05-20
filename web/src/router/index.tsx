@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { Layout, EditorLayout } from "../components/layout";
-import { useAuthStore } from "../store/authStore";
+import { AdminRoute, ProtectedRoute, PublicRoute } from "./RouteGuards";
 
 // 页面组件
 import HomePage from "../pages/HomePage";
@@ -19,43 +19,6 @@ import BlogPostPage from "../pages/BlogPostPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminProvidersPage from "../pages/admin/AdminProvidersPage";
 import AdminModelsPage from "../pages/admin/AdminModelsPage";
-
-// 受保护的路由组件
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-}
-
-// 管理员路由组件
-function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (user?.role !== "admin") {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-}
-
-// 公开路由组件（已登录用户重定向到仪表板）
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
-}
 
 // 路由配置
 export const router = createBrowserRouter([

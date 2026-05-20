@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Github, Twitter, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { SiGithub, SiX } from "@icons-pack/react-simple-icons";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -26,12 +27,12 @@ export const Footer: React.FC = () => {
     {
       label: "GitHub",
       href: "https://github.com/zaunist",
-      icon: Github,
+      icon: SiGithub,
     },
     {
       label: "Twitter",
       href: "https://twitter.com/mdzz",
-      icon: Twitter,
+      icon: SiX,
     },
     {
       label: "Email",

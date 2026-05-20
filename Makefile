@@ -15,7 +15,7 @@ install: ## 安装项目依赖
 	go mod download
 	go mod tidy
 	@echo "🔧 安装前端依赖..."
-	cd web && pnpm install --no-cache --registry https://registry.npmjs.org/
+	cd web && bun install --frozen-lockfile --registry https://registry.npmjs.org/
 	@echo "✅ 依赖安装完成"
 
 # 代码检查
@@ -33,13 +33,13 @@ lint-go: ## 运行 Go 代码检查
 
 lint-web: ## 运行前端代码检查
 	@echo "🔍 运行前端代码检查..."
-	cd web && pnpm run lint
+	cd web && bun run lint
 
 	@echo "🔧 修复前端代码格式..."
-	cd web && pnpm run lint --fix 2>/dev/null || echo "⚠️  前端自动修复可能不支持，请手动修复"
+	cd web && bun run lint --fix 2>/dev/null || echo "⚠️  前端自动修复可能不支持，请手动修复"
 
 	@echo "🧪 运行前端测试..."
-	cd web && pnpm test 2>/dev/null || echo "⚠️  前端测试未配置"
+	cd web && bun test 2>/dev/null || echo "⚠️  前端测试未配置"
 
 # 构建
 build: ## 构建项目
@@ -52,14 +52,14 @@ build-go: ## 仅构建 Go 后端
 
 build-web: ## 仅构建前端
 	@echo "🔨 构建前端..."
-	cd web && pnpm run build
+	cd web && bun run build
 
 # 开发
 dev: ## 启动开发模式
 	@echo "🚀 启动开发模式..."
 	@echo "前端开发服务器将在 http://localhost:5173 启动"
 	@echo "后端服务器需要单独启动: make run"
-	cd web && pnpm run dev
+	cd web && bun run dev
 
 dev-go: ## 启动 Go 开发模式（热重载）
 	@echo "🚀 启动 Go 开发模式（热重载）..."
@@ -116,7 +116,7 @@ check-tools: ## 检查开发工具是否安装
 	@echo "🔍 检查开发工具安装状态..."
 	@echo "\n📋 核心工具:"
 	@printf "  %-15s " "Go:"; go version 2>/dev/null | cut -d' ' -f3 || echo "❌ 未安装"
-	@printf "  %-15s " "Pnpm:"; pnpm --version 2>/dev/null || echo "❌ 未安装"
+	@printf "  %-15s " "Bun:"; bun --version 2>/dev/null || echo "❌ 未安装"
 	@echo "\n🔧 开发工具:"
 	@printf "  %-15s " "golangci-lint:"; golangci-lint version 2>/dev/null | head -1 | cut -d' ' -f4 || echo "❌ 未安装"
 	@printf "  %-15s " "air:"; air -v 2>/dev/null || echo "❌ 未安装"

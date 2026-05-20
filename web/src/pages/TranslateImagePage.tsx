@@ -94,6 +94,7 @@ export default function TranslateImagePage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(null);
 
   // Stores
   const { currentTask, isLoading, isPolling, error: taskError, translateImage, startPolling, clearCurrentTask, clearError } = useAITaskStore();
@@ -121,7 +122,7 @@ export default function TranslateImagePage() {
   // Cleanup
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       clearCurrentTask();
       clearError();
     };
@@ -133,6 +134,8 @@ export default function TranslateImagePage() {
       if (selectedFile) {
         setFile(selectedFile);
         const preview = URL.createObjectURL(selectedFile);
+        if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = preview;
         setPreviewUrl(preview);
         clearCurrentTask();
         clearError();
