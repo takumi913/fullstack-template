@@ -82,7 +82,7 @@ jobs:
       - name: Install frontend dependencies
         run: |
           cd web
-          pnpm install
+          pnpm install --no-frozen-lockfile
 
       - name: Run frontend lint
         run: |
