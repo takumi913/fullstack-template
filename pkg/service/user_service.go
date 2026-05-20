@@ -175,13 +175,13 @@ func (s *userService) validateLoginRequest(req *model.UserLoginRequest) error {
 func (s *userService) GoogleLogin(req *model.GoogleLoginRequest) (*LoginResponse, error) {
 	// 验证输入
 	if req.IDToken == "" {
-		return nil, errors.New("Google ID Token不能为空")
+		return nil, errors.New("google ID Token不能为空")
 	}
 
 	// 验证Google ID Token
 	payload, err := idtoken.Validate(context.Background(), req.IDToken, "")
 	if err != nil {
-		return nil, fmt.Errorf("Google ID Token验证失败: %v", err)
+		return nil, fmt.Errorf("google ID Token验证失败: %v", err)
 	}
 
 	// 从payload中提取用户信息

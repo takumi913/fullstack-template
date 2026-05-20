@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Github, Twitter, Mail } from "lucide-react";
+import { GitBranch, Mail, X } from "lucide-react";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -26,12 +26,12 @@ export const Footer: React.FC = () => {
     {
       label: "GitHub",
       href: "https://github.com/zaunist",
-      icon: Github,
+      icon: GitBranch,
     },
     {
       label: "Twitter",
       href: "https://twitter.com/mdzz",
-      icon: Twitter,
+      icon: X,
     },
     {
       label: "Email",

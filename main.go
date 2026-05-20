@@ -80,6 +80,7 @@ func main() {
 			} else {
 				log.Printf("[%d] %s - %v", v.Status, v.URI, v.Error)
 			}
+
 			return nil
 		},
 	}))
@@ -90,6 +91,7 @@ func main() {
 		Skipper: func(c echo.Context) bool {
 			// 跳过已经压缩的资源（如图片）
 			path := c.Request().URL.Path
+
 			return strings.HasSuffix(path, ".png") ||
 				strings.HasSuffix(path, ".jpg") ||
 				strings.HasSuffix(path, ".jpeg") ||

@@ -37,7 +37,7 @@ func NewGrokService(taskRepo repo.AITaskRepo) GrokService {
 func (s *grokService) CreateTranslateTask(userID string, req *model.TranslateImageRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
 	cfg := configs.AppConfig.Grok
 	if cfg.APIKey == "" {
-		return nil, errors.New("Grok API未配置")
+		return nil, errors.New("grok API未配置")
 	}
 
 	prompt := "Translate text in this image from " + req.SourceLang + " to " + req.TargetLang
@@ -91,7 +91,7 @@ func (s *grokService) CreateTranslateTask(userID string, req *model.TranslateIma
 func (s *grokService) CreateWatermarkTask(userID string, req *model.RemoveWatermarkRequest, _ *model.AIProvider, m *model.AIModel) (*model.AITaskResponse, error) {
 	cfg := configs.AppConfig.Grok
 	if cfg.APIKey == "" {
-		return nil, errors.New("Grok API未配置")
+		return nil, errors.New("grok API未配置")
 	}
 
 	prompt := "Remove watermark from this image"
