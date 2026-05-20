@@ -103,7 +103,7 @@ docker-build: ## 构建 Docker 镜像
 install-tools: ## 安装开发工具
 	@echo "🔧 安装开发工具..."
 	@echo "📦 安装 golangci-lint..."
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.65.0
 	@echo "📦 安装 air (热重载)..."
 	go install github.com/air-verse/air@v1.61.7
 	@echo "✅ 开发工具安装完成"
