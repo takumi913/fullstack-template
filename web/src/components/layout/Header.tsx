@@ -27,7 +27,7 @@ export const Header: React.FC = () => {
   const { wallet, fetchBalance } = useWalletStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 登录后获取钱包余额
   useEffect(() => {
