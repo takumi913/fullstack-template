@@ -135,38 +135,51 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // 手动分割 chunks
-        manualChunks: {
-          // React 核心库
-          "vendor-react": ["react", "react-dom"],
-          // 路由相关
-          "vendor-router": ["react-router-dom"],
-          // UI 相关
-          "vendor-ui": [
-            "@radix-ui/react-avatar",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-label",
-            "@radix-ui/react-separator",
-            "@radix-ui/react-slot",
-            "lucide-react",
-            "class-variance-authority",
-            "clsx",
-            "tailwind-merge",
-          ],
-          // 表单和状态管理
-          "vendor-state": [
-            "zustand",
-            "react-hook-form",
-            "@hookform/resolvers",
-            "zod",
-          ],
-          // 国际化
-          "vendor-i18n": [
-            "i18next",
-            "react-i18next",
-            "i18next-browser-languagedetector",
-          ],
-          // 其他工具
-          "vendor-utils": ["axios", "sonner", "next-themes"],
+        manualChunks: (id) => {
+          if (!id.includes("node_modules")) {
+            return undefined;
+          }
+
+          if (id.includes("react") || id.includes("react-dom")) {
+            return "vendor-react";
+          }
+
+          if (id.includes("react-router-dom")) {
+            return "vendor-router";
+          }
+
+          if (
+            id.includes("@radix-ui") ||
+            id.includes("lucide-react") ||
+            id.includes("class-variance-authority") ||
+            id.includes("clsx") ||
+            id.includes("tailwind-merge")
+          ) {
+            return "vendor-ui";
+          }
+
+          if (
+            id.includes("zustand") ||
+            id.includes("react-hook-form") ||
+            id.includes("@hookform/resolvers") ||
+            id.includes("zod")
+          ) {
+            return "vendor-state";
+          }
+
+          if (
+            id.includes("i18next") ||
+            id.includes("react-i18next") ||
+            id.includes("i18next-browser-languagedetector")
+          ) {
+            return "vendor-i18n";
+          }
+
+          if (id.includes("axios") || id.includes("sonner") || id.includes("next-themes")) {
+            return "vendor-utils";
+          }
+
+          return "vendor-misc";
         },
         // 资源文件名格式
         chunkFileNames: "assets/js/[name]-[hash].js",

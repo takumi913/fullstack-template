@@ -2,12 +2,7 @@ name: Postmortem Onboarding
 
 on:
   workflow_dispatch:
-    inputs:
-      force:
-        description: 'Force regenerate all postmortems (skip existing check)'
-        required: false
-        default: 'false'
-        type: boolean
+
 
 permissions:
   contents: write
@@ -21,6 +16,7 @@ env:
 jobs:
   onboarding:
     runs-on: ubuntu-latest
+    if: false  # disabled intentionally
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
