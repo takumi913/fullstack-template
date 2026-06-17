@@ -8,7 +8,7 @@ import (
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/service"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // AdminHandler 管理员HTTP处理器.
@@ -24,7 +24,7 @@ func NewAdminHandler(adminService service.AdminService) *AdminHandler {
 }
 
 // GET /api/v1/admin/stats.
-func (h *AdminHandler) GetDashboardStats(c echo.Context) error {
+func (h *AdminHandler) GetDashboardStats(c *echo.Context) error {
 	stats, err := h.adminService.GetDashboardStats()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -42,7 +42,7 @@ func (h *AdminHandler) GetDashboardStats(c echo.Context) error {
 }
 
 // GET /api/v1/admin/stats/users.
-func (h *AdminHandler) GetUserGrowth(c echo.Context) error {
+func (h *AdminHandler) GetUserGrowth(c *echo.Context) error {
 	days := 30
 
 	if d := c.QueryParam("days"); d != "" {
@@ -68,7 +68,7 @@ func (h *AdminHandler) GetUserGrowth(c echo.Context) error {
 }
 
 // GET /api/v1/admin/stats/revenue.
-func (h *AdminHandler) GetRevenueGrowth(c echo.Context) error {
+func (h *AdminHandler) GetRevenueGrowth(c *echo.Context) error {
 	days := 30
 
 	if d := c.QueryParam("days"); d != "" {
@@ -94,7 +94,7 @@ func (h *AdminHandler) GetRevenueGrowth(c echo.Context) error {
 }
 
 // POST /api/v1/admin/providers.
-func (h *AdminHandler) CreateProvider(c echo.Context) error {
+func (h *AdminHandler) CreateProvider(c *echo.Context) error {
 	var req model.AIProviderCreateRequest
 
 	if err := c.Bind(&req); err != nil {
@@ -122,7 +122,7 @@ func (h *AdminHandler) CreateProvider(c echo.Context) error {
 }
 
 // GET /api/v1/admin/providers.
-func (h *AdminHandler) ListProviders(c echo.Context) error {
+func (h *AdminHandler) ListProviders(c *echo.Context) error {
 	providers, err := h.adminService.ListProviders()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -140,7 +140,7 @@ func (h *AdminHandler) ListProviders(c echo.Context) error {
 }
 
 // GET /api/v1/admin/providers/:id.
-func (h *AdminHandler) GetProvider(c echo.Context) error {
+func (h *AdminHandler) GetProvider(c *echo.Context) error {
 	id := c.Param("id")
 
 	provider, err := h.adminService.GetProvider(id)
@@ -160,7 +160,7 @@ func (h *AdminHandler) GetProvider(c echo.Context) error {
 }
 
 // PUT /api/v1/admin/providers/:id.
-func (h *AdminHandler) UpdateProvider(c echo.Context) error {
+func (h *AdminHandler) UpdateProvider(c *echo.Context) error {
 	id := c.Param("id")
 
 	var req model.AIProviderUpdateRequest
@@ -190,7 +190,7 @@ func (h *AdminHandler) UpdateProvider(c echo.Context) error {
 }
 
 // DELETE /api/v1/admin/providers/:id.
-func (h *AdminHandler) DeleteProvider(c echo.Context) error {
+func (h *AdminHandler) DeleteProvider(c *echo.Context) error {
 	id := c.Param("id")
 
 	if err := h.adminService.DeleteProvider(id); err != nil {
@@ -209,7 +209,7 @@ func (h *AdminHandler) DeleteProvider(c echo.Context) error {
 }
 
 // PATCH /api/v1/admin/providers/:id/toggle.
-func (h *AdminHandler) ToggleProvider(c echo.Context) error {
+func (h *AdminHandler) ToggleProvider(c *echo.Context) error {
 	id := c.Param("id")
 
 	provider, err := h.adminService.ToggleProvider(id)
@@ -229,7 +229,7 @@ func (h *AdminHandler) ToggleProvider(c echo.Context) error {
 }
 
 // POST /api/v1/admin/models.
-func (h *AdminHandler) CreateModel(c echo.Context) error {
+func (h *AdminHandler) CreateModel(c *echo.Context) error {
 	var req model.AIModelCreateRequest
 
 	if err := c.Bind(&req); err != nil {
@@ -257,7 +257,7 @@ func (h *AdminHandler) CreateModel(c echo.Context) error {
 }
 
 // GET /api/v1/admin/models.
-func (h *AdminHandler) ListModels(c echo.Context) error {
+func (h *AdminHandler) ListModels(c *echo.Context) error {
 	models, err := h.adminService.ListModels()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -275,7 +275,7 @@ func (h *AdminHandler) ListModels(c echo.Context) error {
 }
 
 // GET /api/v1/admin/models/:id.
-func (h *AdminHandler) GetModel(c echo.Context) error {
+func (h *AdminHandler) GetModel(c *echo.Context) error {
 	id := c.Param("id")
 
 	m, err := h.adminService.GetModel(id)
@@ -295,7 +295,7 @@ func (h *AdminHandler) GetModel(c echo.Context) error {
 }
 
 // PUT /api/v1/admin/models/:id.
-func (h *AdminHandler) UpdateModel(c echo.Context) error {
+func (h *AdminHandler) UpdateModel(c *echo.Context) error {
 	id := c.Param("id")
 
 	var req model.AIModelUpdateRequest
@@ -325,7 +325,7 @@ func (h *AdminHandler) UpdateModel(c echo.Context) error {
 }
 
 // DELETE /api/v1/admin/models/:id.
-func (h *AdminHandler) DeleteModel(c echo.Context) error {
+func (h *AdminHandler) DeleteModel(c *echo.Context) error {
 	id := c.Param("id")
 
 	if err := h.adminService.DeleteModel(id); err != nil {
@@ -344,7 +344,7 @@ func (h *AdminHandler) DeleteModel(c echo.Context) error {
 }
 
 // PATCH /api/v1/admin/models/:id/toggle.
-func (h *AdminHandler) ToggleModel(c echo.Context) error {
+func (h *AdminHandler) ToggleModel(c *echo.Context) error {
 	id := c.Param("id")
 
 	m, err := h.adminService.ToggleModel(id)
@@ -364,7 +364,7 @@ func (h *AdminHandler) ToggleModel(c echo.Context) error {
 }
 
 // GET /api/v1/ai/models - 公开 API.
-func (h *AdminHandler) GetPublicModels(c echo.Context) error {
+func (h *AdminHandler) GetPublicModels(c *echo.Context) error {
 	providerType := c.QueryParam("type")
 	if providerType == "" {
 		providerType = "image"

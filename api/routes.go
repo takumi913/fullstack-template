@@ -5,7 +5,7 @@ import (
 	"go-react-template/pkg/handler"
 	"go-react-template/pkg/middleware"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // SetupRoutes 设置所有API路由.
@@ -29,7 +29,7 @@ func SetupRoutes(e *echo.Echo, userHandler *handler.UserHandler, walletHandler *
 // setupPublicRoutes 设置公开路由（无需认证）.
 func setupPublicRoutes(api *echo.Group, userHandler *handler.UserHandler, walletHandler *handler.WalletHandler, adminHandler *handler.AdminHandler) {
 	// 健康检查
-	api.GET("/health", func(c echo.Context) error {
+	api.GET("/health", func(c *echo.Context) error {
 		return c.JSON(200, map[string]interface{}{
 			"success": true,
 			"data": map[string]interface{}{

@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // SessionMiddleware session中间件配置.
@@ -49,7 +49,7 @@ func OptionalSession() echo.MiddlewareFunc {
 }
 
 // CreateSession 创建用户session.
-func (s *SessionMiddleware) CreateSession(c echo.Context, user *model.User) error {
+func (s *SessionMiddleware) CreateSession(c *echo.Context, user *model.User) error {
 	session, err := s.Store.Get(c.Request(), "user-session")
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (s *SessionMiddleware) CreateSession(c echo.Context, user *model.User) erro
 }
 
 // DestroySession 销毁用户session.
-func (s *SessionMiddleware) DestroySession(c echo.Context) error {
+func (s *SessionMiddleware) DestroySession(c *echo.Context) error {
 	session, err := s.Store.Get(c.Request(), "user-session")
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (s *SessionMiddleware) DestroySession(c echo.Context) error {
 // SessionAuth session认证中间件.
 func (s *SessionMiddleware) SessionAuth() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			session, err := s.Store.Get(c.Request(), "user-session")
 			if err != nil {
 				return echo.NewHTTPError(http.StatusUnauthorized, "无效的session")
@@ -118,7 +118,7 @@ func (s *SessionMiddleware) SessionAuth() echo.MiddlewareFunc {
 // OptionalSessionAuth 可选的session认证中间件（不强制要求认证）.
 func (s *SessionMiddleware) OptionalSessionAuth() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			session, err := s.Store.Get(c.Request(), "user-session")
 			if err == nil {
 				// 检查用户是否已认证
@@ -172,7 +172,7 @@ func (s *SessionMiddleware) OptionalSessionAuth() echo.MiddlewareFunc {
 }
 
 // RefreshSession 刷新session（延长过期时间）.
-func (s *SessionMiddleware) RefreshSession(c echo.Context) error {
+func (s *SessionMiddleware) RefreshSession(c *echo.Context) error {
 	session, err := s.Store.Get(c.Request(), "user-session")
 	if err != nil {
 		return err
@@ -192,7 +192,7 @@ func (s *SessionMiddleware) RefreshSession(c echo.Context) error {
 }
 
 // GetUserIDFromSession 从session中获取用户ID.
-func GetUserIDFromSession(c echo.Context) string {
+func GetUserIDFromSession(c *echo.Context) string {
 	userID := c.Get("user_id")
 	if userID == nil {
 		return ""
@@ -207,7 +207,7 @@ func GetUserIDFromSession(c echo.Context) string {
 }
 
 // GetUsernameFromSession 从session中获取用户名.
-func GetUsernameFromSession(c echo.Context) string {
+func GetUsernameFromSession(c *echo.Context) string {
 	username := c.Get("username")
 	if username == nil {
 		return ""
@@ -222,7 +222,7 @@ func GetUsernameFromSession(c echo.Context) string {
 }
 
 // GetEmailFromSession 从session中获取邮箱.
-func GetEmailFromSession(c echo.Context) string {
+func GetEmailFromSession(c *echo.Context) string {
 	email := c.Get("email")
 	if email == nil {
 		return ""
@@ -237,7 +237,7 @@ func GetEmailFromSession(c echo.Context) string {
 }
 
 // ExtractUserIDFromSession 从session上下文中提取用户ID.
-func ExtractUserIDFromSession(c echo.Context) (string, error) {
+func ExtractUserIDFromSession(c *echo.Context) (string, error) {
 	userID, ok := c.Get("user_id").(string)
 	if !ok || userID == "" {
 		return "", echo.NewHTTPError(http.StatusUnauthorized, "用户ID未找到")

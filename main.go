@@ -15,8 +15,8 @@ import (
 	"go-react-template/pkg/repo"
 	"go-react-template/pkg/service"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 func main() {
@@ -72,9 +72,8 @@ func main() {
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus:   true,
 		LogURI:      true,
-		LogError:    true,
 		HandleError: true,
-		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
+		LogValuesFunc: func(_ *echo.Context, v middleware.RequestLoggerValues) error {
 			if v.Error == nil {
 				log.Printf("[%d] %s", v.Status, v.URI)
 			} else {
@@ -88,7 +87,7 @@ func main() {
 	// 启用 Gzip 压缩
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: 5, // 压缩级别 1-9，5 是性能和压缩率的平衡
-		Skipper: func(c echo.Context) bool {
+		Skipper: func(c *echo.Context) bool {
 			// 跳过已经压缩的资源（如图片）
 			path := c.Request().URL.Path
 
@@ -102,7 +101,7 @@ func main() {
 	}))
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000"},
-		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "X-Language"},
 		AllowCredentials: true,
 	}))
@@ -115,7 +114,7 @@ func main() {
 
 	serverAddr := configs.AppConfig.GetServerAddress()
 	log.Printf("服务器启动在地址 %s", serverAddr)
-	e.Logger.Fatal(e.Start(serverAddr))
+	log.Fatal(e.Start(serverAddr))
 }
 
 // setupStaticFiles 设置静态文件服务.
@@ -130,7 +129,7 @@ func setupStaticFiles(e *echo.Echo) {
 	}
 
 	// 服务带有哈希的静态资源文件（长期缓存）
-	e.GET("/assets/*", func(c echo.Context) error {
+	e.GET("/assets/*", func(c *echo.Context) error {
 		filePath := filepath.Join(staticDir, c.Request().URL.Path)
 		if _, err := os.Stat(filePath); err != nil {
 			return echo.NewHTTPError(http.StatusNotFound, "File not found")
@@ -142,19 +141,19 @@ func setupStaticFiles(e *echo.Echo) {
 	})
 
 	// 服务 favicon（短期缓存）
-	e.GET("/favicon.ico", func(c echo.Context) error {
+	e.GET("/favicon.ico", func(c *echo.Context) error {
 		c.Response().Header().Set("Cache-Control", "public, max-age=86400") // 1天
 		return c.File(filepath.Join(staticDir, "favicon.ico"))
 	})
 
 	// 服务网站图标 SVG（长期缓存）
-	e.GET("/vite.svg", func(c echo.Context) error {
+	e.GET("/vite.svg", func(c *echo.Context) error {
 		c.Response().Header().Set("Cache-Control", "public, max-age=604800") // 7天
 		return c.File(filepath.Join(staticDir, "vite.svg"))
 	})
 
 	// 处理SPA路由，所有非API请求都返回index.html
-	e.GET("/*", func(c echo.Context) error {
+	e.GET("/*", func(c *echo.Context) error {
 		path := c.Request().URL.Path
 
 		// 如果是API请求，返回404

@@ -5,7 +5,7 @@ import (
 
 	"go-react-template/pkg/repo"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // AdminAuth 管理员认证中间件.
@@ -13,7 +13,7 @@ func AdminAuth() echo.MiddlewareFunc {
 	userRepo := repo.NewUserRepo()
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			// 从context中获取用户ID（由Session中间件设置）
 			userID, ok := c.Get("user_id").(string)
 			if !ok || userID == "" {

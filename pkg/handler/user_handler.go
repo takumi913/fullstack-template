@@ -8,7 +8,7 @@ import (
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/service"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // UserHandler 用户HTTP处理器.
@@ -24,7 +24,7 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 }
 
 // POST /api/v1/auth/register.
-func (h *UserHandler) Register(c echo.Context) error {
+func (h *UserHandler) Register(c *echo.Context) error {
 	var req model.UserRegisterRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -51,7 +51,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 }
 
 // POST /api/v1/auth/login.
-func (h *UserHandler) Login(c echo.Context) error {
+func (h *UserHandler) Login(c *echo.Context) error {
 	var req model.UserLoginRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -94,7 +94,7 @@ func (h *UserHandler) Login(c echo.Context) error {
 }
 
 // GET /api/v1/user/profile/:id.
-func (h *UserHandler) GetProfile(c echo.Context) error {
+func (h *UserHandler) GetProfile(c *echo.Context) error {
 	id := c.Param("id")
 
 	user, err := h.userService.GetUserByID(id)
@@ -114,7 +114,7 @@ func (h *UserHandler) GetProfile(c echo.Context) error {
 }
 
 // POST /api/v1/auth/google.
-func (h *UserHandler) GoogleLogin(c echo.Context) error {
+func (h *UserHandler) GoogleLogin(c *echo.Context) error {
 	var req model.GoogleLoginRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -157,7 +157,7 @@ func (h *UserHandler) GoogleLogin(c echo.Context) error {
 }
 
 // POST /api/v1/auth/logout.
-func (h *UserHandler) Logout(c echo.Context) error {
+func (h *UserHandler) Logout(c *echo.Context) error {
 	// 销毁session
 	sessionMiddleware := middleware.NewSessionMiddleware()
 	if err := sessionMiddleware.DestroySession(c); err != nil {
@@ -176,7 +176,7 @@ func (h *UserHandler) Logout(c echo.Context) error {
 }
 
 // PUT /api/v1/user/profile.
-func (h *UserHandler) UpdateProfile(c echo.Context) error {
+func (h *UserHandler) UpdateProfile(c *echo.Context) error {
 	var req model.UserUpdateProfileRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -213,7 +213,7 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 }
 
 // POST /api/v1/user/change-password.
-func (h *UserHandler) ChangePassword(c echo.Context) error {
+func (h *UserHandler) ChangePassword(c *echo.Context) error {
 	var req model.UserChangePasswordRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{

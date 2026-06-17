@@ -9,7 +9,7 @@ import (
 	"go-react-template/pkg/repo"
 	"go-react-template/pkg/service"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // AIHandler AI任务HTTP处理器.
@@ -31,7 +31,7 @@ func NewAIHandler(grokService service.GrokService, bltcyService service.BltcySer
 }
 
 // POST /api/v1/ai/translate-image.
-func (h *AIHandler) TranslateImage(c echo.Context) error {
+func (h *AIHandler) TranslateImage(c *echo.Context) error {
 	userID := middleware.GetUserIDFromSession(c)
 
 	var req model.TranslateImageRequest
@@ -105,7 +105,7 @@ func (h *AIHandler) TranslateImage(c echo.Context) error {
 }
 
 // POST /api/v1/ai/remove-watermark.
-func (h *AIHandler) RemoveWatermark(c echo.Context) error {
+func (h *AIHandler) RemoveWatermark(c *echo.Context) error {
 	userID := middleware.GetUserIDFromSession(c)
 
 	var req model.RemoveWatermarkRequest
@@ -179,7 +179,7 @@ func (h *AIHandler) RemoveWatermark(c echo.Context) error {
 }
 
 // GET /api/v1/ai/task/:id.
-func (h *AIHandler) GetTask(c echo.Context) error {
+func (h *AIHandler) GetTask(c *echo.Context) error {
 	taskID := c.Param("id")
 	if taskID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]any{
@@ -206,7 +206,7 @@ func (h *AIHandler) GetTask(c echo.Context) error {
 }
 
 // GET /api/v1/ai/tasks.
-func (h *AIHandler) GetTasks(c echo.Context) error {
+func (h *AIHandler) GetTasks(c *echo.Context) error {
 	userID, err := middleware.ExtractUserIDFromSession(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]any{

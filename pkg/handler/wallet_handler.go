@@ -9,7 +9,7 @@ import (
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/service"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // WalletHandler 钱包HTTP处理器.
@@ -25,7 +25,7 @@ func NewWalletHandler(walletService service.WalletService) *WalletHandler {
 }
 
 // GET /api/v1/wallet.
-func (h *WalletHandler) GetBalance(c echo.Context) error {
+func (h *WalletHandler) GetBalance(c *echo.Context) error {
 	userID := middleware.GetUserIDFromSession(c)
 
 	wallet, err := h.walletService.GetBalance(userID)
@@ -45,7 +45,7 @@ func (h *WalletHandler) GetBalance(c echo.Context) error {
 }
 
 // GET /api/v1/wallet/transactions.
-func (h *WalletHandler) GetTransactions(c echo.Context) error {
+func (h *WalletHandler) GetTransactions(c *echo.Context) error {
 	userID := middleware.GetUserIDFromSession(c)
 
 	var req model.TransactionListRequest
@@ -79,7 +79,7 @@ func (h *WalletHandler) GetTransactions(c echo.Context) error {
 }
 
 // POST /api/v1/wallet/topup.
-func (h *WalletHandler) Topup(c echo.Context) error {
+func (h *WalletHandler) Topup(c *echo.Context) error {
 	userID := middleware.GetUserIDFromSession(c)
 
 	var req model.TopupRequest
@@ -108,7 +108,7 @@ func (h *WalletHandler) Topup(c echo.Context) error {
 }
 
 // GET /api/v1/wallet/pricing.
-func (h *WalletHandler) GetPricing(c echo.Context) error {
+func (h *WalletHandler) GetPricing(c *echo.Context) error {
 	tiers := h.walletService.GetPricingTiers()
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -119,7 +119,7 @@ func (h *WalletHandler) GetPricing(c echo.Context) error {
 }
 
 // POST /api/v1/webhook/stripe.
-func (h *WalletHandler) StripeWebhook(c echo.Context) error {
+func (h *WalletHandler) StripeWebhook(c *echo.Context) error {
 	// 读取请求体
 	payload, err := io.ReadAll(c.Request().Body)
 	if err != nil {
@@ -149,7 +149,7 @@ func (h *WalletHandler) StripeWebhook(c echo.Context) error {
 }
 
 // POST /api/v1/webhook/creem.
-func (h *WalletHandler) CreemWebhook(c echo.Context) error {
+func (h *WalletHandler) CreemWebhook(c *echo.Context) error {
 	// 读取请求体
 	payload, err := io.ReadAll(c.Request().Body)
 	if err != nil {
