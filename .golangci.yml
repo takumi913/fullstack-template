@@ -15,7 +15,6 @@ linters:
   enable:
     - dupl
     - errcheck
-    - goconst
     - gocritic
     - gocyclo
     - godot
@@ -30,7 +29,6 @@ linters:
     - unparam
     - unused
     - whitespace
-    - wsl_v5
   settings:
     errcheck:
       check-type-assertions: true

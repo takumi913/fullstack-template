@@ -1,74 +1,63 @@
-// Package database 负责数据库连接、初始化和迁移
+// Package database manages SQL database connections.
 package database
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
-	"log"
+	"time"
 
 	"go-react-template/configs"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	_ "github.com/jackc/pgx/v5/stdlib" // 注册 PostgreSQL database/sql 驱动。
+	_ "modernc.org/sqlite"             // 注册 SQLite database/sql 驱动。
 )
 
-var DB *gorm.DB
+var DB *sql.DB
 
-// Init 初始化数据库连接.
 func Init() error {
 	if configs.AppConfig == nil {
-		return fmt.Errorf("配置未初始化，请先调用 configs.Init()")
+		return fmt.Errorf("配置未初始化")
 	}
-
-	var dialector gorm.Dialector
-
-	dsn := configs.AppConfig.GetDatabaseDSN()
-
-	// 根据配置选择数据库驱动
-	switch configs.AppConfig.Database.Driver {
-	case "sqlite":
-		dialector = sqlite.Open(dsn)
-		log.Printf("使用 SQLite 数据库: %s", dsn)
-	case "mysql":
-		dialector = mysql.Open(dsn)
-
-		log.Printf("使用 MySQL 数据库: %s:%s/%s",
-			configs.AppConfig.Database.Host,
-			configs.AppConfig.Database.Port,
-			configs.AppConfig.Database.DBName)
-	case "postgres":
-		dialector = postgres.Open(dsn)
-
-		log.Printf("使用 PostgreSQL 数据库: %s:%s/%s",
-			configs.AppConfig.Database.Host,
-			configs.AppConfig.Database.Port,
-			configs.AppConfig.Database.DBName)
-	default:
-		return fmt.Errorf("不支持的数据库驱动: %s", configs.AppConfig.Database.Driver)
-	}
-
-	var err error
-
-	DB, err = gorm.Open(dialector, &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	driver, dsn, err := connectionConfig(configs.AppConfig.Database.Driver, configs.AppConfig.GetDatabaseDSN())
 	if err != nil {
+		return err
+	}
+	db, err := sql.Open(driver, dsn)
+	if err != nil {
+		return fmt.Errorf("打开数据库失败: %w", err)
+	}
+	if driver == "sqlite" {
+		db.SetMaxOpenConns(1)
+	} else {
+		db.SetMaxOpenConns(25)
+		db.SetMaxIdleConns(5)
+		db.SetConnMaxLifetime(30 * time.Minute)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
+		_ = db.Close()
 		return fmt.Errorf("数据库连接失败: %w", err)
 	}
-
-	log.Println("数据库连接成功")
-
+	DB = db
 	return nil
 }
 
-// AutoMigrate 执行数据库迁移.
-func AutoMigrate(models ...interface{}) error {
-	return DB.AutoMigrate(models...)
+func connectionConfig(driver, dsn string) (string, string, error) {
+	switch driver {
+	case "sqlite":
+		return "sqlite", dsn, nil
+	case "postgres", "postgresql":
+		return "pgx", dsn, nil
+	default:
+		return "", "", fmt.Errorf("不支持的数据库驱动: %s", driver)
+	}
 }
-
-// GetDB 获取数据库实例.
-func GetDB() *gorm.DB {
-	return DB
+func GetDB() *sql.DB { return DB }
+func Close() error {
+	if DB == nil {
+		return nil
+	}
+	return DB.Close()
 }

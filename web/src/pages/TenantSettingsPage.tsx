@@ -1,0 +1,13 @@
+import { useState } from "react";
+import { tenantApi, type Tenant } from "@/api";
+import { useTenantStore } from "@/store/tenantStore";
+import { Input } from "./LoginPage";
+import { SettingsPage } from "./ProfileSettingsPage";
+
+export default function TenantSettingsPage() {
+  const { activeTenant, loadTenants } = useTenantStore();
+  const [newName, setNewName] = useState("");
+  async function create(event: React.FormEvent) { event.preventDefault(); await tenantApi.create({ name: newName, slug: "" }); setNewName(""); await loadTenants(); }
+  return <SettingsPage title="工作区设置" description="管理当前工作区，或创建一个新的工作区。"><div className="grid gap-6 lg:grid-cols-2">{activeTenant && <CurrentTenantForm key={activeTenant.id} tenant={activeTenant} reload={loadTenants}/>}<form onSubmit={create} className="panel p-6"><h2 className="text-lg font-medium">新建工作区</h2><p className="mt-1 text-sm text-zinc-500">为另一个团队或项目创建独立空间。</p><div className="mt-6"><Input label="名称" value={newName} onChange={setNewName}/></div><div className="mt-6 border-t pt-5"><button className="button-primary">创建工作区</button></div></form></div></SettingsPage>;
+}
+function CurrentTenantForm({ tenant, reload }: { tenant: Tenant; reload: () => Promise<void> }) { const [name, setName] = useState(tenant.name); const [slug, setSlug] = useState(tenant.slug); async function update(event: React.FormEvent) { event.preventDefault(); await tenantApi.update(tenant.id, { name, slug }); await reload(); } return <form onSubmit={update} className="panel p-6"><h2 className="text-lg font-medium">当前工作区</h2><p className="mt-1 text-sm text-zinc-500">更新名称和 URL 标识。</p><div className="mt-6 space-y-5"><Input label="名称" value={name} onChange={setName}/><Input label="Slug" value={slug} onChange={setSlug}/></div><div className="mt-6 border-t pt-5"><button className="button-primary">保存更改</button></div></form>; }

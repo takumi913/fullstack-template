@@ -18,6 +18,16 @@ install: ## 安装项目依赖
 	cd web && bun install --frozen-lockfile --registry https://registry.npmjs.org/
 	@echo "✅ 依赖安装完成"
 
+sqlc-generate: ## 生成 SQLite/PostgreSQL 查询代码
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
+
+sqlc-verify: ## 检查 sqlc 生成代码是否最新
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
+	git diff --exit-code -- db/generated
+
+test: ## 运行后端测试
+	go test ./...
+
 # 代码检查
 lint: lint-go lint-web ## 运行所有代码检查
 

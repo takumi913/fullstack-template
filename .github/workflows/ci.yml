@@ -11,6 +11,22 @@ jobs:
   go-lint-and-test:
     name: Go Lint and Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: fullstack_template_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      TEST_POSTGRES_DSN: postgres://postgres:postgres@localhost:5432/fullstack_template_test?sslmode=disable
 
     steps:
       - name: Checkout code
@@ -41,6 +57,11 @@ jobs:
         with:
           version: v2.6.2
           args: --timeout=5m
+
+      - name: Verify sqlc generated code
+        run: |
+          go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
+          git diff --exit-code -- db/generated
 
       - name: Run Go tests
         run: |
