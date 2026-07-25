@@ -22,17 +22,12 @@
 
 ```bash
 cp .env.example .env
-make install
+make deps
 make sqlc-generate
-go run .
+make dev
 ```
 
-前端开发：
-
-```bash
-cd web
-bun run dev
-```
+`make dev` 会同时启动后端开发服务（Air 热重载）和前端开发服务器（Vite）。
 
 默认使用 `app.db`。切换 PostgreSQL：
 
@@ -68,5 +63,3 @@ pkg/repo/            数据访问适配层
 pkg/middleware/      Session、租户和权限中间件
 web/                  React 前端
 ```
-
-详细重构设计见 [`docs/sqlc-multitenancy-refactor.md`](docs/sqlc-multitenancy-refactor.md)。

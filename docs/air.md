@@ -17,7 +17,7 @@
 
 ```bash
 # 安装所有开发工具（包括 air）
-make install-tools
+make tools
 ```
 
 ### 方式 2: 手动安装
@@ -182,7 +182,7 @@ echo $PATH | grep $(go env GOPATH)/bin
 export PATH=$PATH:$(go env GOPATH)/bin
 
 # 或重新安装
-make install-tools
+make tools
 ```
 
 ### 2. 构建失败

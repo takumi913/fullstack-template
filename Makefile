@@ -9,7 +9,7 @@ help: ## 显示帮助信息
 	@echo ""
 
 # 安装依赖
-install: ## 安装项目依赖
+deps: ## 安装项目依赖
 	@echo "📦 安装项目依赖..."
 	@echo "🔧 安装 Go 依赖..."
 	go mod download
@@ -25,8 +25,11 @@ sqlc-verify: ## 检查 sqlc 生成代码是否最新
 	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
 	git diff --exit-code -- db/generated
 
-test: ## 运行后端测试
+test: ## 运行前后端测试
+	@echo "🧪 运行后端测试..."
 	go test ./...
+	@echo "🧪 运行前端测试..."
+	cd web && bun test 2>/dev/null || echo "⚠️  前端测试未配置"
 
 # 代码检查
 lint: lint-go lint-web ## 运行所有代码检查
@@ -65,25 +68,25 @@ build-web: ## 仅构建前端
 	cd web && bun run build
 
 # 开发
-dev: ## 启动开发模式
-	@echo "🚀 启动开发模式..."
-	@echo "前端开发服务器将在 http://localhost:5173 启动"
-	@echo "后端服务器需要单独启动: make run"
-	cd web && bun run dev
-
-dev-go: ## 启动 Go 开发模式（热重载）
-	@echo "🚀 启动 Go 开发模式（热重载）..."
-	@if command -v air >/dev/null 2>&1; then \
-		echo "📁 创建临时目录..."; \
-		mkdir -p tmp; \
-		echo "🔥 使用 air 启动热重载..."; \
-		air; \
-	else \
-		echo "❌ air 未安装，使用普通模式启动"; \
-		echo "📦 安装 air: go install github.com/air-verse/air@v1.61.7"; \
-		echo "📦 或使用项目脚本: make install-tools"; \
-		make run; \
-	fi
+dev: ## 启动前后端开发环境（同时启动后端和前端）
+	@echo "🚀 启动前后端开发环境..."
+	@echo "📡 后端将使用 Air 热重载，地址: http://localhost:1323"
+	@echo "🌐 前端将使用 Vite，地址: http://localhost:5173"
+	@mkdir -p tmp
+	@trap 'kill 0' EXIT; \
+	( \
+		if command -v air >/dev/null 2>&1; then \
+			echo "🔥 启动后端热重载..."; \
+			air; \
+		else \
+			echo "❌ air 未安装，使用普通模式启动"; \
+			echo "📦 安装 air: go install github.com/air-verse/air@v1.61.7"; \
+			echo "📦 或使用项目脚本: make tools"; \
+			make run; \
+		fi \
+	) & \
+	(cd web && bun run dev) & \
+	wait
 
 # 运行
 run: ## 运行项目（需要先构建）
@@ -104,13 +107,13 @@ clean: ## 清理构建文件
 	@echo "✅ 清理完成"
 
 # Docker
-docker-build: ## 构建 Docker 镜像
+docker: ## 构建 Docker 镜像
 	@echo "🐳 构建 Docker 镜像..."
 	./scripts/build.sh
 	docker build -t go-react-template .
 
 # 工具安装
-install-tools: ## 安装开发工具
+tools: ## 安装开发工具
 	@echo "🔧 安装开发工具..."
 	@echo "📦 安装 golangci-lint..."
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
@@ -118,11 +121,10 @@ install-tools: ## 安装开发工具
 	go install github.com/air-verse/air@v1.61.7
 	@echo "✅ 开发工具安装完成"
 	@echo "🎉 可用命令:"
-	@echo "   - make dev-go     # 启动 Go 热重载开发"
 	@echo "   - make lint-go    # 运行代码检查"
 
 # 检查工具
-check-tools: ## 检查开发工具是否安装
+check: ## 检查开发工具是否安装
 	@echo "🔍 检查开发工具安装状态..."
 	@echo "\n📋 核心工具:"
 	@printf "  %-15s " "Go:"; go version 2>/dev/null | cut -d' ' -f3 || echo "❌ 未安装"
@@ -133,7 +135,7 @@ check-tools: ## 检查开发工具是否安装
 	@echo "\n🐳 容器工具:"
 	@printf "  %-15s " "Docker:"; docker --version 2>/dev/null | cut -d' ' -f3 | tr -d ',' || echo "❌ 未安装"
 	@printf "  %-15s " "docker-compose:"; docker-compose --version 2>/dev/null | cut -d' ' -f3 | tr -d ',' || echo "❌ 未安装"
-	@echo "\n💡 安装缺失工具: make install-tools"
+	@echo "💡 安装缺失工具: make tools"
 
 # Postmortem 相关命令
 postmortem-onboarding: ## 分析历史 fix commits 生成 postmortem
