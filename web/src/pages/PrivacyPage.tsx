@@ -1,2 +1,25 @@
 import { SettingsPage } from "./ProfileSettingsPage";
-export default function PrivacyPage(){return <SettingsPage title="隐私政策" description="最后更新：2026 年 7 月 22 日"><article className="max-w-2xl space-y-8 text-sm leading-7 text-zinc-600"><section><h2 className="font-medium text-zinc-950">我们收集的信息</h2><p className="mt-2">模板仅存储运行账户与工作区所需的信息，包括用户名、邮箱、密码哈希、成员关系和会话记录。</p></section><section><h2 className="font-medium text-zinc-950">数据用途</h2><p className="mt-2">这些数据用于身份认证、租户隔离和权限校验。接入实际业务后，请根据你的数据处理方式更新本页面。</p></section><section><h2 className="font-medium text-zinc-950">数据控制</h2><p className="mt-2">部署者负责数据库安全、备份、数据保留和用户请求处理。</p></section></article></SettingsPage>}
+export default function PrivacyPage() {
+  return (
+    <SettingsPage title="隐私政策" description="最后更新：2026 年 7 月 22 日">
+      <article className="max-w-2xl space-y-8 text-sm leading-7 text-zinc-600">
+        <section>
+          <h2 className="font-medium text-zinc-950">我们收集的信息</h2>
+          <p className="mt-2">
+            模板仅存储运行账户与工作区所需的信息，包括用户名、邮箱、密码哈希、成员关系和会话记录。
+          </p>
+        </section>
+        <section>
+          <h2 className="font-medium text-zinc-950">数据用途</h2>
+          <p className="mt-2">
+            这些数据用于身份认证、租户隔离和权限校验。接入实际业务后，请根据你的数据处理方式更新本页面。
+          </p>
+        </section>
+        <section>
+          <h2 className="font-medium text-zinc-950">数据控制</h2>
+          <p className="mt-2">部署者负责数据库安全、备份、数据保留和用户请求处理。</p>
+        </section>
+      </article>
+    </SettingsPage>
+  );
+}

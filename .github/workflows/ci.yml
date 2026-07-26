@@ -105,10 +105,20 @@ jobs:
           cd web
           bun install --frozen-lockfile
 
+      - name: Check frontend formatting
+        run: |
+          cd web
+          bun run format:check
+
       - name: Run frontend lint
         run: |
           cd web
           bun run lint
+
+      - name: Run frontend tests
+        run: |
+          cd web
+          bun run test
 
       - name: Build frontend
         run: |

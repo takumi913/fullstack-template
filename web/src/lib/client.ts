@@ -13,6 +13,20 @@ export interface ApiResponse<T = unknown> {
   message: string;
 }
 
+// 接口错误。保留 status 和业务 code，调用方才能按状态码分支处理
+// （例如区分 409 冲突和 422 校验失败），而不是只拿到一句文案。
+export class ApiError extends Error {
+  readonly status: number;
+  readonly code?: number;
+
+  constructor(message: string, status: number, code?: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 // 创建axios实例
 const client: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -31,7 +45,7 @@ client.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // 响应拦截器
@@ -41,42 +55,30 @@ client.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    // 统一处理错误响应
-    let message = "网络错误，请稍后重试";
-
-    if (error.response) {
-      // 服务器返回了错误状态码
-      const { status, data } = error.response;
-
-      switch (status) {
-        case 400:
-          message = (data as { message?: string })?.message || "请求参数错误";
-          break;
-        case 401:
-          message = "未授权，请重新登录";
-          // 触发未授权事件，由 authStore 处理清除逻辑
-          triggerUnauthorized();
-          break;
-        case 403:
-          message = "权限不足";
-          break;
-        case 404:
-          message = "请求的资源不存在";
-          break;
-        case 500:
-          message = "服务器内部错误";
-          break;
-        default:
-          message = (data as { message?: string })?.message || `请求失败 (${status})`;
-      }
-    } else if (error.request) {
+    if (!error.response) {
       // 请求已发出但没有收到响应
-      message = "网络连接超时，请检查网络";
+      const message = error.request ? "网络连接超时，请检查网络" : "网络错误，请稍后重试";
+      return Promise.reject(new ApiError(message, 0));
     }
 
-    console.error("API请求错误:", error);
-    return Promise.reject(new Error(message));
-  }
+    const { status, data } = error.response;
+    const body = data as { message?: string; code?: number } | undefined;
+
+    if (status === 401) {
+      // 触发未授权事件，由 authStore 处理清除逻辑
+      triggerUnauthorized();
+    }
+
+    // 优先使用服务端返回的文案：后端已经对 5xx 做过脱敏，
+    // 403 之类的拒绝原因也比前端硬编码的"权限不足"更具体。
+    const fallback: Record<number, string> = {
+      401: "未授权，请重新登录",
+      404: "请求的资源不存在",
+    };
+    const message = body?.message || fallback[status] || `请求失败 (${status})`;
+
+    return Promise.reject(new ApiError(message, status, body?.code));
+  },
 );
 
 export default client;
