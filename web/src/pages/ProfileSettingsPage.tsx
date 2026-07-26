@@ -11,8 +11,17 @@ export default function ProfileSettingsPage() {
   const [email, setEmail] = useState(user.email);
   const [avatar, setAvatar] = useState(user.avatar_url);
   const [saved, setSaved] = useState(false);
-  async function submit(event: React.FormEvent) { event.preventDefault(); const response = await userApi.updateProfile({ username, email, avatar_url: avatar }); setUser(response.data); setSaved(true); }
-  return <SettingsPage title="个人资料" description="这些信息会显示在你加入的工作区中。"><form onSubmit={submit} className="panel max-w-2xl p-6"><div className="space-y-5"><Input label="用户名" value={username} onChange={setUsername}/><Input label="邮箱" type="email" value={email} onChange={setEmail}/><Input label="头像 URL" value={avatar} onChange={setAvatar} required={false}/></div><div className="mt-6 flex items-center gap-3 border-t pt-5"><button className="button-primary">保存更改</button>{saved && <span className="text-sm text-zinc-500">已保存</span>}</div></form></SettingsPage>;
+  const [error, setError] = useState("");
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setError("");
+    setSaved(false);
+    try { const response = await userApi.updateProfile({ username, email, avatar_url: avatar }); setUser(response.data); setSaved(true); }
+    catch (caught) { setError((caught as Error).message); }
+  }
+
+  return <SettingsPage title="个人资料" description="这些信息会显示在你加入的工作区中。"><form onSubmit={submit} className="panel max-w-2xl p-6"><div className="space-y-5"><Input label="用户名" value={username} onChange={setUsername}/><Input label="邮箱" type="email" value={email} onChange={setEmail}/><Input label="头像 URL" value={avatar} onChange={setAvatar} required={false}/>{error && <p className="text-sm text-red-700">{error}</p>}</div><div className="mt-6 flex items-center gap-3 border-t pt-5"><button className="button-primary">保存更改</button>{saved && <span className="text-sm text-zinc-500">已保存</span>}</div></form></SettingsPage>;
 }
 
 export function SettingsPage({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
