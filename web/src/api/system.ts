@@ -6,7 +6,7 @@ import type { ApiResponse } from "../lib/client";
 export const systemApi = {
   // 健康检查
   health: async (): Promise<ApiResponse<null>> => {
-    const response = await client.get<ApiResponse<null>>("/v1/health");
+    const response = await client.get<ApiResponse<null>>("/api/v1/health");
     return response.data;
   },
 };
