@@ -37,12 +37,12 @@
 - **CSS**: TailwindCSS v4+
 - **状态管理**: Zustand (支持持久化)
 - **路由**: React Router DOM v7+
-- **UI 组件库**: shadcn/ui + Radix UI
-- **表单处理**: React Hook Form + Zod
+- **UI 组件**: 页面使用 `style.css` 中的 `.panel`/`.button-primary`/`.field` 等类；如需成品组件，用 `bunx shadcn@latest add <组件>` 按需引入
+- **表单处理**: 原生受控组件 + service 层校验（未引入表单库）
 - **HTTP 客户端**: Axios
-- **国际化**: i18next
-- **主题切换**: next-themes
-- **通知组件**: Sonner
+- **国际化**: 暂未引入，文案直接写在组件中
+- **主题切换**: 暂未引入
+- **通知组件**: 暂未引入，错误以表单内联红字展示
 - **包管理器**: Bun
 
 ## 3. 项目结构 (Project Structure) 📂
@@ -102,13 +102,12 @@
     │   ├── api/           # API 调用
     │   ├── assets/        # 前端资源
     │   ├── components/    # 可复用组件
-    │   ├── i18n/          # 国际化文件
     │   ├── lib/           # 工具函数
     │   ├── pages/         # 页面级组件
     │   ├── router/        # 路由配置
     │   ├── store/         # Zustand store
     │   └── style.css      # 全局样式和主题配置
-    ├── components.json    # shadcn/ui 配置
+    ├── components.json    # shadcn 配置（供 bunx shadcn add 按需引入组件）
     ├── package.json       # 前端依赖
     ├── tsconfig.json      # TypeScript 配置
     └── vite.config.ts     # Vite 构建配置
@@ -310,7 +309,7 @@ LIMIT ? OFFSET ?;
 
 #### 4.5.1 日志规范
 
-- **使用标准日志库**：使用 Go 标准库 `log` 进行日志记录
+- **使用结构化日志**：统一使用 `log/slog`（与 echo 内部一致），避免混用 `log` 产生两种格式
 - **记录关键操作**：记录用户登录、注册、重要业务操作
 - **错误日志**：记录所有错误信息，便于问题排查
 - **安全考虑**：不记录密码、token 等敏感信息
@@ -338,7 +337,7 @@ log.Printf("数据库连接失败: %v", err)
 - **页面组件** (`pages/`): 路由对应的页面级组件
 - **布局组件** (`components/layout/`): 页面布局相关组件
 - **业务组件** (`components/business/`): 特定业务逻辑组件
-- **通用组件** (`components/ui/`): 可复用的 UI 组件（基于 shadcn/ui）
+- **通用组件** (`components/`): 页面间复用的组件；`components/ui/` 保留给 shadcn 按需添加的组件
 - **表单组件** (`components/form/`): 表单相关组件
 
 #### 5.1.2 组件设计原则
@@ -441,7 +440,7 @@ export default Component;
 
 - **按功能模块分割**：每个业务模块一个 store
 - **状态扁平化**：避免深层嵌套的状态结构
-- **不可变更新**：使用 immer 或展开运算符更新状态
+- **不可变更新**：使用展开运算符创建新对象，不要就地修改 state
 
 #### 5.2.2 Store 结构模板
 
@@ -618,7 +617,7 @@ export const router = createBrowserRouter([
 - **原子化优先**：优先使用 Tailwind 工具类
 - **组件样式**：复杂样式使用 `@apply` 或 CSS-in-JS
 - **主题定制**：TailwindCSS v4+ 使用 CSS 变量进行主题定制，无需配置文件
-- **主题切换**：使用 next-themes 库实现暗黑/明亮主题切换
+- **设计变量**：颜色、圆角等集中定义在 `style.css` 的 `@theme` 中，不在组件里写死
 
 #### 5.4.2 响应式设计
 
@@ -656,208 +655,39 @@ export const getButtonClasses = (variant: keyof typeof buttonVariants) => {
 
 #### 5.4.4 主题系统规范
 
-项目使用 next-themes 库实现主题切换功能，支持明亮和暗黑两种主题模式：
+项目目前只提供明亮主题，未引入主题切换库。颜色与圆角等设计变量集中定义在
+`src/style.css` 的 `@theme` 中，页面通过 `.panel`、`.button-primary`、`.field`
+等语义化类复用样式。
 
-**主题配置原则：**
-
-- **颜色系统**：使用 HSL 色彩空间定义颜色变量
-- **主题变量**：在 `src/style.css` 中定义 CSS 自定义属性
-- **暗黑模式**：使用 `dark` 类名切换，通过 TailwindCSS 的 `dark:` 前缀应用样式
-- **一致性**：所有组件必须同时支持明亮和暗黑主题
-
-**主题实现模板：**
-
-```css
-/* src/style.css */
-:root {
-  /* 明亮主题颜色 */
-  --background: 0 0% 100%; /* 背景色 */
-  --foreground: 25 84% 30%; /* 前景色 */
-  --card: 0 0% 100%; /* 卡片背景 */
-  --card-foreground: 25 84% 30%; /* 卡片前景 */
-  --primary: 25 84% 45%; /* 主色调 */
-  --primary-foreground: 0 0% 100%; /* 主色前景 */
-  --secondary: 38 92% 96%; /* 次要色 */
-  --secondary-foreground: 25 84% 30%; /* 次要色前景 */
-  --muted: 38 92% 96%; /* 静音色 */
-  --muted-foreground: 25 54% 50%; /* 静音色前景 */
-  --accent: 38 92% 96%; /* 强调色 */
-  --accent-foreground: 25 84% 30%; /* 强调色前景 */
-  --destructive: 0 84% 60%; /* 危险色 */
-  --destructive-foreground: 0 0% 100%; /* 危险色前景 */
-  --border: 38 92% 90%; /* 边框色 */
-  --input: 38 92% 90%; /* 输入框边框 */
-  --ring: 25 84% 45%; /* 焦点环 */
-}
-
-.dark {
-  /* 暗黑主题颜色 */
-  --background: 215 28% 17%; /* 背景色 */
-  --foreground: 38 92% 90%; /* 前景色 */
-  --card: 215 28% 17%; /* 卡片背景 */
-  --card-foreground: 38 92% 90%; /* 卡片前景 */
-  --primary: 25 84% 65%; /* 主色调 */
-  --primary-foreground: 215 28% 17%; /* 主色前景 */
-  --secondary: 215 28% 23%; /* 次要色 */
-  --secondary-foreground: 38 92% 90%; /* 次要色前景 */
-  --muted: 215 28% 23%; /* 静音色 */
-  --muted-foreground: 38 92% 60%; /* 静音色前景 */
-  --accent: 215 28% 23%; /* 强调色 */
-  --accent-foreground: 38 92% 90%; /* 强调色前景 */
-  --destructive: 0 62% 30%; /* 危险色 */
-  --destructive-foreground: 38 92% 90%; /* 危险色前景 */
-  --border: 215 28% 23%; /* 边框色 */
-  --input: 215 28% 23%; /* 输入框边框 */
-  --ring: 25 84% 65%; /* 焦点环 */
-}
-```
-
-**主题切换组件实现：**
-
-```typescript
-// components/ThemeToggle.tsx
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-
-export const ThemeToggle: React.FC = () => {
-  const { theme, setTheme } = useTheme();
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="h-9 w-9"
-    >
-      <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">切换主题</span>
-    </Button>
-  );
-};
-```
-
-**组件主题适配规范：**
-
-```typescript
-// 组件主题适配示例
-export const ThemedCard: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  return (
-    <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-orange-200/50 dark:border-slate-700/50 rounded-lg p-6 shadow-lg shadow-orange-100/50 dark:shadow-slate-900/50">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-        标题
-      </h2>
-      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-        {children}
-      </p>
-    </div>
-  );
-};
-```
-
-**主题开发最佳实践：**
-
-1. **颜色对比度**：确保文本在两种主题下都有足够的对比度
-2. **一致性**：使用相同的颜色变量命名规范
-3. **渐进增强**：优先实现明亮主题，再添加暗黑主题支持
-4. **测试验证**：在两种主题下测试所有组件的显示效果
-5. **用户体验**：主题切换应该平滑过渡，避免闪烁
-
-**TailwindCSS v4 主题配置：**
-
-```css
-/* 使用 @theme 指令定义主题变量 */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-}
-
-/* 定义暗黑模式变体 */
-@custom-variant dark (&:is(.dark *));
-```
+如需暗黑模式，再引入 `next-themes` 并按 TailwindCSS 的 `dark:` 变体扩展，
+不要在未使用前预先安装依赖。
 
 ### 5.5 组件开发规范
 
 #### 5.5.1 组件结构
 
-项目使用 Radix UI 作为基础组件库，结合 TailwindCSS 进行样式定制：
+页面组件放在 `src/pages/`，跨页面复用的组件放在 `src/components/`。
+样式优先使用 `style.css` 中已有的语义化类，而不是在每个组件里堆砌原子类：
 
-```typescript
-// components/ui/button.tsx
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
-
-const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-  {
-    variants: {
-      variant: {
-        default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
-
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
+```tsx
+// src/components/layout/Layout.tsx —— 复用 .shell 控制页面宽度
+export function Layout() {
+  return (
+    <div className="shell">
+      <Outlet />
+    </div>
+  );
 }
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-Button.displayName = "Button";
-
-export { Button, buttonVariants };
 ```
+
+若需要下拉菜单、对话框这类交互复杂的成品组件，用 shadcn 按需引入，
+它会把源码直接写进 `src/components/ui/` 并自动补齐所需依赖：
+
+```bash
+bunx shadcn@latest add dropdown-menu
+```
+
+项目保留了 `components.json` 供该命令使用，但不预装任何未被使用的组件。
 
 ### 5.6 移动端适配规范 📱
 
@@ -1304,210 +1134,16 @@ export interface User {
 
 ## 6. 国际化 (i18n) 规范 🌍
 
-### 6.1 配置设置
+项目当前未引入国际化方案，界面文案直接以中文写在组件中。
 
-项目使用 i18next 和 react-i18next 进行国际化支持：
+若确实需要多语言，再安装 `i18next` 与 `react-i18next`，并遵循：
 
-```typescript
-// i18n/index.ts
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import Backend from "i18next-http-backend";
-import LanguageDetector from "i18next-browser-languagedetector";
+- **按功能模块分组**：相关文案放在同一命名空间下，通用文案（如按钮文字）放入 `common`
+- **命名空间层级不超过 3 层**
+- **保持各语言文件的键同步**，避免某种语言缺失键位导致回退
 
-import en from "./locales/en.json";
-import zh from "./locales/zh.json";
-
-const resources = {
-  en: {
-    translation: en,
-  },
-  zh: {
-    translation: zh,
-  },
-};
-
-i18n
-  .use(Backend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources,
-    fallbackLng: "en",
-    debug: import.meta.env.DEV,
-
-    interpolation: {
-      escapeValue: false, // React 已经进行了 XSS 保护
-    },
-
-    detection: {
-      order: ["localStorage", "navigator", "htmlTag"],
-      caches: ["localStorage"],
-    },
-  });
-
-export default i18n;
-```
-
-### 6.2 语言文件组织
-
-```json
-// i18n/locales/en.json
-{
-  "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit"
-  },
-  "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "register": "Register",
-    "email": "Email",
-    "password": "Password",
-    "forgotPassword": "Forgot Password?",
-    "loginSuccess": "Login successful",
-    "loginError": "Login failed"
-  },
-  "navigation": {
-    "home": "Home",
-    "dashboard": "Dashboard",
-    "profile": "Profile",
-    "settings": "Settings"
-  }
-}
-```
-
-```json
-// i18n/locales/zh.json
-{
-  "common": {
-    "loading": "加载中...",
-    "error": "错误",
-    "success": "成功",
-    "cancel": "取消",
-    "confirm": "确认",
-    "save": "保存",
-    "delete": "删除",
-    "edit": "编辑"
-  },
-  "auth": {
-    "login": "登录",
-    "logout": "退出登录",
-    "register": "注册",
-    "email": "邮箱",
-    "password": "密码",
-    "forgotPassword": "忘记密码？",
-    "loginSuccess": "登录成功",
-    "loginError": "登录失败"
-  },
-  "navigation": {
-    "home": "首页",
-    "dashboard": "仪表板",
-    "profile": "个人资料",
-    "settings": "设置"
-  }
-}
-```
-
-### 6.3 使用规范
-
-#### 6.3.1 在组件中使用翻译
-
-```typescript
-import { useTranslation } from "react-i18next";
-
-export const LoginForm: React.FC = () => {
-  const { t } = useTranslation();
-
-  return (
-    <form>
-      <h1>{t("auth.login")}</h1>
-      <input placeholder={t("auth.email")} />
-      <input placeholder={t("auth.password")} type="password" />
-      <button type="submit">{t("auth.login")}</button>
-      <a href="/forgot-password">{t("auth.forgotPassword")}</a>
-    </form>
-  );
-};
-```
-
-#### 6.3.2 带参数的翻译
-
-```typescript
-// 语言文件
-{
-  "welcome": "Welcome, {{name}}!",
-  "itemCount": "You have {{count}} item",
-  "itemCount_plural": "You have {{count}} items"
-}
-
-// 组件中使用
-const { t } = useTranslation()
-
-// 带参数
-<h1>{t('welcome', { name: user.name })}</h1>
-
-// 复数形式
-<p>{t('itemCount', { count: items.length })}</p>
-```
-
-#### 6.3.3 语言切换组件
-
-```typescript
-import { useTranslation } from "react-i18next";
-
-export const LanguageSwitcher: React.FC = () => {
-  const { i18n } = useTranslation();
-
-  const languages = [
-    { code: "en", name: "English" },
-    { code: "zh", name: "中文" },
-  ];
-
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-  };
-
-  return (
-    <select
-      value={i18n.language}
-      onChange={(e) => changeLanguage(e.target.value)}
-    >
-      {languages.map((lang) => (
-        <option key={lang.code} value={lang.code}>
-          {lang.name}
-        </option>
-      ))}
-    </select>
-  );
-};
-```
-
-### 6.4 最佳实践
-
-#### 6.4.1 命名规范
-
-- **命名空间**：使用点分隔的命名空间，如 `auth.login`、`common.loading`
-- **语义化**：键名应该语义化，描述内容而不是位置
-- **一致性**：保持命名风格的一致性
-
-#### 6.4.2 文本组织
-
-- **按功能模块分组**：将相关的文本放在同一个命名空间下
-- **复用通用文本**：将常用的文本（如按钮文字）放在 `common` 命名空间
-- **避免嵌套过深**：命名空间层级不要超过 3 层
-
-#### 6.4.3 开发流程
-
-- **先英文后翻译**：开发时先用英文，功能完成后再添加其他语言
-- **翻译文件同步**：确保所有语言文件的键保持同步
-- **测试多语言**：在不同语言环境下测试界面布局
+在引入之前不要预先安装依赖——未使用的依赖会带来安装成本、
+锁文件变动和依赖升级噪音，却不产生任何价值。
 
 ## 7. 开发工具和环境 🛠️
 
