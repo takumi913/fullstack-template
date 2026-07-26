@@ -1,5 +1,5 @@
 # 第一阶段：前端构建阶段
-FROM oven/bun:1.3.2-alpine AS frontend-builder
+FROM oven/bun:1.3.14-alpine AS frontend-builder
 
 # 设置工作目录
 WORKDIR /app
