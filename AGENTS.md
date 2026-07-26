@@ -19,7 +19,7 @@
 
 ### 后端 (Backend)
 
-- **语言**: Go 1.24+
+- **语言**: Go 1.25+（以 go.mod 的 go 指令为准）
 - **Web 框架**: Echo v4
 - **数据访问**: database/sql + sqlc（由 SQL 生成类型安全代码，无 ORM）
 - **数据库**: SQLite/MySQL/PostgreSQL (多数据库支持)
@@ -1151,20 +1151,21 @@ export interface User {
 
 #### 7.1.1 后端开发工具
 
-- **Go**: 1.24+ 版本
-- **Air**: 热重载工具，提升开发效率
-- **golangci-lint**: 代码质量检查工具
+- **Go**: 版本以 `go.mod` 的 go 指令为准（当前 1.25.8）
+- **Air**: 热重载工具，`make tools` 安装
+- **golangci-lint**: 代码检查，版本必须与 CI 一致，`make tools` 安装
 - **Docker**: 容器化部署
 - **Make**: 项目管理和构建工具
 
 #### 7.1.2 前端开发工具
 
-- **Node.js**: 18+ 版本
-- **Bun**: JavaScript 运行时和包管理器
+- **Bun**: 运行时与包管理器，版本固定在 `package.json` 的 `packageManager`
+  （前端全程由 bun 执行，不依赖单独安装的 Node）
 - **TypeScript**: 类型安全的 JavaScript
-- **Vite**: 快速的构建工具
-- **ESLint**: 代码质量检查
-- **Prettier**: 代码格式化
+- **Vite**: 构建工具
+- **Vitest**: 单元测试，`bun run test`
+- **ESLint**: 代码检查，`bun run lint`
+- **Prettier**: 代码格式化，`bun run format`（CI 会校验格式）
 
 ## 8. 项目特定规约
 

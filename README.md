@@ -85,6 +85,13 @@ make build           # 构建
 
 前端另有 `bun run format` 格式化（CI 会检查格式）。
 
+## 文档
+
+- [配置说明](docs/configuration.md) — 全部环境变量
+- [Docker 部署](docs/docker.md) — 镜像构建、生产配置与已知限制
+- [Go 代码检查](docs/golangci-lint.md) — golangci-lint 版本要求与用法
+- [Air 热重载](docs/air.md) — 本地开发热重载
+
 ## 目录
 
 ```text

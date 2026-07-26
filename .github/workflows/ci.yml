@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   # Go 后端检查和测试
   go-lint-and-test:
@@ -30,22 +33,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
-          go-version: "1.25"
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          # 与 go.mod 的 go 指令保持一致；setup-go 自带模块与构建缓存
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
 
       - name: Download Go dependencies
         run: |
@@ -53,23 +48,27 @@ jobs:
           go mod verify
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.6.2
+          version: v2.12.2
           args: --timeout=5m
 
       - name: Verify sqlc generated code
         run: |
           go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
-          git diff --exit-code -- db/generated
+          # 用 git status 而非 git diff：新生成但未提交的文件是未跟踪状态，git diff 看不见
+          if [ -n "$(git status --porcelain -- db/generated)" ]; then
+            echo "::error::db/generated 与 db/query 不一致，请提交 sqlc 生成结果"
+            git status --porcelain -- db/generated
+            git diff -- db/generated
+            exit 1
+          fi
 
       - name: Run Go tests
-        run: |
-          go test -v -race ./...
+        run: go test -v -race ./...
 
       - name: Build Go binary
-        run: |
-          go build -o server main.go
+        run: go build -o server main.go
 
   # 前端检查和测试
   frontend-lint-and-test:
@@ -78,49 +77,60 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
+      # 前端全程使用 bun 运行，不需要单独安装 Node
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.2
 
-      - name: Cache frontend dependencies
-        uses: actions/cache@v4
+      # 只缓存下载内容，不缓存 node_modules：
+      # 后者可能来自不同的锁文件，与 --frozen-lockfile 的意图相悖
+      - name: Cache Bun downloads
+        uses: actions/cache@v6
         with:
-          path: |
-            web/node_modules
-            ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('web/bun.lock', 'web/package.json') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('web/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
       - name: Install frontend dependencies
-        run: |
-          cd web
-          bun install --frozen-lockfile
+        working-directory: web
+        run: bun install --frozen-lockfile
 
       - name: Check frontend formatting
-        run: |
-          cd web
-          bun run format:check
+        working-directory: web
+        run: bun run format:check
 
       - name: Run frontend lint
-        run: |
-          cd web
-          bun run lint
+        working-directory: web
+        run: bun run lint
 
       - name: Run frontend tests
-        run: |
-          cd web
-          bun run test
+        working-directory: web
+        run: bun run test
 
       - name: Build frontend
-        run: |
-          cd web
-          bun run build
+        working-directory: web
+        run: bun run build
+
+  # 校验镜像可构建。发布时才推送镜像，这里只构建，
+  # 否则 Dockerfile 的问题要等到发布当天才会暴露。
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -38,20 +38,18 @@ cp -r web/dist/* static/
 echo "✅ 静态文件复制完成"
 
 # 代码质量检查
+# 工具缺失时必须失败而不是跳过：否则构建会带着未经检查的代码报告成功，
+# 与 make lint-go 的行为也不一致。脚本已 set -e，检查不通过会直接终止。
 echo "🔍 运行代码质量检查..."
-if command -v golangci-lint >/dev/null 2>&1; then
-    echo "📋 运行 golangci-lint 检查..."
-    golangci-lint run
-    if [ $? -eq 0 ]; then
-        echo "✅ 代码质量检查通过"
-    else
-        echo "❌ 代码质量检查失败，请修复问题后重新构建"
-        exit 1
-    fi
-else
-    echo "⚠️  golangci-lint 未安装，跳过代码质量检查"
-    echo "   安装方式: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2"
+if ! command -v golangci-lint >/dev/null 2>&1; then
+    echo "❌ golangci-lint 未安装，无法完成构建前的代码检查"
+    echo "   安装方式: make tools"
+    echo "   或: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2"
+    exit 1
 fi
+echo "📋 运行 golangci-lint 检查..."
+golangci-lint run
+echo "✅ 代码质量检查通过"
 
 # 构建后端 Go 程序
 echo "🔨 构建后端 Go 程序..."

@@ -45,7 +45,7 @@ lint-go: ## 运行 Go 代码检查
 		golangci-lint run; \
 	else \
 		echo "❌ golangci-lint 未安装"; \
-		echo "📦 安装方式: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2"; \
+		echo "📦 安装方式: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2"; \
 		exit 1; \
 	fi
 
@@ -122,7 +122,7 @@ docker: ## 构建 Docker 镜像
 tools: ## 安装开发工具
 	@echo "🔧 安装开发工具..."
 	@echo "📦 安装 golangci-lint..."
-	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
 	@echo "📦 安装 air (热重载)..."
 	go install github.com/air-verse/air@v1.61.7
 	@echo "✅ 开发工具安装完成"

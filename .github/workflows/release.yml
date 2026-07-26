@@ -3,7 +3,7 @@ name: Create Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -22,13 +22,19 @@ jobs:
         run: |
           current_tag="${{ github.ref_name }}"
           previous_tag=$(git tag --sort=-creatordate | grep -v "^${current_tag}$" | head -1 || echo "")
-          echo "previous_tag=$previous_tag" >> $GITHUB_OUTPUT
+          echo "previous_tag=$previous_tag" >> "$GITHUB_OUTPUT"
 
       - name: Generate release title
         id: title
         run: |
-          quote=$(curl -s https://v1.hitokoto.cn/ | jq -r '.hitokoto // "Stay hungry, stay foolish."')
-          echo "quote=$quote" >> $GITHUB_OUTPUT
+          # jq 的 // 只在 JSON 解析成功且字段为 null 时兜底：接口挂掉返回空或 HTML 时不会生效，
+          # 因此这里显式处理失败，避免发布标题变成空字符串或整个步骤直接失败。
+          default_quote="Stay hungry, stay foolish."
+          quote=$(curl -sS --max-time 5 https://v1.hitokoto.cn/ 2>/dev/null \
+            | jq -r '.hitokoto // empty' 2>/dev/null || true)
+          # 只接受单行纯文本，防止远端内容注入额外的步骤输出
+          quote=$(printf '%s' "$quote" | tr -d '\r\n' | cut -c1-80)
+          echo "quote=${quote:-$default_quote}" >> "$GITHUB_OUTPUT"
 
       - name: Generate changelog
         id: changelog
@@ -36,28 +42,28 @@ jobs:
           current_tag="${{ github.ref_name }}"
           previous_tag="${{ steps.prev_tag.outputs.previous_tag }}"
 
-          echo "## What's Changed" > changelog.md
-          echo "" >> changelog.md
-
-          if [[ -n "$previous_tag" ]]; then
-            # 获取两个 tag 之间的 commit
-            git log --pretty=format:"* %s (%h)" "${previous_tag}..${current_tag}" >> changelog.md
-          else
-            # 如果没有之前的 tag，获取所有 commit
-            git log --pretty=format:"* %s (%h)" >> changelog.md
-          fi
-
-          echo "" >> changelog.md
-          echo "" >> changelog.md
-          echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${previous_tag}...${current_tag}" >> changelog.md
+          {
+            echo "## What's Changed"
+            echo ""
+            if [[ -n "$previous_tag" ]]; then
+              git log --pretty=format:"* %s (%h)" "${previous_tag}..${current_tag}"
+            else
+              git log --pretty=format:"* %s (%h)"
+            fi
+            echo ""
+            echo ""
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${previous_tag}...${current_tag}"
+          } > changelog.md
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
-          name: "${{ github.ref_name }} -- \"${{ steps.title.outputs.quote }}\""
+          name: ${{ github.ref_name }} -- "${{ steps.title.outputs.quote }}"
           body_path: changelog.md
           draft: false
           prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') }}
           generate_release_notes: false
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          # 用 PAT 创建的 Release 才能触发 build.yml（内置 GITHUB_TOKEN 创建的不会触发其他工作流）。
+          # 未配置 PAT_TOKEN 时回退到内置 token：Release 仍会创建，只是镜像需手动触发构建。
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}

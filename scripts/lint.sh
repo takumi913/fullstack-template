@@ -17,9 +17,9 @@ cd "$PROJECT_ROOT"
 if ! command -v golangci-lint >/dev/null 2>&1; then
     echo "❌ golangci-lint 未安装"
     echo "📦 安装方式:"
-    echo "   方式1: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2"
+    echo "   方式1: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2"
     echo "   方式2: brew install golangci-lint (macOS)"
-    echo "   方式3: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b \$(go env GOPATH)/bin v2.6.2"
+    echo "   方式3: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b \$(go env GOPATH)/bin v2.12.2"
     exit 1
 fi
 
@@ -28,23 +28,12 @@ echo "⚙️  配置文件: .golangci.yml"
 echo ""
 
 # 运行 golangci-lint
+# 脚本已 set -e：检查不通过会立即退出，因此无需再判断 $?（此前的 else 分支永远执行不到）
+trap 'echo ""; echo "❌ 代码质量检查失败"; echo "💡 自动修复格式问题: golangci-lint run --fix"' ERR
 golangci-lint run
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "✅ 代码质量检查通过！"
-    echo "🎉 代码符合项目规范"
-else
-    echo ""
-    echo "❌ 代码质量检查失败"
-    echo "🔧 请根据上述提示修复问题"
-    echo ""
-    echo "💡 常用修复命令:"
-    echo "   - 自动修复格式问题: golangci-lint run --fix"
-    echo "   - 查看详细帮助: golangci-lint help"
-    echo "   - 查看配置: golangci-lint config"
-    exit 1
-fi
+echo ""
+echo "✅ 代码质量检查通过！"
 
 echo ""
 echo "📊 检查统计:"
