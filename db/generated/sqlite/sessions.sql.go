@@ -11,6 +11,15 @@ import (
 	"time"
 )
 
+const clearSessionsActiveTenant = `-- name: ClearSessionsActiveTenant :exec
+UPDATE sessions SET active_tenant_id = NULL, updated_at = CURRENT_TIMESTAMP WHERE active_tenant_id = ?
+`
+
+func (q *Queries) ClearSessionsActiveTenant(ctx context.Context, activeTenantID sql.NullString) error {
+	_, err := q.db.ExecContext(ctx, clearSessionsActiveTenant, activeTenantID)
+	return err
+}
+
 const createSession = `-- name: CreateSession :exec
 INSERT INTO sessions (id, user_id, token_hash, active_tenant_id, expires_at) VALUES (?, ?, ?, ?, ?)
 `

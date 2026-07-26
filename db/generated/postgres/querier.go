@@ -6,9 +6,11 @@ package postgresdb
 
 import (
 	"context"
+	"database/sql"
 )
 
 type Querier interface {
+	ClearSessionsActiveTenant(ctx context.Context, activeTenantID sql.NullString) error
 	CountTenantOwners(ctx context.Context, tenantID string) (int64, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) error
 	CreateTenant(ctx context.Context, arg CreateTenantParams) error

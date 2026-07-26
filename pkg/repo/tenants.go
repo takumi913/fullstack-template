@@ -80,18 +80,26 @@ func (s *Store) UpdateTenant(ctx context.Context, t *model.Tenant) error {
 	return nil
 }
 func (s *Store) DeleteTenant(ctx context.Context, id string) error {
-	var n int64
-	var e error
-	if s.driver == "sqlite" {
-		n, e = s.sqlite.SoftDeleteTenant(ctx, id)
-	} else {
-		n, e = s.postgres.SoftDeleteTenant(ctx, id)
-	}
-	if e != nil {
-		return e
-	}
-	if n == 0 {
-		return ErrNotFound
-	}
-	return nil
+	// 软删除和清理会话必须同一个事务：否则中途失败会留下指向已删除租户的会话。
+	return s.WithTx(ctx, func(tx *Store) error {
+		var n int64
+		var e error
+		if tx.driver == "sqlite" {
+			n, e = tx.sqlite.SoftDeleteTenant(ctx, id)
+		} else {
+			n, e = tx.postgres.SoftDeleteTenant(ctx, id)
+		}
+		if e != nil {
+			return e
+		}
+		if n == 0 {
+			return ErrNotFound
+		}
+		// 租户被删除后，会话里的 active_tenant_id 会变成悬空引用，
+		// 导致 /auth/session 返回一个不在 tenants 列表中的租户 ID。
+		if tx.driver == "sqlite" {
+			return tx.sqlite.ClearSessionsActiveTenant(ctx, nullableString(&id))
+		}
+		return tx.postgres.ClearSessionsActiveTenant(ctx, nullableString(&id))
+	})
 }

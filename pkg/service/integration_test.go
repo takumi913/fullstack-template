@@ -82,6 +82,29 @@ func TestSoftDeletedTenantBlocksMemberAccess(t *testing.T) {
 	}
 }
 
+func TestDeletingTenantClearsSessionActiveTenant(t *testing.T) {
+	configs.AppConfig = &configs.Config{Session: configs.SessionConfig{ExpireHour: 24}}
+	store := testStore(t)
+	auth := service.NewAuthService(store)
+	ctx := context.Background()
+	owner, token, err := auth.Register(ctx, model.RegisterRequest{Username: "alice", Email: "alice@example.com", Password: "secret12"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tenantID := owner.Tenants[0].ID
+	if err := service.NewTenantService(store).Delete(ctx, tenantID); err != nil {
+		t.Fatal(err)
+	}
+	// 删除租户后会话不能再指向它，否则 /auth/session 会返回一个不在 tenants 列表中的 ID。
+	result, _, err := auth.Session(ctx, token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.ActiveTenantID != nil {
+		t.Fatalf("session still points at deleted tenant %q", *result.ActiveTenantID)
+	}
+}
+
 func TestPostgresMigrations(t *testing.T) {
 	dsn := os.Getenv("TEST_POSTGRES_DSN")
 	if dsn == "" {
