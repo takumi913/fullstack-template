@@ -17,7 +17,7 @@ COPY web/ ./
 RUN bun run build
 
 # 第二阶段：后端构建阶段
-FROM golang:1.25-alpine AS backend-builder
+FROM golang:1.26-alpine AS backend-builder
 
 # 安装构建依赖
 RUN apk add --no-cache git
