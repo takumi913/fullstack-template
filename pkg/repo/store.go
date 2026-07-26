@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -42,7 +43,9 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	// SQLite 只有一个连接（MaxOpenConns=1），泄漏一次即全局死锁。
 	defer func() {
 		if r := recover(); r != nil {
-			_ = tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				log.Printf("panic 后事务回滚失败: %v", rbErr)
+			}
 			panic(r)
 		}
 	}()
