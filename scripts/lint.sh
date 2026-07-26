@@ -17,9 +17,9 @@ cd "$PROJECT_ROOT"
 if ! command -v golangci-lint >/dev/null 2>&1; then
     echo "❌ golangci-lint 未安装"
     echo "📦 安装方式:"
-    echo "   方式1: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+    echo "   方式1: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2"
     echo "   方式2: brew install golangci-lint (macOS)"
-    echo "   方式3: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b \$(go env GOPATH)/bin v1.55.2"
+    echo "   方式3: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b \$(go env GOPATH)/bin v2.6.2"
     exit 1
 fi
 

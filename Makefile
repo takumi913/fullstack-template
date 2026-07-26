@@ -27,7 +27,7 @@ sqlc-verify: ## 检查 sqlc 生成代码是否最新
 
 test: ## 运行前后端测试
 	@echo "🧪 运行后端测试..."
-	go test ./...
+	go test $$(go list ./... | grep -v /web/node_modules)
 	@echo "🧪 运行前端测试..."
 	cd web && bun test 2>/dev/null || echo "⚠️  前端测试未配置"
 
@@ -40,7 +40,7 @@ lint-go: ## 运行 Go 代码检查
 		golangci-lint run; \
 	else \
 		echo "❌ golangci-lint 未安装"; \
-		echo "📦 安装方式: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; \
+		echo "📦 安装方式: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2"; \
 		exit 1; \
 	fi
 
@@ -48,11 +48,9 @@ lint-web: ## 运行前端代码检查
 	@echo "🔍 运行前端代码检查..."
 	cd web && bun run lint
 
+lint-web-fix: ## 自动修复前端代码格式
 	@echo "🔧 修复前端代码格式..."
-	cd web && bun run lint --fix 2>/dev/null || echo "⚠️  前端自动修复可能不支持，请手动修复"
-
-	@echo "🧪 运行前端测试..."
-	cd web && bun test 2>/dev/null || echo "⚠️  前端测试未配置"
+	cd web && bun run lint --fix
 
 # 构建
 build: ## 构建项目
@@ -116,7 +114,7 @@ docker: ## 构建 Docker 镜像
 tools: ## 安装开发工具
 	@echo "🔧 安装开发工具..."
 	@echo "📦 安装 golangci-lint..."
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.6.2
 	@echo "📦 安装 air (热重载)..."
 	go install github.com/air-verse/air@v1.61.7
 	@echo "✅ 开发工具安装完成"
