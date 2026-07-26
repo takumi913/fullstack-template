@@ -65,8 +65,9 @@ func Init() error {
 // parseOrigins 解析逗号分隔的来源列表。这里必须自己校验并返回错误，
 // 因为 echo 的 CORS 中间件遇到非法来源会直接 panic，而不是报配置错误。
 func parseOrigins(raw string) ([]string, error) {
-	var origins []string
-	for _, item := range strings.Split(raw, ",") {
+	items := strings.Split(raw, ",")
+	origins := make([]string, 0, len(items))
+	for _, item := range items {
 		item = strings.TrimSpace(item)
 		if item == "" {
 			continue
