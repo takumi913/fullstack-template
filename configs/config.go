@@ -32,9 +32,8 @@ type DatabaseConfig struct {
 	Path     string `json:"path"`
 }
 type SessionConfig struct {
-	Secret       string `json:"secret"`
-	ExpireHour   int    `json:"expire_hour"`
-	CookieSecure bool   `json:"cookie_secure"`
+	ExpireHour   int  `json:"expire_hour"`
+	CookieSecure bool `json:"cookie_secure"`
 }
 
 var AppConfig *Config
@@ -43,7 +42,7 @@ func Init() error {
 	if err := godotenv.Load(); err != nil {
 		log.Println("未找到 .env，使用环境变量或默认值")
 	}
-	AppConfig = &Config{Server: ServerConfig{Port: getEnv("SERVER_PORT", "1323"), Host: getEnv("SERVER_HOST", "0.0.0.0"), CORSOrigins: strings.Split(getEnv("CORS_ALLOW_ORIGINS", "http://localhost:5173,http://localhost:3000"), ",")}, Database: DatabaseConfig{Driver: getEnv("DB_DRIVER", "sqlite"), Host: getEnv("DB_HOST", "localhost"), Port: getEnv("DB_PORT", "5432"), Username: getEnv("DB_USERNAME", "postgres"), Password: getEnv("DB_PASSWORD", ""), DBName: getEnv("DB_NAME", "fullstack_template"), SSLMode: getEnv("DB_SSLMODE", "disable"), Path: getEnv("DB_PATH", "app.db")}, Session: SessionConfig{Secret: getEnv("SESSION_SECRET", "change-me"), ExpireHour: getEnvInt("SESSION_EXPIRE_HOUR", 24), CookieSecure: getEnv("COOKIE_SECURE", "false") == "true"}}
+	AppConfig = &Config{Server: ServerConfig{Port: getEnv("SERVER_PORT", "1323"), Host: getEnv("SERVER_HOST", "0.0.0.0"), CORSOrigins: strings.Split(getEnv("CORS_ALLOW_ORIGINS", "http://localhost:5173,http://localhost:3000"), ",")}, Database: DatabaseConfig{Driver: getEnv("DB_DRIVER", "sqlite"), Host: getEnv("DB_HOST", "localhost"), Port: getEnv("DB_PORT", "5432"), Username: getEnv("DB_USERNAME", "postgres"), Password: getEnv("DB_PASSWORD", ""), DBName: getEnv("DB_NAME", "fullstack_template"), SSLMode: getEnv("DB_SSLMODE", "disable"), Path: getEnv("DB_PATH", "app.db")}, Session: SessionConfig{ExpireHour: getEnvInt("SESSION_EXPIRE_HOUR", 24), CookieSecure: getEnv("COOKIE_SECURE", "false") == "true"}}
 	if AppConfig.Database.Driver != "sqlite" && AppConfig.Database.Driver != "postgres" && AppConfig.Database.Driver != "postgresql" {
 		return fmt.Errorf("DB_DRIVER 仅支持 sqlite 或 postgres")
 	}

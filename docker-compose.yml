@@ -8,7 +8,6 @@ services:
       SERVER_PORT: 1323
       DB_DRIVER: sqlite
       DB_PATH: /app/data/app.db
-      SESSION_SECRET: replace-in-production
     volumes:
       - ./data:/app/data
     restart: unless-stopped

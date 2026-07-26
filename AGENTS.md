@@ -6,7 +6,7 @@
 
 - **只做必要的事**：避免过度设计和过早优化。只引入当前功能所必需的依赖和抽象。
 - **代码自解释**：优先通过清晰的命名（变量、函数、文件）和合理的代码结构来让代码不言自明，注释是必要的补充。
-- **利用框架/库的优势**：充分使用 Echo、Gorm、React、TailwindCSS 等工具提供的原生能力，而不是在其上构建不必要的封装。
+- **利用框架/库的优势**：充分使用 Echo、sqlc、React、TailwindCSS 等工具提供的原生能力，而不是在其上构建不必要的封装。
 
 ### 1.2 开发原则
 
@@ -21,7 +21,7 @@
 
 - **语言**: Go 1.24+
 - **Web 框架**: Echo v4
-- **ORM**: Gorm
+- **数据访问**: database/sql + sqlc（由 SQL 生成类型安全代码，无 ORM）
 - **数据库**: SQLite/MySQL/PostgreSQL (多数据库支持)
 - **身份认证**: Session
 - **密码加密**: bcrypt
@@ -88,7 +88,7 @@
 │   ├── database/          # 数据库连接、初始化和迁移
 │   ├── handler/           # HTTP 请求处理器 (Echo Handlers)
 │   ├── middleware/        # 中间件
-│   ├── model/             # 数据模型 (Gorm Models)
+│   ├── model/             # 数据模型（普通 struct + JSON 标签）
 │   ├── repo/              # 数据访问层
 │   └── service/           # 业务逻辑层
 │
@@ -192,16 +192,16 @@ func (h *UserHandler) Register(c echo.Context) error {
 - **原则**：
   - 只负责数据的 CRUD 操作
   - 不包含业务逻辑
-  - 使用 GORM 进行数据库操作
-  - 定义清晰的接口
+  - 调用 sqlc 生成的查询（`db/generated/{sqlite,postgres}`），在此层适配两种驱动
+  - 修改查询时先改 `db/query/` 下的 SQL，再运行 `make sqlc-generate`；CI 会校验生成代码是否最新
 
 #### 4.1.4 Model 层 (pkg/model/)
 
 - **职责**：数据结构定义，包括数据库模型和 DTO
 - **原则**：
-  - 数据库模型使用 GORM 标签
+  - 数据库模型为普通 struct，仅使用 JSON 标签（字段与列的映射由 sqlc 生成代码负责）
   - 请求/响应 DTO 使用 JSON 标签
-  - 添加必要的验证标签
+  - 校验逻辑写在 service 层，不依赖标签
 
 ### 4.2 API 设计规范
 
@@ -268,13 +268,13 @@ func (h *UserHandler) Register(c echo.Context) error {
 #### 4.3.1 输入验证
 
 - **所有用户输入必须验证**：使用结构体标签进行基础验证
-- **防止 SQL 注入**：使用 GORM 的参数化查询
+- **防止 SQL 注入**：只通过 sqlc 生成的参数化查询访问数据库，禁止手工拼接 SQL
 - **防止 XSS 攻击**：对用户输入进行适当的转义和过滤
 - **文件上传安全**：限制文件类型、大小和存储位置
 
 #### 4.3.2 身份认证与授权
 
-- **SESSION 认证**：使用 `gorilla/sessions` 库实现 SESSION 认证
+- **SESSION 认证**：随机 token 存入 HttpOnly Cookie，服务端只保存其 SHA-256 哈希（`sessions` 表）
 - **密码安全**：使用 `bcrypt` 进行密码哈希，成本因子设为默认值
 - **Token 管理**：设置合理的过期时间（默认 24 小时），支持 token 刷新
 - **第三方登录**：支持 Google OAuth2 登录，安全处理用户信息
@@ -285,17 +285,19 @@ func (h *UserHandler) Register(c echo.Context) error {
 #### 4.4.1 数据库优化
 
 - **索引策略**：在经常查询的字段上建立索引（如 email、username）
-- **避免 N+1 查询**：使用 GORM 的 `Preload` 进行关联查询
-- **分页查询**：对大数据集使用 `Limit` 和 `Offset` 进行分页
-- **软删除**：使用 GORM 的软删除功能，避免物理删除数据
-- **连接池**：合理配置数据库连接池参数
+- **避免 N+1 查询**：在 `db/query/` 中用 JOIN 一次取回关联数据，不要在循环里查询
+- **分页查询**：在 SQL 中使用 `LIMIT`/`OFFSET` 参数，由 sqlc 生成带参数的查询方法
+- **软删除**：通过 `deleted_at` 列实现，查询需显式加上 `deleted_at IS NULL`
+- **连接池**：合理配置数据库连接池参数（SQLite 限制为单连接）
 
-```go
-// 预加载示例
-db.Preload("Profile").Find(&users)
-
-// 分页查询示例
-db.Limit(10).Offset(page * 10).Find(&users)
+```sql
+-- db/query/sqlite/tenants.sql
+-- name: ListTenants :many
+SELECT t.* FROM tenants t
+JOIN tenant_members m ON m.tenant_id = t.id
+WHERE m.user_id = ? AND t.deleted_at IS NULL
+ORDER BY t.created_at
+LIMIT ? OFFSET ?;
 ```
 
 #### 4.4.2 缓存策略
