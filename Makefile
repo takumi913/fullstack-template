@@ -1,6 +1,13 @@
 # Go + React 全栈项目 Makefile
 # 提供统一的项目管理命令
 
+# 工具版本统一在这里定义。
+# golangci-lint 版本必须与 .github/workflows/ci.yml 中 golangci-lint-action 的
+# version 保持一致：本地与 CI 版本不同会出现「本地绿、CI 红」的假结果。
+GOLANGCI_LINT_VERSION := v2.12.2
+SQLC_VERSION := v1.30.0
+AIR_VERSION := v1.61.7
+
 .PHONY: help deps sqlc-generate sqlc-verify test lint lint-go lint-web lint-web-fix build build-go build-web dev run clean docker tools check postmortem-onboarding postmortem-check postmortem-accept postmortem-list
 
 # 默认目标
@@ -21,18 +28,20 @@ deps: ## 安装项目依赖
 	@echo "✅ 依赖安装完成"
 
 sqlc-generate: ## 生成 SQLite/PostgreSQL 查询代码
-	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc@$(SQLC_VERSION) generate
 
 sqlc-verify: ## 检查 sqlc 生成代码是否最新
-	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc@$(SQLC_VERSION) generate
 	@# 用 git status 而非 git diff：新生成但未 git add 的文件是未跟踪状态，git diff 看不见
 	@test -z "$$(git status --porcelain -- db/generated)" || { \
 		echo "❌ db/generated 与 db/query 不一致，请提交 sqlc 生成结果:"; \
-		git status --porcelain -- db/generated; exit 1; }
+		git status --porcelain -- db/generated; \
+		git diff -- db/generated; exit 1; }
 
 test: ## 运行前后端测试
 	@echo "🧪 运行后端测试..."
-	go test $$(go list ./... | grep -v /web/node_modules)
+	@# -race 与 CI (ci.yml) 保持一致，否则数据竞争只会在推送后才暴露
+	go test -race $$(go list ./... | grep -v /web/node_modules)
 	@echo "🧪 运行前端测试..."
 	cd web && bun run test
 
@@ -45,12 +54,14 @@ lint-go: ## 运行 Go 代码检查
 		golangci-lint run; \
 	else \
 		echo "❌ golangci-lint 未安装"; \
-		echo "📦 安装方式: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2"; \
+		echo "📦 安装方式: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)"; \
 		exit 1; \
 	fi
 
 lint-web: ## 运行前端代码检查
 	@echo "🔍 运行前端代码检查..."
+	@# 格式检查与 CI (ci.yml) 保持一致，否则 prettier 问题只会在推送后才暴露
+	cd web && bun run format:check
 	cd web && bun run lint
 
 lint-web-fix: ## 自动修复前端格式与 lint 问题
@@ -84,10 +95,9 @@ dev: ## 启动前后端开发环境（同时启动后端和前端）
 			echo "🔥 启动后端热重载..."; \
 			air; \
 		else \
-			echo "❌ air 未安装，使用普通模式启动"; \
-			echo "📦 安装 air: go install github.com/air-verse/air@v1.61.7"; \
-			echo "📦 或使用项目脚本: make tools"; \
-			make run; \
+			echo "❌ air 未安装，退化为无热重载模式 (go run)"; \
+			echo "📦 安装 air: make tools"; \
+			go run main.go; \
 		fi \
 	) & \
 	(cd web && bun run dev) & \
@@ -122,9 +132,9 @@ docker: ## 构建 Docker 镜像
 tools: ## 安装开发工具
 	@echo "🔧 安装开发工具..."
 	@echo "📦 安装 golangci-lint..."
-	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 	@echo "📦 安装 air (热重载)..."
-	go install github.com/air-verse/air@v1.61.7
+	go install github.com/air-verse/air@$(AIR_VERSION)
 	@echo "✅ 开发工具安装完成"
 	@echo "🎉 可用命令:"
 	@echo "   - make lint-go    # 运行代码检查"

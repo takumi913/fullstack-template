@@ -35,6 +35,9 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # 预发布（-rc/-alpha/-beta，由 release.yml 自动标记 prerelease）只推
+          # 版本号 tag，不推 latest，避免 :latest 被 rc 版本覆盖。
+          # 表达式为空字符串的行会被 build-push-action 忽略。
           tags: |
-            zaunist/go-react-template:latest
             zaunist/go-react-template:${{ github.event.release.tag_name }}
+            ${{ !github.event.release.prerelease && 'zaunist/go-react-template:latest' || '' }}

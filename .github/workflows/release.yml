@@ -19,9 +19,12 @@ jobs:
 
       - name: Get previous tag
         id: prev_tag
+        # 全程用 runner 注入的 $GITHUB_REF_NAME 环境变量，不用 ${{ github.ref_name }}
+        # 内插进脚本：tag 名允许 $、; 等 shell 元字符，内插存在命令注入面。
+        # 取“当前 tag 的祖先里最近的 tag”而非“最近创建的 tag”：
+        # 在旧分支上补打 hotfix tag 不会污染下一个正式版的 changelog 范围。
         run: |
-          current_tag="${{ github.ref_name }}"
-          previous_tag=$(git tag --sort=-creatordate | grep -v "^${current_tag}$" | head -1 || echo "")
+          previous_tag=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || echo "")
           echo "previous_tag=$previous_tag" >> "$GITHUB_OUTPUT"
 
       - name: Generate release title
@@ -38,21 +41,23 @@ jobs:
 
       - name: Generate changelog
         id: changelog
+        env:
+          # tag 名经环境变量传入而非 ${{ }} 内插，理由同上
+          PREVIOUS_TAG: ${{ steps.prev_tag.outputs.previous_tag }}
         run: |
-          current_tag="${{ github.ref_name }}"
-          previous_tag="${{ steps.prev_tag.outputs.previous_tag }}"
-
           {
             echo "## What's Changed"
             echo ""
-            if [[ -n "$previous_tag" ]]; then
-              git log --pretty=format:"* %s (%h)" "${previous_tag}..${current_tag}"
+            if [[ -n "$PREVIOUS_TAG" ]]; then
+              git log --pretty=format:"* %s (%h)" "${PREVIOUS_TAG}..${GITHUB_REF_NAME}"
+              echo ""
+              echo ""
+              echo "**Full Changelog**: https://github.com/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${GITHUB_REF_NAME}"
             else
+              # 首个 tag 没有对比基准：列出全部提交，也没有 compare 链接可给
               git log --pretty=format:"* %s (%h)"
+              echo ""
             fi
-            echo ""
-            echo ""
-            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${previous_tag}...${current_tag}"
           } > changelog.md
 
       - name: Create Release

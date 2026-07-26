@@ -43,8 +43,7 @@ echo "✅ 静态文件复制完成"
 echo "🔍 运行代码质量检查..."
 if ! command -v golangci-lint >/dev/null 2>&1; then
     echo "❌ golangci-lint 未安装，无法完成构建前的代码检查"
-    echo "   安装方式: make tools"
-    echo "   或: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2"
+    echo "   安装方式: make tools（版本统一由 Makefile 定义，与 CI 一致）"
     exit 1
 fi
 echo "📋 运行 golangci-lint 检查..."
