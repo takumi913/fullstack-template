@@ -32,6 +32,15 @@ func (s *Store) DeleteSession(ctx context.Context, id string) error {
 	_, e := s.postgres.DeleteSession(ctx, id)
 	return e
 }
+
+// DeleteExpiredSessions 清理已过期的会话记录。过期会话不会被认证逻辑接受，
+// 但若不清理会无限堆积。
+func (s *Store) DeleteExpiredSessions(ctx context.Context) error {
+	if s.driver == "sqlite" {
+		return s.sqlite.DeleteExpiredSessions(ctx)
+	}
+	return s.postgres.DeleteExpiredSessions(ctx)
+}
 func (s *Store) DeleteUserSessions(ctx context.Context, userID string) error {
 	if s.driver == "sqlite" {
 		return s.sqlite.DeleteSessionsByUserID(ctx, userID)

@@ -2,7 +2,7 @@ package configs
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/url"
 	"os"
 	"strconv"
@@ -41,7 +41,7 @@ var AppConfig *Config
 
 func Init() error {
 	if err := godotenv.Load(); err != nil {
-		log.Println("未找到 .env，使用环境变量或默认值")
+		slog.Info("未找到 .env，使用环境变量或默认值")
 	}
 	origins, err := parseOrigins(getEnv("CORS_ALLOW_ORIGINS", "http://localhost:5173,http://localhost:3000"))
 	if err != nil {
@@ -99,7 +99,7 @@ func getEnvInt(k string, d int) int {
 	}
 	v, err := strconv.Atoi(raw)
 	if err != nil {
-		log.Printf("环境变量 %s=%q 不是合法整数，使用默认值 %d", k, raw, d)
+		slog.Warn("环境变量不是合法整数，使用默认值", "key", k, "value", raw, "default", d)
 		return d
 	}
 	return v

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -44,7 +44,7 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	defer func() {
 		if r := recover(); r != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				log.Printf("panic 后事务回滚失败: %v", rbErr)
+				slog.Error("panic 后事务回滚失败", "error", rbErr)
 			}
 			panic(r)
 		}

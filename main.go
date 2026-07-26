@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,15 +24,17 @@ import (
 )
 
 func main() {
+	// echo 内部使用 log/slog，应用日志保持一致，避免同一份 stdout 里混两种格式。
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 	if err := configs.Init(); err != nil {
-		log.Fatal("配置初始化失败:", err)
+		fatal("配置初始化失败", err)
 	}
 	if err := database.Init(); err != nil {
-		log.Fatal("数据库初始化失败:", err)
+		fatal("数据库初始化失败", err)
 	}
 	if err := migrations.Up(context.Background(), database.GetDB(), configs.AppConfig.Database.Driver); err != nil {
 		_ = database.Close()
-		log.Fatal("数据库迁移失败:", err)
+		fatal("数据库迁移失败", err)
 	}
 
 	store := repo.NewStore(database.GetDB(), configs.AppConfig.Database.Driver)
@@ -52,8 +54,10 @@ func main() {
 	} else {
 		e.IPExtractor = echo.ExtractIPDirect()
 	}
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{LogStatus: true, LogURI: true, HandleError: true, LogValuesFunc: func(_ *echo.Context, v middleware.RequestLoggerValues) error {
-		log.Printf("[%d] %s", v.Status, v.URI)
+	// RequestID 让访问日志和处理器里的错误日志能通过同一个 id 关联起来。
+	e.Use(middleware.RequestID())
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{LogStatus: true, LogURI: true, LogMethod: true, LogLatency: true, LogRequestID: true, HandleError: true, LogValuesFunc: func(_ *echo.Context, v middleware.RequestLoggerValues) error {
+		slog.Info("request", "method", v.Method, "uri", v.URI, "status", v.Status, "latency_ms", v.Latency.Milliseconds(), "request_id", v.RequestID)
 		return nil
 	}}))
 	e.Use(middleware.Recover())
@@ -64,6 +68,7 @@ func main() {
 
 	// SIGINT/SIGTERM 触发优雅关机（默认 10 秒宽限），之后统一关闭数据库连接。
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	go purgeExpiredSessions(ctx, store)
 	sc := echo.StartConfig{Address: configs.AppConfig.GetServerAddress(), BeforeServeFunc: func(s *http.Server) error {
 		s.ReadHeaderTimeout = 10 * time.Second
 		s.ReadTimeout = 30 * time.Second
@@ -75,11 +80,34 @@ func main() {
 	err := sc.Start(ctx, e)
 	stop()
 	if closeErr := database.Close(); closeErr != nil {
-		log.Printf("关闭数据库失败: %v", closeErr)
+		slog.Error("关闭数据库失败", "error", closeErr)
 	}
 	if err != nil {
-		log.Printf("服务器异常退出: %v", err)
-		os.Exit(1)
+		fatal("服务器异常退出", err)
+	}
+}
+
+// fatal 记录错误后退出。不用 log.Fatal 是为了统一走 slog，
+// 也避免 os.Exit 跳过已注册的 defer。
+func fatal(msg string, err error) {
+	slog.Error(msg, "error", err)
+	os.Exit(1)
+}
+
+// purgeExpiredSessions 定期清理过期会话，否则 sessions 表会无限增长。
+func purgeExpiredSessions(ctx context.Context, store *repo.Store) {
+	const interval = time.Hour
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		if err := store.DeleteExpiredSessions(ctx); err != nil && ctx.Err() == nil {
+			slog.Error("清理过期会话失败", "error", err)
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
 	}
 }
 
@@ -104,7 +132,7 @@ func setupStaticFiles(e *echo.Echo) {
 
 	// 检查静态文件目录是否存在
 	if _, err := os.Stat(staticDir); os.IsNotExist(err) {
-		log.Printf("警告: 静态文件目录 %s 不存在，跳过静态文件服务设置", staticDir)
+		slog.Warn("静态文件目录不存在，跳过静态文件服务", "dir", staticDir)
 		return
 	}
 

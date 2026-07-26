@@ -9,7 +9,7 @@ import (
 	"go-react-template/configs"
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/repo"
-	"log"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -77,7 +77,7 @@ func (s *AuthService) Register(ctx context.Context, req model.RegisterRequest) (
 			return nil, "", errors.New("邮箱或用户名已被使用")
 		}
 		// 原始错误只记日志：它会被当作 400 返回，绕过 handler 层的 5xx 脱敏。
-		log.Printf("注册失败: %v", err)
+		slog.Error("注册失败", "error", err)
 		return nil, "", errors.New("注册失败，请稍后重试")
 	}
 	user, err = s.store.GetUserByID(ctx, user.ID)
