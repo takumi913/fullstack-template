@@ -24,7 +24,14 @@ func SetupRoutes(e *echo.Echo, h Handlers, auth *middleware.AuthMiddleware, tena
 		return c.JSON(http.StatusOK, map[string]any{"code": 0, "data": map[string]string{"status": "healthy"}, "message": "服务正常运行"})
 	})
 	// 未认证的凭据接口按 IP 限流，缓解暴力破解和 bcrypt CPU 消耗。
-	authLimiter := echomw.RateLimiter(echomw.NewRateLimiterMemoryStoreWithConfig(echomw.RateLimiterMemoryStoreConfig{Rate: 5, Burst: 20, ExpiresIn: 3 * time.Minute}))
+	// Rate 的单位是「次/秒」：0.2 即约 12 次/分钟，Burst 允许用户连续试错 10 次。
+	authLimiter := echomw.RateLimiterWithConfig(echomw.RateLimiterConfig{
+		Store: echomw.NewRateLimiterMemoryStoreWithConfig(echomw.RateLimiterMemoryStoreConfig{Rate: 0.2, Burst: 10, ExpiresIn: 15 * time.Minute}),
+		// 限流响应也要走统一的 {code,data,message} 结构，否则前端会显示英文原文。
+		DenyHandler: func(c *echo.Context, _ string, _ error) error {
+			return c.JSON(http.StatusTooManyRequests, map[string]any{"code": 1, "data": nil, "message": "操作过于频繁，请稍后再试"})
+		},
+	})
 	v1.POST("/auth/register", h.Auth.Register, authLimiter)
 	v1.POST("/auth/login", h.Auth.Login, authLimiter)
 	protected := v1.Group("", auth.Require)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -46,6 +45,13 @@ func main() {
 	tenantMiddleware := middleware2.NewTenantMiddleware(store)
 
 	e := echo.New()
+	// 限流按客户端 IP 计数。默认只信任连接来源；部署在反向代理后面时必须开启
+	// TRUST_PROXY，否则所有用户会被算作同一个 IP，一个人触发限流会波及全部用户。
+	if configs.AppConfig.Server.TrustProxy {
+		e.IPExtractor = echo.ExtractIPFromXFFHeader()
+	} else {
+		e.IPExtractor = echo.ExtractIPDirect()
+	}
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{LogStatus: true, LogURI: true, HandleError: true, LogValuesFunc: func(_ *echo.Context, v middleware.RequestLoggerValues) error {
 		log.Printf("[%d] %s", v.Status, v.URI)
 		return nil
@@ -65,12 +71,13 @@ func main() {
 		s.IdleTimeout = 2 * time.Minute
 		return nil
 	}}
+	// Start 会在收到信号后完成优雅关机再返回，正常关机返回 nil。
 	err := sc.Start(ctx, e)
 	stop()
 	if closeErr := database.Close(); closeErr != nil {
 		log.Printf("关闭数据库失败: %v", closeErr)
 	}
-	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+	if err != nil {
 		log.Printf("服务器异常退出: %v", err)
 		os.Exit(1)
 	}
@@ -80,6 +87,14 @@ func main() {
 // 先以根路径清洗，保证 ".." 无法逃出 staticDir（防止路径穿越读取任意文件）。
 func staticFilePath(staticDir, urlPath string) string {
 	return filepath.Join(staticDir, filepath.Clean("/"+urlPath))
+}
+
+// regularFile 判断路径是否为可直接返回的普通文件。
+// 目录必须排除：c.File 对目录会回落到其中的 index.html，
+// 于是 /assets/.. 这类请求会拿到带一年强缓存的首页。
+func regularFile(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && info.Mode().IsRegular()
 }
 
 // setupStaticFiles 设置静态文件服务.
@@ -96,7 +111,7 @@ func setupStaticFiles(e *echo.Echo) {
 	// 服务带有哈希的静态资源文件（长期缓存）
 	e.GET("/assets/*", func(c *echo.Context) error {
 		filePath := staticFilePath(staticDir, c.Request().URL.Path)
-		if _, err := os.Stat(filePath); err != nil {
+		if !regularFile(filePath) {
 			return echo.NewHTTPError(http.StatusNotFound, "File not found")
 		}
 		// 设置强缓存：1年，因为文件名包含哈希值
@@ -132,7 +147,7 @@ func setupStaticFiles(e *echo.Echo) {
 			filePath = filepath.Join(staticDir, "index.html")
 		}
 
-		if _, err := os.Stat(filePath); err == nil {
+		if regularFile(filePath) {
 			// 对于 HTML 文件，使用协商缓存
 			if filepath.Ext(filePath) == ".html" {
 				c.Response().Header().Set("Cache-Control", "no-cache")

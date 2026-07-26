@@ -55,8 +55,8 @@ fi
 
 # 构建后端 Go 程序
 echo "🔨 构建后端 Go 程序..."
-# go-sqlite3 需要 CGO 支持
-CGO_ENABLED=1 go build -o server main.go
+# modernc.org/sqlite 为纯 Go 实现，无需 CGO
+CGO_ENABLED=0 go build -o server main.go
 
 if [ ! -f "server" ]; then
     echo "❌ 后端构建失败"
