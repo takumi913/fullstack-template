@@ -26,11 +26,17 @@ func (s *UserService) Update(ctx context.Context, id string, req model.UpdatePro
 	if e != nil {
 		return nil, e
 	}
-	if strings.TrimSpace(req.Username) != "" {
-		u.Username = strings.TrimSpace(req.Username)
+	if username := strings.TrimSpace(req.Username); username != "" {
+		if len(username) < 3 || len(username) > 50 {
+			return nil, errors.New("用户名长度必须在3-50个字符之间")
+		}
+		u.Username = username
 	}
-	if strings.TrimSpace(req.Email) != "" {
-		u.Email = strings.ToLower(strings.TrimSpace(req.Email))
+	if email := strings.ToLower(strings.TrimSpace(req.Email)); email != "" {
+		if !strings.Contains(email, "@") {
+			return nil, errors.New("邮箱格式不正确")
+		}
+		u.Email = email
 	}
 	u.AvatarURL = strings.TrimSpace(req.AvatarURL)
 	if e = s.store.UpdateUserProfile(ctx, u); e != nil {

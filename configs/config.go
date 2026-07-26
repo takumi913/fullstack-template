@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -16,8 +17,9 @@ type Config struct {
 	Session  SessionConfig  `json:"session"`
 }
 type ServerConfig struct {
-	Port string `json:"port"`
-	Host string `json:"host"`
+	Port        string   `json:"port"`
+	Host        string   `json:"host"`
+	CORSOrigins []string `json:"cors_origins"`
 }
 type DatabaseConfig struct {
 	Driver   string `json:"driver"`
@@ -41,7 +43,7 @@ func Init() error {
 	if err := godotenv.Load(); err != nil {
 		log.Println("未找到 .env，使用环境变量或默认值")
 	}
-	AppConfig = &Config{Server: ServerConfig{Port: getEnv("SERVER_PORT", "1323"), Host: getEnv("SERVER_HOST", "0.0.0.0")}, Database: DatabaseConfig{Driver: getEnv("DB_DRIVER", "sqlite"), Host: getEnv("DB_HOST", "localhost"), Port: getEnv("DB_PORT", "5432"), Username: getEnv("DB_USERNAME", "postgres"), Password: getEnv("DB_PASSWORD", ""), DBName: getEnv("DB_NAME", "fullstack_template"), SSLMode: getEnv("DB_SSLMODE", "disable"), Path: getEnv("DB_PATH", "app.db")}, Session: SessionConfig{Secret: getEnv("SESSION_SECRET", "change-me"), ExpireHour: getEnvInt("SESSION_EXPIRE_HOUR", 24), CookieSecure: getEnv("COOKIE_SECURE", "false") == "true"}}
+	AppConfig = &Config{Server: ServerConfig{Port: getEnv("SERVER_PORT", "1323"), Host: getEnv("SERVER_HOST", "0.0.0.0"), CORSOrigins: strings.Split(getEnv("CORS_ALLOW_ORIGINS", "http://localhost:5173,http://localhost:3000"), ",")}, Database: DatabaseConfig{Driver: getEnv("DB_DRIVER", "sqlite"), Host: getEnv("DB_HOST", "localhost"), Port: getEnv("DB_PORT", "5432"), Username: getEnv("DB_USERNAME", "postgres"), Password: getEnv("DB_PASSWORD", ""), DBName: getEnv("DB_NAME", "fullstack_template"), SSLMode: getEnv("DB_SSLMODE", "disable"), Path: getEnv("DB_PATH", "app.db")}, Session: SessionConfig{Secret: getEnv("SESSION_SECRET", "change-me"), ExpireHour: getEnvInt("SESSION_EXPIRE_HOUR", 24), CookieSecure: getEnv("COOKIE_SECURE", "false") == "true"}}
 	if AppConfig.Database.Driver != "sqlite" && AppConfig.Database.Driver != "postgres" && AppConfig.Database.Driver != "postgresql" {
 		return fmt.Errorf("DB_DRIVER 仅支持 sqlite 或 postgres")
 	}

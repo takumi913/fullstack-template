@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
+	"time"
 
 	"go-react-template/api"
 	"go-react-template/configs"
@@ -48,12 +52,27 @@ func main() {
 	}}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{AllowOrigins: []string{"http://localhost:5173", "http://localhost:3000"}, AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions}, AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept}, AllowCredentials: true}))
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{AllowOrigins: configs.AppConfig.Server.CORSOrigins, AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions}, AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept}, AllowCredentials: true}))
 	api.SetupRoutes(e, handlers, authMiddleware, tenantMiddleware)
 	setupStaticFiles(e)
-	if err := e.Start(configs.AppConfig.GetServerAddress()); err != nil {
-		_ = database.Close()
-		log.Fatal(err)
+
+	// SIGINT/SIGTERM 触发优雅关机（默认 10 秒宽限），之后统一关闭数据库连接。
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	sc := echo.StartConfig{Address: configs.AppConfig.GetServerAddress(), BeforeServeFunc: func(s *http.Server) error {
+		s.ReadHeaderTimeout = 10 * time.Second
+		s.ReadTimeout = 30 * time.Second
+		s.WriteTimeout = 30 * time.Second
+		s.IdleTimeout = 2 * time.Minute
+		return nil
+	}}
+	err := sc.Start(ctx, e)
+	stop()
+	if closeErr := database.Close(); closeErr != nil {
+		log.Printf("关闭数据库失败: %v", closeErr)
+	}
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Printf("服务器异常退出: %v", err)
+		os.Exit(1)
 	}
 }
 

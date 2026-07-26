@@ -5,8 +5,10 @@ import (
 	"go-react-template/pkg/middleware"
 	"go-react-template/pkg/model"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v5"
+	echomw "github.com/labstack/echo/v5/middleware"
 )
 
 type Handlers struct {
@@ -21,8 +23,10 @@ func SetupRoutes(e *echo.Echo, h Handlers, auth *middleware.AuthMiddleware, tena
 	v1.GET("/health", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]any{"code": 0, "data": map[string]string{"status": "healthy"}, "message": "服务正常运行"})
 	})
-	v1.POST("/auth/register", h.Auth.Register)
-	v1.POST("/auth/login", h.Auth.Login)
+	// 未认证的凭据接口按 IP 限流，缓解暴力破解和 bcrypt CPU 消耗。
+	authLimiter := echomw.RateLimiter(echomw.NewRateLimiterMemoryStoreWithConfig(echomw.RateLimiterMemoryStoreConfig{Rate: 5, Burst: 20, ExpiresIn: 3 * time.Minute}))
+	v1.POST("/auth/register", h.Auth.Register, authLimiter)
+	v1.POST("/auth/login", h.Auth.Login, authLimiter)
 	protected := v1.Group("", auth.Require)
 	protected.POST("/auth/logout", h.Auth.Logout)
 	protected.GET("/auth/session", h.Auth.Session)
