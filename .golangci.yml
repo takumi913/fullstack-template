@@ -112,7 +112,6 @@ linters:
       - static
       - vendor
       - .git
-      - ".*_test.go$"
     rules:
       - path: '(.+)\.go$'
         text: Error return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
@@ -162,7 +161,6 @@ formatters:
       - static
       - vendor
       - .git
-      - ".*_test.go$"
       - \.pb\.go
 
 issues:

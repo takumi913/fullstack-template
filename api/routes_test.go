@@ -24,7 +24,7 @@ import (
 
 // 这些用例走完整的 HTTP 栈（路由 → 中间件 → handler → service → repo），
 // 覆盖仅靠 service 层测试无法验证的权限矩阵和认证边界。
-func newTestServer(t *testing.T) (*echo.Echo, *repo.Store) {
+func newTestServer(t *testing.T) *echo.Echo {
 	t.Helper()
 	configs.AppConfig = &configs.Config{Session: configs.SessionConfig{ExpireHour: 24}}
 	db, err := sql.Open("sqlite", "file:"+t.TempDir()+"/api.db?_pragma=foreign_keys(1)")
@@ -44,7 +44,7 @@ func newTestServer(t *testing.T) (*echo.Echo, *repo.Store) {
 	}
 	e := echo.New()
 	api.SetupRoutes(e, handlers, middleware.NewAuthMiddleware(service.NewAuthService(store)), middleware.NewTenantMiddleware(store))
-	return e, store
+	return e
 }
 
 // do 发起一次请求，token 为空表示不带会话 Cookie。
@@ -109,7 +109,7 @@ func addMemberAs(t *testing.T, e *echo.Echo, ownerToken, tenantID, email string,
 }
 
 func TestUnauthenticatedRequestsAreRejected(t *testing.T) {
-	e, _ := newTestServer(t)
+	e := newTestServer(t)
 	for _, path := range []string{"/api/v1/tenants", "/api/v1/user/profile", "/api/v1/auth/session"} {
 		if status, _ := do(t, e, http.MethodGet, path, "", ""); status != http.StatusUnauthorized {
 			t.Errorf("%s 无会话时应返回 401，实际 %d", path, status)
@@ -118,14 +118,14 @@ func TestUnauthenticatedRequestsAreRejected(t *testing.T) {
 }
 
 func TestInvalidSessionTokenIsRejected(t *testing.T) {
-	e, _ := newTestServer(t)
+	e := newTestServer(t)
 	if status, _ := do(t, e, http.MethodGet, "/api/v1/tenants", "not-a-real-token", ""); status != http.StatusUnauthorized {
 		t.Errorf("伪造 token 应返回 401，实际 %d", status)
 	}
 }
 
 func TestNonMemberCannotReachTenantEndpoints(t *testing.T) {
-	e, _ := newTestServer(t)
+	e := newTestServer(t)
 	_, tenantID := register(t, e, "alice", "alice@example.com")
 	outsider, _ := register(t, e, "mallory", "mallory@example.com")
 
@@ -143,7 +143,7 @@ func TestNonMemberCannotReachTenantEndpoints(t *testing.T) {
 }
 
 func TestMemberRoleCannotManageTenantOrMembers(t *testing.T) {
-	e, _ := newTestServer(t)
+	e := newTestServer(t)
 	ownerToken, tenantID := register(t, e, "alice", "alice@example.com")
 	memberToken, _ := register(t, e, "bobby", "bob@example.com")
 	addMemberAs(t, e, ownerToken, tenantID, "bob@example.com", model.TenantRoleMember)
@@ -167,7 +167,7 @@ func TestMemberRoleCannotManageTenantOrMembers(t *testing.T) {
 }
 
 func TestAdminCanManageMembersButNotDeleteTenant(t *testing.T) {
-	e, _ := newTestServer(t)
+	e := newTestServer(t)
 	ownerToken, tenantID := register(t, e, "alice", "alice@example.com")
 	adminToken, _ := register(t, e, "carol", "carol@example.com")
 	register(t, e, "dave", "dave@example.com")
@@ -185,7 +185,7 @@ func TestAdminCanManageMembersButNotDeleteTenant(t *testing.T) {
 }
 
 func TestOwnerHasFullAccess(t *testing.T) {
-	e, _ := newTestServer(t)
+	e := newTestServer(t)
 	ownerToken, tenantID := register(t, e, "alice", "alice@example.com")
 	checks := []struct {
 		method, path, body string

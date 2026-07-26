@@ -1,11 +1,13 @@
 # Go + React 全栈项目 Makefile
 # 提供统一的项目管理命令
 
+.PHONY: help deps sqlc-generate sqlc-verify test lint lint-go lint-web lint-web-fix build build-go build-web dev run clean docker tools check postmortem-onboarding postmortem-check postmortem-accept postmortem-list
+
 # 默认目标
 help: ## 显示帮助信息
 	@echo "Go + React 全栈项目管理命令:"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v -E '^(postmortem|lint|build-go|build-web)' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v -E '^(postmortem|lint-|build-go|build-web)' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
 # 安装依赖
@@ -23,7 +25,10 @@ sqlc-generate: ## 生成 SQLite/PostgreSQL 查询代码
 
 sqlc-verify: ## 检查 sqlc 生成代码是否最新
 	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate
-	git diff --exit-code -- db/generated
+	@# 用 git status 而非 git diff：新生成但未 git add 的文件是未跟踪状态，git diff 看不见
+	@test -z "$$(git status --porcelain -- db/generated)" || { \
+		echo "❌ db/generated 与 db/query 不一致，请提交 sqlc 生成结果:"; \
+		git status --porcelain -- db/generated; exit 1; }
 
 test: ## 运行前后端测试
 	@echo "🧪 运行后端测试..."
@@ -48,8 +53,10 @@ lint-web: ## 运行前端代码检查
 	@echo "🔍 运行前端代码检查..."
 	cd web && bun run lint
 
-lint-web-fix: ## 自动修复前端代码格式
-	@echo "🔧 修复前端代码格式..."
+lint-web-fix: ## 自动修复前端格式与 lint 问题
+	@echo "🔧 格式化前端代码..."
+	cd web && bun run format
+	@echo "🔧 修复前端 lint 问题..."
 	cd web && bun run lint --fix
 
 # 构建
@@ -107,7 +114,8 @@ clean: ## 清理构建文件
 # Docker
 docker: ## 构建 Docker 镜像
 	@echo "🐳 构建 Docker 镜像..."
-	./scripts/build.sh
+	@# 不需要先本地构建：Dockerfile 自带前后端构建阶段，
+	@# 且 .dockerignore 会排除 web/dist、static、server，本地产物根本进不了镜像
 	docker build -t go-react-template .
 
 # 工具安装
@@ -125,14 +133,17 @@ tools: ## 安装开发工具
 check: ## 检查开发工具是否安装
 	@echo "🔍 检查开发工具安装状态..."
 	@echo "\n📋 核心工具:"
-	@printf "  %-15s " "Go:"; go version 2>/dev/null | cut -d' ' -f3 || echo "❌ 未安装"
+	@# 回退分支必须包住整条管道：若写成 `cmd | cut || echo`，退出码取自 cut，
+	@# 工具缺失时既不报错也不输出，看起来像检查通过。
+	@printf "  %-15s " "Go:"; { go version 2>/dev/null || echo "x x ❌未安装"; } | cut -d' ' -f3
 	@printf "  %-15s " "Bun:"; bun --version 2>/dev/null || echo "❌ 未安装"
 	@echo "\n🔧 开发工具:"
-	@printf "  %-15s " "golangci-lint:"; golangci-lint version 2>/dev/null | head -1 | cut -d' ' -f4 || echo "❌ 未安装"
-	@printf "  %-15s " "air:"; air -v 2>/dev/null || echo "❌ 未安装"
+	@printf "  %-15s " "golangci-lint:"; { golangci-lint version 2>/dev/null || echo "x x x ❌未安装"; } | head -1 | cut -d' ' -f4
+	@# air -v 输出多行 ASCII 艺术字，版本号夹在中间，需要提取而非取某一行
+	@printf "  %-15s " "air:"; { air -v 2>/dev/null || echo "❌ 未安装"; } | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+|❌ 未安装' | head -1
 	@echo "\n🐳 容器工具:"
-	@printf "  %-15s " "Docker:"; docker --version 2>/dev/null | cut -d' ' -f3 | tr -d ',' || echo "❌ 未安装"
-	@printf "  %-15s " "docker-compose:"; docker-compose --version 2>/dev/null | cut -d' ' -f3 | tr -d ',' || echo "❌ 未安装"
+	@printf "  %-15s " "Docker:"; { docker --version 2>/dev/null || echo "x x ❌未安装"; } | cut -d' ' -f3 | tr -d ','
+	@printf "  %-15s " "docker-compose:"; { docker compose version --short 2>/dev/null || echo "❌ 未安装"; }
 	@echo "💡 安装缺失工具: make tools"
 
 # Postmortem 相关命令
