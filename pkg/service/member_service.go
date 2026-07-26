@@ -66,14 +66,13 @@ func (s *MemberService) Delete(ctx context.Context, tenantID, userID string, act
 	if actor.Role == model.TenantRoleAdmin && target.Role == model.TenantRoleOwner {
 		return errors.New("管理员不能删除所有者")
 	}
-	if target.Role == model.TenantRoleOwner {
-		owners, e := s.store.CountOwners(ctx, tenantID)
-		if e != nil {
-			return e
-		}
-		if owners <= 1 {
+	// 「至少保留一个 owner」的判断和删除必须原子完成，否则两个并发删除
+	// 会各自读到 owners=2 并双双放行，租户从此没有任何 owner。
+	if e = s.store.DeleteMemberKeepingOwner(ctx, tenantID, userID); e != nil {
+		if errors.Is(e, repo.ErrConflict) {
 			return errors.New("租户至少需要一个所有者")
 		}
+		return e
 	}
-	return s.store.DeleteMember(ctx, tenantID, userID)
+	return nil
 }

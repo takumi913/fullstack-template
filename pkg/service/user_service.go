@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/repo"
 	"strings"
@@ -27,18 +28,25 @@ func (s *UserService) Update(ctx context.Context, id string, req model.UpdatePro
 		return nil, e
 	}
 	if username := strings.TrimSpace(req.Username); username != "" {
-		if len(username) < 3 || len(username) > 50 {
-			return nil, errors.New("用户名长度必须在3-50个字符之间")
+		if err := validateUsername(username); err != nil {
+			return nil, err
 		}
 		u.Username = username
 	}
 	if email := strings.ToLower(strings.TrimSpace(req.Email)); email != "" {
-		if !strings.Contains(email, "@") {
-			return nil, errors.New("邮箱格式不正确")
+		if err := validateEmail(email); err != nil {
+			return nil, err
 		}
 		u.Email = email
 	}
-	u.AvatarURL = strings.TrimSpace(req.AvatarURL)
+	// 只有显式提供 avatar_url 时才修改，否则局部更新会把已有头像清空。
+	if req.AvatarURL != nil {
+		avatar := strings.TrimSpace(*req.AvatarURL)
+		if len(avatar) > maxAvatarURLLen {
+			return nil, fmt.Errorf("头像地址长度不能超过 %d 个字符", maxAvatarURLLen)
+		}
+		u.AvatarURL = avatar
+	}
 	if e = s.store.UpdateUserProfile(ctx, u); e != nil {
 		if errors.Is(e, repo.ErrConflict) {
 			return nil, errors.New("邮箱或用户名已被使用")
@@ -51,6 +59,9 @@ func (s *UserService) Update(ctx context.Context, id string, req model.UpdatePro
 func (s *UserService) ChangePassword(ctx context.Context, id string, req model.ChangePasswordRequest) error {
 	if len(req.NewPassword) < 6 {
 		return errors.New("新密码长度不能少于6个字符")
+	}
+	if len(req.NewPassword) > maxPasswordLen {
+		return fmt.Errorf("新密码长度不能超过 %d 个字节", maxPasswordLen)
 	}
 	u, e := s.store.GetUserByID(ctx, id)
 	if e != nil {

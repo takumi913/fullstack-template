@@ -8,5 +8,10 @@ SELECT tm.id, tm.tenant_id, tm.user_id, tm.role, tm.created_at, tm.updated_at, u
 UPDATE tenant_members SET role = $1, updated_at = CURRENT_TIMESTAMP WHERE tenant_id = $2 AND user_id = $3;
 -- name: DeleteTenantMember :execrows
 DELETE FROM tenant_members WHERE tenant_id = $1 AND user_id = $2;
+-- name: DeleteTenantMemberKeepingOwner :execrows
+DELETE FROM tenant_members
+WHERE tenant_members.tenant_id = $1 AND tenant_members.user_id = $2
+  AND (tenant_members.role <> 'owner'
+       OR (SELECT COUNT(*) FROM tenant_members m WHERE m.tenant_id = $1 AND m.role = 'owner') > 1);
 -- name: CountTenantOwners :one
 SELECT COUNT(*) FROM tenant_members WHERE tenant_id = $1 AND role = 'owner';

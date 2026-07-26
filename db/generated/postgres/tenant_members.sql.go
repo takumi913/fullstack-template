@@ -59,6 +59,26 @@ func (q *Queries) DeleteTenantMember(ctx context.Context, arg DeleteTenantMember
 	return result.RowsAffected()
 }
 
+const deleteTenantMemberKeepingOwner = `-- name: DeleteTenantMemberKeepingOwner :execrows
+DELETE FROM tenant_members
+WHERE tenant_members.tenant_id = $1 AND tenant_members.user_id = $2
+  AND (tenant_members.role <> 'owner'
+       OR (SELECT COUNT(*) FROM tenant_members m WHERE m.tenant_id = $1 AND m.role = 'owner') > 1)
+`
+
+type DeleteTenantMemberKeepingOwnerParams struct {
+	TenantID string
+	UserID   string
+}
+
+func (q *Queries) DeleteTenantMemberKeepingOwner(ctx context.Context, arg DeleteTenantMemberKeepingOwnerParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteTenantMemberKeepingOwner, arg.TenantID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
 const getTenantMember = `-- name: GetTenantMember :one
 SELECT tm.id, tm.tenant_id, tm.user_id, tm.role, tm.created_at, tm.updated_at FROM tenant_members tm JOIN tenants t ON t.id = tm.tenant_id WHERE tm.tenant_id = $1 AND tm.user_id = $2 AND t.deleted_at IS NULL LIMIT 1
 `

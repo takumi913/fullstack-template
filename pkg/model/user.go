@@ -42,9 +42,10 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 type UpdateProfileRequest struct {
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	AvatarURL string `json:"avatar_url"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	// 指针以区分「字段未提供」（nil，保持原值）和「显式清空」（""）。
+	AvatarURL *string `json:"avatar_url"`
 }
 type ChangePasswordRequest struct {
 	OldPassword string `json:"old_password"`

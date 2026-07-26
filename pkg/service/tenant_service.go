@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/repo"
 	"strings"
@@ -22,11 +23,14 @@ func (s *TenantService) Get(ctx context.Context, id string) (*model.Tenant, erro
 func (s *TenantService) Create(ctx context.Context, userID string, req model.CreateTenantRequest) (*model.Tenant, error) {
 	req.Name = strings.TrimSpace(req.Name)
 	req.Slug = slugify(req.Slug)
-	if req.Name == "" {
-		return nil, errors.New("租户名称不能为空")
+	if err := validateTenantName(req.Name); err != nil {
+		return nil, err
 	}
 	if req.Slug == "" {
 		req.Slug = slugify(req.Name) + "-" + uuid.NewString()[:8]
+	}
+	if len(req.Slug) > maxTenantSlug {
+		return nil, fmt.Errorf("标识长度不能超过 %d 个字符", maxTenantSlug)
 	}
 	t := &model.Tenant{ID: uuid.NewString(), Name: req.Name, Slug: req.Slug, CreatedBy: userID}
 	m := &model.TenantMember{ID: uuid.NewString(), TenantID: t.ID, UserID: userID, Role: model.TenantRoleOwner}
@@ -45,11 +49,23 @@ func (s *TenantService) Update(ctx context.Context, id string, req model.UpdateT
 	if e != nil {
 		return nil, e
 	}
-	if strings.TrimSpace(req.Name) != "" {
-		t.Name = strings.TrimSpace(req.Name)
+	if name := strings.TrimSpace(req.Name); name != "" {
+		if err := validateTenantName(name); err != nil {
+			return nil, err
+		}
+		t.Name = name
 	}
 	if strings.TrimSpace(req.Slug) != "" {
-		t.Slug = slugify(req.Slug)
+		// 必须校验 slugify 之后的结果：像 "!!!!" 这样的输入会被规整成空串，
+		// 直接写库会让该租户的标识变成空字符串，并占用唯一索引。
+		slug := slugify(req.Slug)
+		if slug == "" {
+			return nil, errors.New("标识必须包含字母或数字")
+		}
+		if len(slug) > maxTenantSlug {
+			return nil, fmt.Errorf("标识长度不能超过 %d 个字符", maxTenantSlug)
+		}
+		t.Slug = slug
 	}
 	if e = s.store.UpdateTenant(ctx, t); e != nil {
 		return nil, e

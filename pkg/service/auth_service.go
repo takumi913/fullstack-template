@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"go-react-template/configs"
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/repo"
@@ -17,20 +18,75 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// 用于在邮箱不存在时消耗与真实校验相当的时间，避免暴露账号是否存在。
+var dummyPasswordHash = func() []byte {
+	h, err := bcrypt.GenerateFromPassword([]byte("dummy-password-for-timing"), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return h
+}()
+
 type AuthService struct{ store *repo.Store }
 
 func NewAuthService(store *repo.Store) *AuthService { return &AuthService{store: store} }
-func validateCredentials(username, email, password string) error {
-	username = strings.TrimSpace(username)
-	email = strings.TrimSpace(strings.ToLower(email))
-	if username != "" && (len(username) < 3 || len(username) > 50) {
-		return errors.New("用户名长度必须在3-50个字符之间")
+
+// 长度上限对齐 PostgreSQL schema 中最窄的列定义。
+// SQLite 的 TEXT 没有长度限制，不在此处校验会导致同一份输入在两种数据库上行为不同：
+// SQLite 静默写入，PostgreSQL 报驱动错误。
+const (
+	maxUsernameLen  = 50
+	maxEmailLen     = 255
+	maxAvatarURLLen = 500
+	maxTenantName   = 100
+	maxTenantSlug   = 100
+	// bcrypt 只处理前 72 字节，超出会直接返回错误。
+	maxPasswordLen = 72
+)
+
+func validateUsername(username string) error {
+	if len(username) < 3 || len(username) > maxUsernameLen {
+		return fmt.Errorf("用户名长度必须在3-%d个字符之间", maxUsernameLen)
 	}
+	return nil
+}
+
+func validateEmail(email string) error {
 	if email == "" || !strings.Contains(email, "@") {
 		return errors.New("邮箱格式不正确")
 	}
+	if len(email) > maxEmailLen {
+		return fmt.Errorf("邮箱长度不能超过 %d 个字符", maxEmailLen)
+	}
+	return nil
+}
+
+func validateTenantName(name string) error {
+	if name == "" {
+		return errors.New("租户名称不能为空")
+	}
+	if len(name) > maxTenantName {
+		return fmt.Errorf("租户名称长度不能超过 %d 个字符", maxTenantName)
+	}
+	return nil
+}
+
+func validateCredentials(username, email, password string) error {
+	username = strings.TrimSpace(username)
+	email = strings.TrimSpace(strings.ToLower(email))
+	// 注册必须要求用户名：空用户名会占用 users.username 的唯一索引，
+	// 之后所有人都无法再用空用户名注册。
+	if err := validateUsername(username); err != nil {
+		return err
+	}
+	if err := validateEmail(email); err != nil {
+		return err
+	}
 	if len(password) < 6 {
 		return errors.New("密码长度不能少于6个字符")
+	}
+	if len(password) > maxPasswordLen {
+		return fmt.Errorf("密码长度不能超过 %d 个字节", maxPasswordLen)
 	}
 	return nil
 }
@@ -96,7 +152,15 @@ func (s *AuthService) Register(ctx context.Context, req model.RegisterRequest) (
 }
 func (s *AuthService) Login(ctx context.Context, req model.LoginRequest) (*model.AuthResponse, string, error) {
 	user, err := s.store.GetUserByEmail(ctx, strings.ToLower(strings.TrimSpace(req.Email)))
-	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)) != nil {
+	if err != nil {
+		// 邮箱不存在时也要跑一次 bcrypt：否则响应耗时相差数万倍，
+		// 攻击者可据此判断某个邮箱是否已注册。结果必然不匹配，无需检查。
+		if err := bcrypt.CompareHashAndPassword(dummyPasswordHash, []byte(req.Password)); err != nil {
+			_ = err
+		}
+		return nil, "", errors.New("邮箱或密码错误")
+	}
+	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)) != nil {
 		return nil, "", errors.New("邮箱或密码错误")
 	}
 	if user.Status != model.UserStatusActive {

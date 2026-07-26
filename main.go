@@ -61,6 +61,9 @@ func main() {
 		return nil
 	}}))
 	e.Use(middleware.Recover())
+	// 限制请求体大小：注册等接口在鉴权之前就会读取并解析请求体，
+	// 没有上限时一个超大请求即可耗尽内存（超时只限制时长，不限制体积）。
+	e.Use(middleware.BodyLimit(64 * 1024))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{AllowOrigins: configs.AppConfig.Server.CORSOrigins, AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions}, AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept}, AllowCredentials: true}))
 	api.SetupRoutes(e, handlers, authMiddleware, tenantMiddleware)

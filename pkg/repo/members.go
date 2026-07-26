@@ -77,6 +77,32 @@ func (s *Store) DeleteMember(ctx context.Context, tenantID, userID string) error
 	}
 	return nil
 }
+
+// DeleteMemberKeepingOwner 删除成员，但拒绝删除租户的最后一个 owner。
+// 判断和删除在同一条 SQL 里完成，因此并发删除不会把租户变成无人可管理的状态；
+// 先查询再删除的写法在两个请求交错时会双双通过检查。
+// 返回 ErrConflict 表示该成员是最后一个 owner。
+func (s *Store) DeleteMemberKeepingOwner(ctx context.Context, tenantID, userID string) error {
+	var n int64
+	var e error
+	if s.driver == "sqlite" {
+		// SQLite 的 ? 是位置参数，租户 ID 在外层和子查询各出现一次。
+		n, e = s.sqlite.DeleteTenantMemberKeepingOwner(ctx, sqlitedb.DeleteTenantMemberKeepingOwnerParams{
+			TenantID: tenantID, UserID: userID, TenantID_2: tenantID})
+	} else {
+		// PostgreSQL 的 $1 可复用，因此只有两个参数。
+		n, e = s.postgres.DeleteTenantMemberKeepingOwner(ctx, postgresdb.DeleteTenantMemberKeepingOwnerParams{
+			TenantID: tenantID, UserID: userID})
+	}
+	if e != nil {
+		return e
+	}
+	if n == 0 {
+		return ErrConflict
+	}
+	return nil
+}
+
 func (s *Store) CountOwners(ctx context.Context, tenantID string) (int64, error) {
 	if s.driver == "sqlite" {
 		return s.sqlite.CountTenantOwners(ctx, tenantID)

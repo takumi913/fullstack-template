@@ -20,6 +20,7 @@ type Querier interface {
 	DeleteSession(ctx context.Context, id string) (int64, error)
 	DeleteSessionsByUserID(ctx context.Context, userID string) error
 	DeleteTenantMember(ctx context.Context, arg DeleteTenantMemberParams) (int64, error)
+	DeleteTenantMemberKeepingOwner(ctx context.Context, arg DeleteTenantMemberKeepingOwnerParams) (int64, error)
 	GetSessionByTokenHash(ctx context.Context, tokenHash string) (Session, error)
 	GetTenantByID(ctx context.Context, id string) (Tenant, error)
 	GetTenantBySlug(ctx context.Context, slug string) (Tenant, error)
