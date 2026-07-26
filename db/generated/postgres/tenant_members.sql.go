@@ -60,7 +60,7 @@ func (q *Queries) DeleteTenantMember(ctx context.Context, arg DeleteTenantMember
 }
 
 const getTenantMember = `-- name: GetTenantMember :one
-SELECT id, tenant_id, user_id, role, created_at, updated_at FROM tenant_members WHERE tenant_id = $1 AND user_id = $2 LIMIT 1
+SELECT tm.id, tm.tenant_id, tm.user_id, tm.role, tm.created_at, tm.updated_at FROM tenant_members tm JOIN tenants t ON t.id = tm.tenant_id WHERE tm.tenant_id = $1 AND tm.user_id = $2 AND t.deleted_at IS NULL LIMIT 1
 `
 
 type GetTenantMemberParams struct {

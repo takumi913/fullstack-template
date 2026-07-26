@@ -63,6 +63,25 @@ func TestTenantMembershipIsolation(t *testing.T) {
 	}
 }
 
+func TestSoftDeletedTenantBlocksMemberAccess(t *testing.T) {
+	configs.AppConfig = &configs.Config{Session: configs.SessionConfig{ExpireHour: 24}}
+	store := testStore(t)
+	auth := service.NewAuthService(store)
+	ctx := context.Background()
+	owner, _, err := auth.Register(ctx, model.RegisterRequest{Username: "alice", Email: "alice@example.com", Password: "secret12"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tenantID := owner.Tenants[0].ID
+	if err := service.NewTenantService(store).Delete(ctx, tenantID); err != nil {
+		t.Fatal(err)
+	}
+	// 租户软删除后，成员查询必须失败，否则该租户下的成员管理接口仍然可用。
+	if _, err := store.GetMember(ctx, tenantID, owner.User.ID); err == nil {
+		t.Fatal("soft-deleted tenant still resolves membership")
+	}
+}
+
 func TestPostgresMigrations(t *testing.T) {
 	dsn := os.Getenv("TEST_POSTGRES_DSN")
 	if dsn == "" {
