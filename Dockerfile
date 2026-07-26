@@ -17,10 +17,10 @@ COPY web/ ./
 RUN bun run build
 
 # 第二阶段：后端构建阶段
-FROM golang:1.24-alpine AS backend-builder
+FROM golang:1.25-alpine AS backend-builder
 
-# 安装构建依赖（gcc 和 musl-dev 是 CGO 必需的）
-RUN apk add --no-cache git make bash gcc musl-dev
+# 安装构建依赖
+RUN apk add --no-cache git
 
 # 设置工作目录
 WORKDIR /app
@@ -40,8 +40,8 @@ COPY --from=frontend-builder /app/dist ./web/dist
 # 复制前端静态文件到后端静态目录
 RUN mkdir -p static && cp -r web/dist/* static/
 
-# 构建后端（go-sqlite3 需要 CGO 支持）
-RUN CGO_ENABLED=1 go build -o server main.go
+# 构建后端（modernc.org/sqlite 为纯 Go 实现，无需 CGO）
+RUN CGO_ENABLED=0 go build -o server main.go
 
 # 第三阶段：运行阶段
 FROM alpine:latest

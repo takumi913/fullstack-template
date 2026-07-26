@@ -191,7 +191,6 @@ $RECYCLE.BIN/
 *.zip
 
 # Docker
-.dockerignore
 Dockerfile.dev
 docker-compose.override.yml
 
