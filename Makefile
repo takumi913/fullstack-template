@@ -8,13 +8,13 @@ GOLANGCI_LINT_VERSION := v2.12.2
 SQLC_VERSION := v1.30.0
 AIR_VERSION := v1.61.7
 
-.PHONY: help deps sqlc-generate sqlc-verify test lint lint-go lint-web lint-web-fix build build-go build-web dev run clean docker tools check postmortem-onboarding postmortem-check postmortem-accept postmortem-list
+.PHONY: help deps sqlc-generate sqlc-verify test lint lint-go lint-web lint-web-fix build build-go build-web dev run clean docker tools check
 
 # 默认目标
 help: ## 显示帮助信息
 	@echo "Go + React 全栈项目管理命令:"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v -E '^(postmortem|lint-|build-go|build-web)' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -v -E '^(lint-|build-go|build-web)' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 
 # 安装依赖
@@ -155,36 +155,3 @@ check: ## 检查开发工具是否安装
 	@printf "  %-15s " "Docker:"; { docker --version 2>/dev/null || echo "x x ❌未安装"; } | cut -d' ' -f3 | tr -d ','
 	@printf "  %-15s " "docker-compose:"; { docker compose version --short 2>/dev/null || echo "❌ 未安装"; }
 	@echo "💡 安装缺失工具: make tools"
-
-# Postmortem 相关命令
-postmortem-onboarding: ## 分析历史 fix commits 生成 postmortem
-	@echo "📋 运行 Postmortem Onboarding..."
-	@if [ -z "$$OPENAI_API_KEY" ]; then \
-		echo "❌ 请设置 OPENAI_API_KEY 环境变量"; \
-		exit 1; \
-	fi
-	./scripts/postmortem.sh onboarding
-
-postmortem-check: ## 检查当前变更是否触发已知问题
-	@echo "🔍 运行 Pre-release Postmortem 检查..."
-	@if [ -z "$$OPENAI_API_KEY" ]; then \
-		echo "❌ 请设置 OPENAI_API_KEY 环境变量"; \
-		exit 1; \
-	fi
-	./scripts/postmortem.sh pre-release origin/main HEAD
-
-postmortem-accept: ## 接受一个风险 (用法: make postmortem-accept PM_ID="PM-xxx" REASON="原因")
-	@if [ -z "$(PM_ID)" ]; then \
-		echo "❌ 请提供 PM_ID 参数"; \
-		echo "用法: make postmortem-accept PM_ID=\"PM-20260113-001\" REASON=\"原因\""; \
-		exit 1; \
-	fi
-	@if [ -z "$(REASON)" ]; then \
-		echo "❌ 请提供 REASON 参数"; \
-		echo "用法: make postmortem-accept PM_ID=\"PM-20260113-001\" REASON=\"原因\""; \
-		exit 1; \
-	fi
-	./scripts/postmortem.sh accept-risk "$(PM_ID)" "$(REASON)" "$(EXPIRES)"
-
-postmortem-list: ## 列出所有已接受的风险
-	./scripts/postmortem.sh list-accepted

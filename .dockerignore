@@ -10,4 +10,3 @@ tmp
 *.db
 .env
 docs
-postmortem
