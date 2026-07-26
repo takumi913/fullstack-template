@@ -4,11 +4,11 @@ FROM oven/bun:1.3.2-alpine AS frontend-builder
 # 设置工作目录
 WORKDIR /app
 
-# 复制前端项目文件
-COPY web/package.json .
+# 复制前端依赖清单（锁文件保证构建可重现）
+COPY web/package.json web/bun.lock ./
 
 # 安装前端依赖
-RUN bun install
+RUN bun install --frozen-lockfile
 
 # 复制前端源码
 COPY web/ ./

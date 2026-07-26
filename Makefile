@@ -15,7 +15,7 @@ deps: ## 安装项目依赖
 	go mod download
 	go mod tidy
 	@echo "🔧 安装前端依赖..."
-	cd web && bun install --registry https://registry.npmjs.org/
+	cd web && bun install --frozen-lockfile --registry https://registry.npmjs.org/
 	@echo "✅ 依赖安装完成"
 
 sqlc-generate: ## 生成 SQLite/PostgreSQL 查询代码
