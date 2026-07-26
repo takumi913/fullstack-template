@@ -15,7 +15,7 @@ type AuthHandler struct{ service *service.AuthService }
 
 func NewAuthHandler(s *service.AuthService) *AuthHandler { return &AuthHandler{service: s} }
 func (h *AuthHandler) setCookie(c *echo.Context, token string) {
-	c.SetCookie(&http.Cookie{Name: middleware.SessionCookie, Value: token, Path: "/", MaxAge: configs.AppConfig.Session.ExpireHour * 3600, HttpOnly: true, Secure: false, SameSite: http.SameSiteLaxMode})
+	c.SetCookie(&http.Cookie{Name: middleware.SessionCookie, Value: token, Path: "/", MaxAge: configs.AppConfig.Session.ExpireHour * 3600, HttpOnly: true, Secure: configs.AppConfig.Session.CookieSecure, SameSite: http.SameSiteLaxMode})
 }
 func (h *AuthHandler) Register(c *echo.Context) error {
 	var req model.RegisterRequest
@@ -47,7 +47,7 @@ func (h *AuthHandler) Logout(c *echo.Context) error {
 			return failure(c, http.StatusInternalServerError, e)
 		}
 	}
-	c.SetCookie(&http.Cookie{Name: middleware.SessionCookie, Value: "", Path: "/", MaxAge: -1, Expires: time.Unix(0, 0), HttpOnly: true, SameSite: http.SameSiteLaxMode})
+	c.SetCookie(&http.Cookie{Name: middleware.SessionCookie, Value: "", Path: "/", MaxAge: -1, Expires: time.Unix(0, 0), HttpOnly: true, Secure: configs.AppConfig.Session.CookieSecure, SameSite: http.SameSiteLaxMode})
 	return success(c, nil, "退出成功")
 }
 func (h *AuthHandler) Session(c *echo.Context) error {

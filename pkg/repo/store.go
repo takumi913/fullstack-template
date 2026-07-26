@@ -38,6 +38,14 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	} else {
 		child.postgres = s.postgres.WithTx(tx)
 	}
+	// fn panic 时必须回滚，否则连接不会归还；
+	// SQLite 只有一个连接（MaxOpenConns=1），泄漏一次即全局死锁。
+	defer func() {
+		if r := recover(); r != nil {
+			_ = tx.Rollback()
+			panic(r)
+		}
+	}()
 	if err := fn(child); err != nil {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
 			return errors.Join(err, rollbackErr)

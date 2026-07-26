@@ -121,7 +121,7 @@ func (s *AuthService) createSession(ctx context.Context, userID string, active *
 	}
 	token := hex.EncodeToString(raw)
 	sum := sha256.Sum256([]byte(token))
-	v := &model.Session{ID: uuid.NewString(), UserID: userID, TokenHash: hex.EncodeToString(sum[:]), ActiveTenantID: active, ExpiresAt: time.Now().Add(time.Duration(configs.AppConfig.Session.ExpireHour) * time.Hour)}
+	v := &model.Session{ID: uuid.NewString(), UserID: userID, TokenHash: hex.EncodeToString(sum[:]), ActiveTenantID: active, ExpiresAt: time.Now().UTC().Add(time.Duration(configs.AppConfig.Session.ExpireHour) * time.Hour)}
 	if err := s.store.CreateSession(ctx, v); err != nil {
 		return "", err
 	}

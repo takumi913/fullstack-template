@@ -57,6 +57,12 @@ func main() {
 	}
 }
 
+// staticFilePath 将 URL 路径映射到静态目录内的文件路径。
+// 先以根路径清洗，保证 ".." 无法逃出 staticDir（防止路径穿越读取任意文件）。
+func staticFilePath(staticDir, urlPath string) string {
+	return filepath.Join(staticDir, filepath.Clean("/"+urlPath))
+}
+
 // setupStaticFiles 设置静态文件服务.
 func setupStaticFiles(e *echo.Echo) {
 	// 静态文件目录
@@ -70,7 +76,7 @@ func setupStaticFiles(e *echo.Echo) {
 
 	// 服务带有哈希的静态资源文件（长期缓存）
 	e.GET("/assets/*", func(c *echo.Context) error {
-		filePath := filepath.Join(staticDir, c.Request().URL.Path)
+		filePath := staticFilePath(staticDir, c.Request().URL.Path)
 		if _, err := os.Stat(filePath); err != nil {
 			return echo.NewHTTPError(http.StatusNotFound, "File not found")
 		}
@@ -102,7 +108,7 @@ func setupStaticFiles(e *echo.Echo) {
 		}
 
 		// 检查请求的文件是否存在
-		filePath := filepath.Join(staticDir, path)
+		filePath := staticFilePath(staticDir, path)
 		if path == "/" {
 			filePath = filepath.Join(staticDir, "index.html")
 		}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go-react-template/pkg/model"
 	"go-react-template/pkg/repo"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -25,7 +26,7 @@ func (s *MemberService) Add(ctx context.Context, tenantID string, actor model.Te
 	if actor.Role == model.TenantRoleAdmin && req.Role == model.TenantRoleOwner {
 		return nil, errors.New("管理员不能添加所有者")
 	}
-	u, e := s.store.GetUserByEmail(ctx, req.Email)
+	u, e := s.store.GetUserByEmail(ctx, strings.ToLower(strings.TrimSpace(req.Email)))
 	if e != nil {
 		return nil, errors.New("用户不存在，请先注册")
 	}
