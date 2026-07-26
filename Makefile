@@ -29,7 +29,7 @@ test: ## 运行前后端测试
 	@echo "🧪 运行后端测试..."
 	go test $$(go list ./... | grep -v /web/node_modules)
 	@echo "🧪 运行前端测试..."
-	cd web && bun test 2>/dev/null || echo "⚠️  前端测试未配置"
+	cd web && bun run test
 
 # 代码检查
 lint: lint-go lint-web ## 运行所有代码检查
