@@ -17,19 +17,22 @@ export const useTenantStore = create<TenantState>((set, get) => ({
   membership: null,
   members: [],
   // 会话响应已包含租户列表，直接用它填充 store，使刷新后直接进入租户页面也有数据。
+  // membership/members 必须一并清空：它们属于上一个会话，换用户登录后会造成越权 UI 和信息泄漏。
   hydrate: (auth) =>
     set({
       tenants: auth.tenants,
       activeTenant:
         auth.tenants.find((t) => t.id === auth.active_tenant_id) ?? auth.tenants[0] ?? null,
+      membership: null,
+      members: [],
     }),
   loadTenants: async () => {
     const r = await tenantApi.list();
-    const current = get().activeTenant;
+    const currentID = get().activeTenant?.id;
+    // 必须取列表里的新对象，沿用旧对象会让改名后的工作区在界面上仍显示旧名字。
     set({
       tenants: r.data,
-      activeTenant:
-        current && r.data.some((t) => t.id === current.id) ? current : (r.data[0] ?? null),
+      activeTenant: r.data.find((t) => t.id === currentID) ?? r.data[0] ?? null,
     });
   },
   selectTenant: async (tenant) => {
@@ -49,3 +52,11 @@ export const useTenantStore = create<TenantState>((set, get) => ({
   reset: () => set({ tenants: [], activeTenant: null, membership: null, members: [] }),
 }));
 import { useAuthStore } from "./authStore";
+
+// 认证状态一旦被清除（主动登出或会话失效），租户数据必须立即作废。
+// 否则同一标签页换用户登录时，上一个用户的成员名单和角色会残留在内存中。
+useAuthStore.subscribe((state, prev) => {
+  if (prev.isAuthenticated && !state.isAuthenticated) {
+    useTenantStore.getState().reset();
+  }
+});

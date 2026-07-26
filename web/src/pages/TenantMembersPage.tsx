@@ -8,11 +8,26 @@ export default function TenantMembersPage() {
   const { activeTenant, members, membership, loadMembers } = useTenantStore();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<TenantRole>("member");
+  const [loadError, setLoadError] = useState("");
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const { error, pending, run } = useAsyncAction();
+  const activeTenantID = activeTenant?.id ?? null;
+  // 依赖 id 而非对象：loadTenants 每次都会产出新对象，依赖对象会让本效果重复触发。
   useEffect(() => {
-    void loadMembers();
-  }, [activeTenant, loadMembers]);
-  const canManage = membership?.role === "owner" || membership?.role === "admin";
+    let cancelled = false;
+    loadMembers()
+      .then(() => !cancelled && setLoadError(""))
+      .catch((caught: Error) => !cancelled && setLoadError(caught.message))
+      .finally(() => !cancelled && setLoadedFor(activeTenantID));
+    // 切换工作区时丢弃上一次请求的结果，避免先发后到覆盖新数据。
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTenantID, loadMembers]);
+  // 由「已为当前工作区加载完成」推导，避免在效果里同步 setState。
+  const loaded = loadedFor === activeTenantID;
+  // 成员列表未加载完时不能认为有管理权限，否则会短暂显示越权的管理表单。
+  const canManage = loaded && (membership?.role === "owner" || membership?.role === "admin");
 
   function add(event: React.FormEvent) {
     event.preventDefault();
@@ -20,6 +35,7 @@ export default function TenantMembersPage() {
     void run(async () => {
       await tenantApi.addMember(activeTenant.id, { email, role });
       setEmail("");
+      setRole("member");
       await loadMembers();
     });
   }
@@ -58,13 +74,18 @@ export default function TenantMembersPage() {
           </button>
         </form>
       )}
-      {error && <p className="mb-6 text-sm text-red-700">{error}</p>}
+      {(error || loadError) && <p className="mb-6 text-sm text-red-700">{error || loadError}</p>}
       <div className="panel overflow-hidden">
         <div className="grid grid-cols-[1fr_auto] border-b bg-zinc-50 px-5 py-3 text-xs font-medium text-zinc-500">
           <span>用户</span>
           <span>角色</span>
         </div>
         <div className="rule-list">
+          {/* 加载中和「确实没有成员」必须区分开，否则两者看起来完全一样 */}
+          {!loaded && <p className="px-5 py-4 text-sm text-zinc-500">加载中…</p>}
+          {loaded && !loadError && members.length === 0 && (
+            <p className="px-5 py-4 text-sm text-zinc-500">暂无成员</p>
+          )}
           {members.map((member) => (
             <div key={member.id} className="flex items-center justify-between gap-4 px-5 py-4">
               <div className="min-w-0">

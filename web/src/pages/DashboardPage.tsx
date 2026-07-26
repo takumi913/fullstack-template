@@ -1,5 +1,5 @@
 import { Building2, ChevronRight, Settings, Users } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { useTenantStore } from "@/store/tenantStore";
@@ -13,9 +13,23 @@ const links = [
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
   const { tenants, activeTenant, loadTenants, selectTenant } = useTenantStore();
+  const [error, setError] = useState("");
+  const [switching, setSwitching] = useState(false);
   useEffect(() => {
-    void loadTenants();
+    loadTenants().catch((caught: Error) => setError(caught.message));
   }, [loadTenants]);
+
+  // 切换期间禁用下拉框：否则连续切换时，先发出的请求可能后返回并覆盖后一次的选择，
+  // 造成界面显示的工作区与服务端会话不一致。
+  function switchTenant(id: string) {
+    const tenant = tenants.find((item) => item.id === id);
+    if (!tenant || switching) return;
+    setError("");
+    setSwitching(true);
+    selectTenant(tenant)
+      .catch((caught: Error) => setError(caught.message))
+      .finally(() => setSwitching(false));
+  }
 
   return (
     <div className="shell py-12 sm:py-16">
@@ -29,12 +43,10 @@ export default function DashboardPage() {
         <label className="text-xs font-medium text-zinc-500">
           当前工作区
           <select
-            className="field mt-2 block w-full min-w-52"
+            className="field mt-2 block w-full min-w-52 disabled:opacity-60"
             value={activeTenant?.id ?? ""}
-            onChange={(event) => {
-              const tenant = tenants.find((item) => item.id === event.target.value);
-              if (tenant) void selectTenant(tenant);
-            }}
+            disabled={switching}
+            onChange={(event) => switchTenant(event.target.value)}
           >
             {tenants.map((tenant) => (
               <option key={tenant.id} value={tenant.id}>
@@ -42,6 +54,7 @@ export default function DashboardPage() {
               </option>
             ))}
           </select>
+          {error && <p className="mt-2 text-sm font-normal text-red-700">{error}</p>}
         </label>
       </div>
 

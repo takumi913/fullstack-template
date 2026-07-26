@@ -1,11 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
-import { useTenantStore } from "@/store/tenantStore";
 
 export const Header = () => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const reset = useTenantStore((state) => state.reset);
   const navigate = useNavigate();
 
   return (
@@ -28,10 +26,12 @@ export const Header = () => {
               </Link>
               <button
                 className="rounded-md px-3 py-2 text-sm text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
-                onClick={async () => {
-                  await logout();
-                  reset();
-                  navigate("/");
+                // 登出请求失败也要离开当前页：本地会话状态已清空，
+                // 停留在原地会让用户看到一个自己已无权访问的页面。
+                onClick={() => {
+                  logout()
+                    .catch(() => {})
+                    .finally(() => navigate("/"));
                 }}
               >
                 退出

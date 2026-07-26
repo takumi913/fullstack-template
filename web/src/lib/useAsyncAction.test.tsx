@@ -21,7 +21,7 @@ describe("useAsyncAction", () => {
     let release!: () => void;
     const blocked = new Promise<void>((resolve) => (release = resolve));
 
-    let first!: Promise<void>;
+    let first!: Promise<boolean>;
     act(() => {
       first = result.current.run(async () => {
         calls++;
@@ -31,9 +31,12 @@ describe("useAsyncAction", () => {
     expect(result.current.pending).toBe(true);
 
     await act(async () => {
-      await result.current.run(async () => {
-        calls++;
-      });
+      // 被忽略的提交返回 false，调用方据此可以区分「没执行」和「执行成功」
+      expect(
+        await result.current.run(async () => {
+          calls++;
+        }),
+      ).toBe(false);
     });
     expect(calls).toBe(1);
 
