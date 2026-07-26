@@ -21,17 +21,16 @@ help: ## 显示帮助信息
 deps: ## 安装项目依赖
 	@echo "📦 安装项目依赖..."
 	@echo "🔧 安装 Go 依赖..."
+	@# 只 download 不 tidy：安装依赖不应带有改写 go.mod/go.sum 的副作用
 	go mod download
-	go mod tidy
 	@echo "🔧 安装前端依赖..."
-	cd web && bun install --frozen-lockfile --registry https://registry.npmjs.org/
+	cd web && bun install --frozen-lockfile
 	@echo "✅ 依赖安装完成"
 
 sqlc-generate: ## 生成 SQLite/PostgreSQL 查询代码
 	go run github.com/sqlc-dev/sqlc/cmd/sqlc@$(SQLC_VERSION) generate
 
-sqlc-verify: ## 检查 sqlc 生成代码是否最新
-	go run github.com/sqlc-dev/sqlc/cmd/sqlc@$(SQLC_VERSION) generate
+sqlc-verify: sqlc-generate ## 检查 sqlc 生成代码是否最新
 	@# 用 git status 而非 git diff：新生成但未 git add 的文件是未跟踪状态，git diff 看不见
 	@test -z "$$(git status --porcelain -- db/generated)" || { \
 		echo "❌ db/generated 与 db/query 不一致，请提交 sqlc 生成结果:"; \
@@ -77,6 +76,7 @@ build: ## 构建项目
 
 build-go: ## 仅构建 Go 后端
 	@echo "🔨 构建 Go 后端..."
+	@# modernc.org/sqlite 为纯 Go 实现，无需 CGO
 	CGO_ENABLED=0 go build -o server main.go
 
 build-web: ## 仅构建前端
@@ -88,7 +88,6 @@ dev: ## 启动前后端开发环境（同时启动后端和前端）
 	@echo "🚀 启动前后端开发环境..."
 	@echo "📡 后端将使用 Air 热重载，地址: http://localhost:1323"
 	@echo "🌐 前端将使用 Vite，地址: http://localhost:5173"
-	@mkdir -p tmp
 	@trap 'kill 0' EXIT; \
 	( \
 		if command -v air >/dev/null 2>&1; then \
@@ -118,6 +117,7 @@ clean: ## 清理构建文件
 	@echo "🧹 清理构建文件..."
 	rm -rf web/dist
 	rm -rf static
+	rm -rf tmp
 	rm -f server
 	@echo "✅ 清理完成"
 
@@ -136,8 +136,6 @@ tools: ## 安装开发工具
 	@echo "📦 安装 air (热重载)..."
 	go install github.com/air-verse/air@$(AIR_VERSION)
 	@echo "✅ 开发工具安装完成"
-	@echo "🎉 可用命令:"
-	@echo "   - make lint-go    # 运行代码检查"
 
 # 检查工具
 check: ## 检查开发工具是否安装

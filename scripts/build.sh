@@ -50,10 +50,8 @@ echo "📋 运行 golangci-lint 检查..."
 golangci-lint run
 echo "✅ 代码质量检查通过"
 
-# 构建后端 Go 程序
-echo "🔨 构建后端 Go 程序..."
-# modernc.org/sqlite 为纯 Go 实现，无需 CGO
-CGO_ENABLED=0 go build -o server main.go
+# 构建后端 Go 程序（构建命令统一维护在 make build-go 里）
+make build-go
 
 if [ ! -f "server" ]; then
     echo "❌ 后端构建失败"
