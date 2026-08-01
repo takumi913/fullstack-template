@@ -4,7 +4,8 @@
 version: 2
 updates:
   # 前端依赖
-  - package-ecosystem: "npm"
+  # 使用 Bun 更新器，让依赖 PR 同时更新 package.json 和 bun.lock。
+  - package-ecosystem: "bun"
     directory: "/web"
     schedule:
       interval: "weekly"
