@@ -15,17 +15,47 @@
 - **渐进式重构**：持续改进代码质量，但避免大规模重写。
 - **实用主义**：专注于功能实现和用户体验，避免过度工程化。
 
+### 1.3 问题排查与修复原则
+
+**先确认，再动手；先根因，再修复。**
+
+- **先确认问题是否真实存在**：拿到任何问题描述（报错、疑似 bug、评审意见、"我感觉这里有问题"）后，第一步是验证而不是修改。通过复现步骤、日志、测试用例或通读实际代码路径来确认问题确实存在、触发条件是什么、影响范围有多大。无法确认的，先说明"未复现/未找到证据"，不要凭猜测改代码。
+- **避免过度猜想导致矫枉过正**：只修已确认的问题。不要顺手"预防性"地改动那些看起来可疑但没有任何证据出错的代码，也不要为了一个具体问题引入通用框架式的抽象。基于猜测的改动会带来新的复杂度和新的 bug，这本身就是更大的问题。
+- **先从架构角度找根因**：定位问题后，先判断它在架构上属于哪一层的职责缺失或边界破坏——是分层职责串了（handler 写了业务逻辑、service 直接拼 SQL），是状态归属错了，还是数据流方向反了。再回到实际业务场景，确认这个根因能否解释观察到的全部现象；解释不了，说明还没找到真正的根因。
+- **禁止打补丁式修复**：不要用"加个 if 特判""包一层 try/catch 吞掉错误""在这个调用点单独兜底"这类手段绕开症状。修复必须落在根因所在的那一层，使同类问题在其它调用点也一并消失。如果发现同一根因在多处产生了相似的症状，一次性修掉，而不是逐个打补丁。
+- **权衡要显式**：如果根因修复代价过大、超出当前改动范围，明确说明取舍和临时方案的边界，由人来决定，而不是默默留下一个补丁。
+- **修复后验证**：说明如何验证（复现步骤是否消失、新增/已有测试、`make lint`、`bun run test`），并检查代码库中是否还有其它地方存在同一根因。
+
+### 1.4 防御性编程与测试的边界
+
+**克制是默认值：只在边界防御，只测核心。**
+
+- **减少防御性编程**：校验只做在系统边界——HTTP 入参、外部 API 响应、配置读取、数据库返回。边界之内的函数信任已经校验过的数据，不要层层重复判空、重复包 try/catch。
+- **不吞掉错误**：错误应当冒泡到真正能处理它的那一层，不要就地 catch 后返回默认值或空对象。被掩盖的错误会变成更难排查的问题。
+- **不为不可能的分支写代码**：不给"理论上不会发生"的情况加兜底。这类分支无法验证、无法测试，只会让真正的 bug 静默通过。
+- **测试只覆盖核心**：为核心业务规则、容易出错的边界条件、以及修复过的 bug 写测试。不给纯转发的 handler、getter/setter、框架自身的行为、显而易见的类型映射写测试。
+- **严格控制测试文件数量**：优先在已有测试文件中追加用例，而不是新建文件；一个模块对应一个测试文件。大量零碎的测试文件会污染上下文、浪费大量 token，维护成本远高于它带来的信心。
+- **测试要有信息量**：测试失败时应当能直接指出是哪条业务规则被破坏。断言具体行为，不要快照式地断言整个数据结构。
+
+### 1.5 注释规范
+
+注释解释「为什么」，代码本身表达「做什么」。复述代码的注释等于噪音。
+
+- **公开 API**：Go 的导出函数、类型、接口需要注释说明用途与边界条件（golangci-lint 会检查）
+- **非显然的决策**：绕过某个坑、选择某种权衡、与直觉相反的实现，必须写清原因
+- **复杂业务规则**：说明规则来源和适用条件，而不是逐行翻译代码
+- **不写**：getter/setter、参数含义已由命名表达、被注释掉的旧代码（交给 git）
+
 ## 2. 技术栈 (Tech Stack) 🛠️
 
 ### 后端 (Backend)
 
 - **语言**: Go 1.25+（以 go.mod 的 go 指令为准）
-- **Web 框架**: Echo v4
+- **Web 框架**: Echo v5（注意 handler 签名是 `*echo.Context` 指针，与 v4 不同）
 - **数据访问**: database/sql + sqlc（由 SQL 生成类型安全代码，无 ORM）
-- **数据库**: SQLite/MySQL/PostgreSQL (多数据库支持)
+- **数据库**: SQLite 与 PostgreSQL 双方言（`db/query/`、`db/migrations/` 各维护一套）
 - **身份认证**: Session
 - **密码加密**: bcrypt
-- **第三方登录**: Google OAuth2
 - **配置管理**: godotenv
 - **依赖管理**: Go Modules
 
@@ -38,7 +68,8 @@
 - **状态管理**: Zustand (支持持久化)
 - **路由**: React Router DOM v7+
 - **UI 组件**: 页面使用 `style.css` 中的 `.panel`/`.button-primary`/`.field` 等类；如需成品组件，用 `bunx shadcn@latest add <组件>` 按需引入
-- **表单处理**: 原生受控组件 + service 层校验（未引入表单库）
+- **表单处理**: 原生受控组件 + `useAsyncAction`（未引入表单库），业务校验以后端 service 层为准
+- **图标**: lucide-react（已在用，不要再引入第二个图标库）
 - **HTTP 客户端**: Axios
 - **国际化**: 暂未引入，文案直接写在组件中
 - **主题切换**: 暂未引入
@@ -66,9 +97,6 @@
 ├── .github/               # GitHub 配置
 │   └── workflows/         # CI/CD 工作流
 │
-├── .trae/                 # Trae AI 配置
-│   └── rules/             # 项目规约文档
-│
 ├── api/                   # API 定义文件
 │   └── routes.go          # 路由定义
 │
@@ -77,6 +105,11 @@
 │
 ├── configs/               # 配置管理
 │   └── config.go          # 配置文件
+│
+├── db/                    # 数据库定义
+│   ├── migrations/        # 迁移脚本
+│   ├── query/             # 手写 SQL（sqlite/ 与 postgres/ 两套方言）
+│   └── generated/         # sqlc 生成代码，禁止手改
 │
 ├── docs/                  # 项目文档
 │   ├── air.md             # Air 热重载文档
@@ -113,66 +146,31 @@
     └── vite.config.ts     # Vite 构建配置
 ```
 
-### 3.2 目录职责说明
-
-#### 后端目录
-
-- **`pkg/`**: 核心业务代码，按功能模块组织
-- **`api/`**: API 路由定义和文档
-- **`configs/`**: 配置文件和环境变量管理
-- **`scripts/`**: 构建、部署和维护脚本
-
-#### 前端目录
-
-- **`web/src/components/`**: 可复用的 UI 组件
-- **`web/src/pages/`**: 页面级组件
-- **`web/src/lib/`**: 工具函数和通用逻辑
-- **`web/src/store/`**: 全局状态管理
-
-#### 配置和文档
-
-- **`docs/`**: 项目文档和使用指南
-- **`.github/`**: GitHub Actions 和模板
-
 ## 4. 后端开发规约 (Backend Rules)
 
 ### 4.1 代码分层职责
 
 #### 4.1.1 Handler 层 (pkg/handler/)
 
-- **职责**：HTTP 请求解析、参数验证、响应格式化
+- **职责**：绑定入参、调用 service、返回统一响应，只做这三件事
 - **原则**：
-  - 不包含业务逻辑，只负责数据转换和验证
-  - 使用 Echo 的绑定和验证功能
-  - 统一错误处理和响应格式
-  - 记录请求日志
+  - 不包含业务逻辑，业务规则与校验一律在 service 层
+  - 响应必须走 `pkg/handler/response.go` 的 `success`/`failure`，不要自己拼 map
+  - 不要把原始错误直接回传给客户端；`failure` 已统一处理 5xx 的脱敏与日志
+  - 请求日志由中间件统一记录，handler 不重复记
 
 ```go
-// 示例：用户注册处理器
-func (h *UserHandler) Register(c echo.Context) error {
-    var req model.UserRegisterRequest
-    if err := c.Bind(&req); err != nil {
-        return c.JSON(http.StatusBadRequest, map[string]interface{}{
-            "code":    1,
-            "data":    nil,
-            "message": "请求参数格式错误",
-        })
-    }
-
-    user, err := h.userService.Register(&req)
-    if err != nil {
-        return c.JSON(http.StatusBadRequest, map[string]interface{}{
-            "code":    1,
-            "data":    nil,
-            "message": err.Error(),
-        })
-    }
-
-    return c.JSON(http.StatusOK, map[string]interface{}{
-        "code":    0,
-        "data":    user,
-        "message": "注册成功",
-    })
+// pkg/handler/user_handler.go
+func (h *UserHandler) Update(c *echo.Context) error {
+	var req model.UpdateProfileRequest
+	if e := c.Bind(&req); e != nil {
+		return failure(c, 400, e)
+	}
+	v, e := h.service.Update(c.Request().Context(), middleware.UserID(c), req)
+	if e != nil {
+		return failure(c, 400, e)
+	}
+	return success(c, v, "更新成功")
 }
 ```
 
@@ -210,43 +208,19 @@ func (h *UserHandler) Register(c echo.Context) error {
 - **HTTP 方法**：
   - `GET`: 获取资源
   - `POST`: 创建资源
-  - `PUT`: 完整更新资源
-  - `PATCH`: 部分更新资源
+  - `PATCH`: 更新资源（本项目统一用 PATCH，不使用 PUT）
   - `DELETE`: 删除资源
 
 #### 4.2.2 统一响应格式
 
 项目采用统一的响应格式，所有 API 接口都应遵循以下规范：
 
-```go
+```jsonc
 // 成功响应
-{
-    "code": 0,
-    "data": {},
-    "message": "操作成功"
-}
+{ "code": 0, "data": {}, "message": "操作成功" }
 
 // 错误响应
-{
-    "code": 1,
-    "data": null,
-    "message": "具体错误信息"
-}
-
-// 分页响应
-{
-    "code": 0,
-    "data": {
-        "items": [],
-        "pagination": {
-            "page": 1,
-            "limit": 10,
-            "total": 100,
-            "pages": 10
-        }
-    },
-    "message": "获取成功"
-}
+{ "code": 1, "data": null, "message": "具体错误信息" }
 ```
 
 **响应字段说明：**
@@ -254,6 +228,8 @@ func (h *UserHandler) Register(c echo.Context) error {
 - `code`: 业务状态码，0 表示成功，非 0 表示失败
 - `data`: 响应数据，成功时包含具体数据，失败时为 null
 - `message`: 响应消息，提供用户友好的提示信息
+
+项目当前没有分页接口；将来新增时，把 `items` 与 `pagination` 放进 `data`，不要另造顶层字段。
 
 #### 4.2.3 错误处理
 
@@ -266,44 +242,48 @@ func (h *UserHandler) Register(c echo.Context) error {
 
 #### 4.3.1 输入验证
 
-- **所有用户输入必须验证**：使用结构体标签进行基础验证
+- **所有用户输入必须验证**：校验写在 service 层（与 4.1.4 一致），handler 只做绑定和格式检查
 - **防止 SQL 注入**：只通过 sqlc 生成的参数化查询访问数据库，禁止手工拼接 SQL
 - **防止 XSS 攻击**：对用户输入进行适当的转义和过滤
-- **文件上传安全**：限制文件类型、大小和存储位置
 
 #### 4.3.2 身份认证与授权
 
 - **SESSION 认证**：随机 token 存入 HttpOnly Cookie，服务端只保存其 SHA-256 哈希（`sessions` 表）
 - **密码安全**：使用 `bcrypt` 进行密码哈希，成本因子设为默认值
-- **Token 管理**：设置合理的过期时间（默认 24 小时），支持 token 刷新
-- **第三方登录**：支持 Google OAuth2 登录，安全处理用户信息
+- **会话有效期**：由 `SESSION_EXPIRE_HOUR` 控制（默认 24 小时），过期后需重新登录；没有刷新机制
 - **中间件保护**：使用 SESSION 中间件保护需要认证的路由
 
-### 4.4 性能优化
+#### 4.3.3 多租户与权限控制
 
-#### 4.4.1 数据库优化
+租户内资源按角色授权，角色与权限的映射集中在 `pkg/model/permission.go`：
+
+- **角色**：`Owner` / `Admin` / `Member`；权限用 `资源:动作` 常量表示（如 `tenant:update`）
+- **路由必须挂权限**：租户作用域下的路由一律加 `middleware.Require(model.PermissionXxx)`，
+  漏挂即越权。在 `api/routes.go` 新增路由时，先确定它需要哪个权限
+- **新增权限**：在 `permission.go` 定义常量后，必须在 `RolePermissions` 里为三个角色都显式赋值，
+  不要依赖 map 零值——漏写会静默变成"无权限"，且难以排查
+- **授权只在中间件这一层**：不要在 service 或前端重复做权限判断，同一规则散落多处必然发散；
+  前端按角色隐藏入口只是体验优化，不能当作授权手段
+- **认证类路由限流**：登录、注册等接口挂 `authLimiter`
+
+### 4.4 数据库与性能优化
 
 - **索引策略**：在经常查询的字段上建立索引（如 email、username）
 - **避免 N+1 查询**：在 `db/query/` 中用 JOIN 一次取回关联数据，不要在循环里查询
-- **分页查询**：在 SQL 中使用 `LIMIT`/`OFFSET` 参数，由 sqlc 生成带参数的查询方法
 - **软删除**：通过 `deleted_at` 列实现，查询需显式加上 `deleted_at IS NULL`
 - **连接池**：合理配置数据库连接池参数（SQLite 限制为单连接）
 
 ```sql
 -- db/query/sqlite/tenants.sql
--- name: ListTenants :many
+-- name: ListTenantsByUserID :many
 SELECT t.* FROM tenants t
-JOIN tenant_members m ON m.tenant_id = t.id
-WHERE m.user_id = ? AND t.deleted_at IS NULL
-ORDER BY t.created_at
-LIMIT ? OFFSET ?;
+JOIN tenant_members tm ON tm.tenant_id = t.id
+WHERE tm.user_id = ? AND t.deleted_at IS NULL
+ORDER BY t.created_at ASC;
 ```
 
-#### 4.4.2 缓存策略
-
-- **静态资源缓存**：前端静态资源使用浏览器缓存
-- **API 响应缓存**：对不经常变化的数据进行适当缓存
-- **数据库查询优化**：避免重复查询，合理使用事务
+同一个查询要在 `db/query/sqlite/` 和 `db/query/postgres/` 各写一份（占位符分别是 `?` 和 `$1`），
+两边的查询名必须一致，`pkg/repo/` 才能按驱动切换。
 
 ### 4.5 日志和监控
 
@@ -313,20 +293,15 @@ LIMIT ? OFFSET ?;
 - **记录关键操作**：记录用户登录、注册、重要业务操作
 - **错误日志**：记录所有错误信息，便于问题排查
 - **安全考虑**：不记录密码、token 等敏感信息
-- **中间件日志**：使用 Echo 的 Logger 中间件记录 HTTP 请求
+- **中间件日志**：HTTP 访问日志由 `main.go` 里的 `RequestLoggerWithConfig` 转发给 slog，
+  不要改用 `middleware.Logger()`——那会引入第二种日志格式
+- **请求关联**：`RequestID` 中间件生成的 id 会同时出现在访问日志和 `failure` 记录的错误日志里
 
 ```go
-// 日志记录示例
-log.Printf("用户注册成功: %s", user.Email)
-log.Printf("数据库连接失败: %v", err)
+// 日志记录示例：统一走 log/slog，用结构化字段而不是拼接字符串
+slog.Info("用户注册成功", "user_id", user.ID)
+slog.Error("数据库连接失败", "err", err)
 ```
-
-### 4.6 注释规范
-
-- **公开函数**：必须有清晰的注释说明功能、参数和返回值
-- **复杂逻辑**：对于复杂的业务逻辑，添加必要的行内注释
-- **接口定义**：所有接口必须有详细的注释
-- **常量和变量**：重要的常量和全局变量需要注释说明
 
 ## 5. 前端开发规约 (Frontend Rules)
 
@@ -335,104 +310,39 @@ log.Printf("数据库连接失败: %v", err)
 #### 5.1.1 组件分类和组织
 
 - **页面组件** (`pages/`): 路由对应的页面级组件
-- **布局组件** (`components/layout/`): 页面布局相关组件
-- **业务组件** (`components/business/`): 特定业务逻辑组件
-- **通用组件** (`components/`): 页面间复用的组件；`components/ui/` 保留给 shadcn 按需添加的组件
-- **表单组件** (`components/form/`): 表单相关组件
+- **布局组件** (`components/layout/`): 页面骨架，如 `Layout`、`Header`、`Footer`
+- **复用组件** (`components/`): 跨页面复用的组件，`components/ui/` 留给 shadcn 按需引入的成品组件
+
+组件先写在使用它的页面里，出现第二个使用者时再提取到 `components/`。
+不预先创建空的分类目录。
 
 #### 5.1.2 组件设计原则
 
 - **单一职责**：每个组件只负责一个功能或展示一个 UI 片段
 - **可复用性**：通用组件应该高度可配置和可复用
-- **可访问性**：遵循 WCAG 无障碍访问标准
+- **可访问性**：输入框有关联的 `label`，交互元素可键盘到达，焦点样式沿用 `style.css` 的 `:focus-visible`
 
-#### 5.1.3 组件命名规范
+#### 5.1.3 命名与导出
 
-```typescript
-// 组件文件命名：PascalCase
-// UserProfile.tsx, LoginForm.tsx, DataTable.tsx
+- 组件文件名用 PascalCase，与组件同名：`LoginPage.tsx`、`Header.tsx`
+- 具名导出，不用默认导出；对外暴露的目录用 `index.ts` 汇总
+- Props 接口命名为 `<组件名>Props`，与组件放在同一文件
+- 对外可定制样式的组件接收 `className`，用 `cn()` 与内部样式合并
 
-// 组件导出
-export const UserProfile: React.FC<UserProfileProps> = ({ ... }) => {
-  // 组件实现
-};
+#### 5.1.4 视觉风格
 
-// Props 类型定义
-interface UserProfileProps {
-  userId: string;
-  onEdit?: (user: User) => void;
-  className?: string;
-}
+视觉风格以 `src/style.css` 的 `@theme` 变量和其中的语义化类（`.shell`、`.panel`、`.button-primary`、`.button-secondary`、`.field`）为唯一事实来源。新组件复用这些变量和类，不在组件里写死颜色、圆角、字体；需要新增设计变量时，加到 `@theme` 再引用。
+
+#### 5.1.5 按需引入成品组件
+
+下拉菜单、对话框这类交互复杂的组件用 shadcn 按需引入，它会把源码直接写进
+`src/components/ui/` 并补齐依赖：
+
+```bash
+bunx shadcn@latest add dropdown-menu
 ```
 
-#### 5.1.4 组件结构模板
-
-```typescript
-import React from "react";
-import { cn } from "@/lib/utils";
-
-// Props 接口定义
-interface ComponentProps {
-  // 必需属性
-  title: string;
-  // 可选属性
-  description?: string;
-  // 事件处理
-  onClick?: () => void;
-  // 样式相关
-  className?: string;
-  children?: React.ReactNode;
-}
-
-// 组件实现
-export const Component: React.FC<ComponentProps> = ({
-  title,
-  description,
-  onClick,
-  className,
-  children,
-}) => {
-  return (
-    <div className={cn("default-styles", className)}>
-      <h2>{title}</h2>
-      {description && <p>{description}</p>}
-      {children}
-    </div>
-  );
-};
-
-// 默认导出（如果需要）
-export default Component;
-```
-
-#### 5.1.5 组件设计风格
-
-- 整体风格：
-
-  - 这是一种在大面积浅色背景下，使用渐变、模糊、动态流光、极细描边、微噪点、外发光以及庄重的无衬线字体，外加流畅克制的微动效来组织和修饰界面元素的网页设计风格。
-  - 背景颜色：橙色系小清新渐变色
-  - 文字颜色：与背景颜色对比度高的字体颜色，禁止使用蓝紫色
-  - 字体：无衬线字体
-  - 动态效果：按钮的背景颜色要随着鼠标悬停而变化，文字颜色要随着鼠标悬停而变化，按钮的圆角要随着鼠标悬停而变化，以避免视觉上的干扰。
-  - 禁止使用蓝紫色渐变
-
-- 导航栏：
-  - 采用扁平化设计风格：按钮的背景颜色和文字颜色之间的对比度要高，同时按钮的圆角要小，以避免视觉上的干扰。
-  - 采用动态效果：按钮的背景颜色要随着鼠标悬停而变化，文字颜色要随着鼠标悬停而变化，按钮的圆角要随着鼠标悬停而变化，以避免视觉上的干扰。
-- 按钮：
-  - 采用扁平化设计风格：按钮的背景颜色和文字颜色之间的对比度要高，同时按钮的圆角要小，以避免视觉上的干扰。
-  - 不要使用渐变，按钮与背景颜色有一定对比度的颜色
-- 表单元素：
-  - 输入框：
-    - 采用扁平化设计风格：输入框的背景颜色和文字颜色之间的对比度要高，同时输入框的圆角要小，以避免视觉上的干扰。
-    - 输入框下方的下划线：
-      - 采用动态效果：下划线的颜色要与输入框的文字颜色保持一致，下划线的宽度要与输入框的文字宽度保持一致，下划线的位置要与输入框的文字位置保持一致。
-  - 下拉选择框：
-    - 采用扁平化设计风格：下拉选择框的背景颜色和文字颜色之间的对比度要高，同时下拉选择框的圆角要小，以避免视觉上的干扰。
-  - 复选框：
-    - 采用扁平化设计风格：复选框的背景颜色和文字颜色之间的对比度要高，同时复选框的圆角要小，以避免视觉上的干扰。
-- 页脚：
-  - 采用扁平化设计风格：页脚的背景颜色和文字颜色之间的对比度要高，同时页脚的圆角要小，以避免视觉上的干扰。
+项目保留 `components.json` 供该命令使用，但不预装任何未被使用的组件。
 
 ### 5.2 状态管理规范 (Zustand)
 
@@ -442,67 +352,14 @@ export default Component;
 - **状态扁平化**：避免深层嵌套的状态结构
 - **不可变更新**：使用展开运算符创建新对象，不要就地修改 state
 
-#### 5.2.2 Store 结构模板
+#### 5.2.2 Store 编写规则
 
-基于项目实际使用的认证状态管理示例：
+以 `src/store/authStore.ts` 为参照，不要把 store 源码复制进文档或其它 store：
 
-```typescript
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { userApi } from "@/api";
-import type { User } from "@/api";
-
-// 认证状态接口
-interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (user: User) => void;
-  logout: () => Promise<void>;
-  setUser: (user: User) => void;
-  clearAuth: () => void;
-}
-
-// 创建认证状态store
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-
-      // 登录
-      login: (user: User) => {
-        set({ user, isAuthenticated: true });
-      },
-
-      // 登出
-      logout: async () => {
-        try {
-          await userApi.logout();
-        } catch (error) {
-          console.error("注销请求失败:", error);
-        } finally {
-          localStorage.removeItem("token");
-          set({ user: null, isAuthenticated: false });
-        }
-      },
-
-      // 设置用户信息
-      setUser: (user: User) => {
-        set({ user, isAuthenticated: true });
-      },
-
-      // 清除认证状态
-      clearAuth: () => {
-        localStorage.removeItem("token");
-        set({ user: null, isAuthenticated: false });
-      },
-    }),
-    {
-      name: "auth-storage", // 持久化存储的key
-    }
-  )
-);
-```
+- 状态与操作定义在同一个接口里，`create<T>()(...)` 显式标注类型
+- 需要跨刷新保留的用 `persist` 中间件，并显式指定 `name`
+- 只持久化可安全落盘的数据；凭据是 HttpOnly Cookie，前端不持久化任何 token
+- 副作用（调接口）写在 store 的 action 里，组件只调用 action，不在组件里编排多步状态变更
 
 #### 5.2.3 状态使用规范
 
@@ -522,93 +379,12 @@ const userStore = useUserStore(); // 会导致不必要的重渲染
 
 ### 5.3 路由管理规范 (React Router DOM)
 
-#### 5.3.1 路由配置
+路由集中配置在 `src/router/index.tsx`，守卫组件在 `src/router/RouteGuards.tsx`：
 
-项目使用 React Router DOM v7+ 进行路由管理，支持嵌套路由和路由守卫：
-
-```typescript
-// router/index.tsx
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import { Layout, SimpleLayout } from "../components/layout";
-import { useAuthStore } from "../store/authStore";
-import HomePage from "../pages/HomePage";
-import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
-import DashboardPage from "../pages/DashboardPage";
-
-// 受保护的路由组件
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-}
-
-// 公开路由组件（已登录用户重定向到仪表板）
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
-}
-
-// 路由配置
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "dashboard",
-        element: (
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        ),
-      },
-    ],
-  },
-  {
-    path: "/login",
-    element: (
-      <SimpleLayout>
-        <PublicRoute>
-          <LoginPage />
-        </PublicRoute>
-      </SimpleLayout>
-    ),
-  },
-  {
-    path: "/register",
-    element: (
-      <SimpleLayout>
-        <PublicRoute>
-          <RegisterPage />
-        </PublicRoute>
-      </SimpleLayout>
-    ),
-  },
-]);
-```
-
-#### 5.3.2 路由守卫
-
-项目实现了两种路由守卫：
-
-- **ProtectedRoute**: 保护需要登录的页面，未登录用户重定向到登录页
-- **PublicRoute**: 保护登录/注册页面，已登录用户重定向到仪表板
-
-路由守卫的实现已在上面的路由配置中展示，通过 Zustand 状态管理获取用户认证状态。
+- **ProtectedRoute**：需要登录的页面，未登录重定向到 `/login`
+- **PublicRoute**：登录/注册页，已登录重定向到已认证首页
+- 守卫只读 `authStore` 的认证状态，不自己发请求
+- 新增页面时在 `router/index.tsx` 注册，并按需要套用对应守卫；不要在页面组件内部自己做跳转判断
 
 ### 5.4 样式开发规范 (TailwindCSS)
 
@@ -619,41 +395,19 @@ export const router = createBrowserRouter([
 - **主题定制**：TailwindCSS v4+ 使用 CSS 变量进行主题定制，无需配置文件
 - **设计变量**：颜色、圆角等集中定义在 `style.css` 的 `@theme` 中，不在组件里写死
 
-#### 5.4.2 响应式设计
+#### 5.4.2 样式复用
+
+重复出现的样式先沉淀为 `style.css` 里的语义化类，再在组件中用 `cn()` 组合，
+颜色一律引用 `@theme` 变量，不要写死具体色值：
 
 ```typescript
-// 移动优先的响应式设计
-<div
-  className="
-  w-full p-4
-  sm:w-1/2 sm:p-6
-  md:w-1/3 md:p-8
-  lg:w-1/4 lg:p-10
-"
->
-  响应式内容
-</div>
+// 复用 style.css 中的 .button-primary，只在此处叠加位置相关的原子类
+<button className={cn("button-primary", "w-full sm:w-auto", className)}>
+  提交
+</button>
 ```
 
-#### 5.4.3 样式复用
-
-```typescript
-// lib/styles.ts - 样式工具函数
-export const buttonVariants = {
-  primary: "bg-blue-600 hover:bg-blue-700 text-white",
-  secondary: "bg-gray-200 hover:bg-gray-300 text-gray-900",
-  danger: "bg-red-600 hover:bg-red-700 text-white",
-};
-
-export const getButtonClasses = (variant: keyof typeof buttonVariants) => {
-  return cn(
-    "px-4 py-2 rounded-md font-medium transition-colors",
-    buttonVariants[variant]
-  );
-};
-```
-
-#### 5.4.4 主题系统规范
+#### 5.4.3 主题系统规范
 
 项目目前只提供明亮主题，未引入主题切换库。颜色与圆角等设计变量集中定义在
 `src/style.css` 的 `@theme` 中，页面通过 `.panel`、`.button-primary`、`.field`
@@ -662,403 +416,52 @@ export const getButtonClasses = (variant: keyof typeof buttonVariants) => {
 如需暗黑模式，再引入 `next-themes` 并按 TailwindCSS 的 `dark:` 变体扩展，
 不要在未使用前预先安装依赖。
 
-### 5.5 组件开发规范
+### 5.5 移动端适配规范 📱
 
-#### 5.5.1 组件结构
-
-页面组件放在 `src/pages/`，跨页面复用的组件放在 `src/components/`。
-样式优先使用 `style.css` 中已有的语义化类，而不是在每个组件里堆砌原子类：
-
-```tsx
-// src/components/layout/Layout.tsx —— 复用 .shell 控制页面宽度
-export function Layout() {
-  return (
-    <div className="shell">
-      <Outlet />
-    </div>
-  );
-}
-```
-
-若需要下拉菜单、对话框这类交互复杂的成品组件，用 shadcn 按需引入，
-它会把源码直接写进 `src/components/ui/` 并自动补齐所需依赖：
-
-```bash
-bunx shadcn@latest add dropdown-menu
-```
-
-项目保留了 `components.json` 供该命令使用，但不预装任何未被使用的组件。
-
-### 5.6 移动端适配规范 📱
-
-#### 5.6.1 响应式设计原则
+#### 5.5.1 响应式设计原则
 
 - **移动优先 (Mobile First)**：从最小屏幕开始设计，逐步增强到大屏幕
 - **断点策略**：使用 TailwindCSS 标准断点
-  - `xs`: < 640px (手机竖屏)
+  - 默认（无前缀）: < 640px (手机竖屏)
   - `sm`: ≥ 640px (手机横屏/小平板)
   - `md`: ≥ 768px (平板)
   - `lg`: ≥ 1024px (桌面)
   - `xl`: ≥ 1280px (大桌面)
   - `2xl`: ≥ 1536px (超大桌面)
 
-```typescript
-// 响应式布局示例
-<div
-  className="
-  // 移动端：单列布局，小间距
-  flex flex-col gap-4 p-4
-  // 平板：两列布局，中等间距
-  md:grid md:grid-cols-2 md:gap-6 md:p-6
-  // 桌面：三列布局，大间距
-  lg:grid-cols-3 lg:gap-8 lg:p-8
-"
->
-  {items.map((item) => (
-    <Card
-      key={item.id}
-      className="
-      // 移动端：全宽卡片
-      w-full
-      // 桌面：固定最大宽度
-      lg:max-w-sm
-    "
-    >
-      {item.content}
-    </Card>
-  ))}
-</div>
-```
-
 #### 5.5.2 触摸交互优化
 
-- **触摸目标尺寸**：最小 44px × 44px (iOS) 或 48dp × 48dp (Android)
-- **触摸反馈**：提供清晰的视觉和触觉反馈
-- **手势支持**：支持常见手势操作
+- **触摸目标尺寸**：可点击元素最小 44px × 44px
+- **触摸反馈**：hover/active 状态要有明确的视觉变化
+- **禁用 iOS 输入框缩放**：输入框字号不小于 16px
 
-```typescript
-// 触摸友好的按钮组件
-export const TouchButton: React.FC<TouchButtonProps> = ({
-  children,
-  variant = "primary",
-  size = "default",
-  ...props
-}) => {
-  const sizeClasses = {
-    small: "min-h-[44px] px-4 py-2 text-sm",
-    default: "min-h-[48px] px-6 py-3 text-base",
-    large: "min-h-[56px] px-8 py-4 text-lg",
-  };
+#### 5.5.3 移动端表单优化
 
-  return (
-    <button
-      className={cn(
-        // 基础样式
-        "relative overflow-hidden rounded-lg font-medium transition-all duration-200",
-        // 触摸反馈
-        "active:scale-95 active:brightness-90",
-        // 焦点样式
-        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-        // 尺寸
-        sizeClasses[size],
-        // 变体样式
-        buttonVariants[variant]
-      )}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-```
+- **输入类型优化**：使用正确的 `type`（`email`/`tel`/`number`）触发合适的键盘
+- **标签和占位符**：每个输入框都有可访问的 label
+- **验证反馈**：错误以内联文案展示在对应字段下方
 
-#### 5.5.3 移动端导航设计
+#### 5.5.4 移动端资源优化
 
-- **底部导航栏**：主要导航使用底部标签栏
-- **汉堡菜单**：次要功能使用侧边抽屉
-- **面包屑导航**：深层页面提供返回路径
+- **图片**：优先 WebP，非首屏图片用原生 `loading="lazy"`（其余性能规约见 5.7）
 
-```typescript
-// 移动端底部导航组件
-export const MobileBottomNav: React.FC = () => {
-  const location = useLocation();
+> 底部导航、滑动手势、下拉刷新、虚拟滚动这类交互，等到确有页面需要时再实现，
+> 不要预先在项目里放置无人使用的组件和 Hook。
 
-  const navItems = [
-    { path: "/", icon: HomeIcon, label: "首页" },
-    { path: "/explore", icon: SearchIcon, label: "发现" },
-    { path: "/notifications", icon: BellIcon, label: "通知" },
-    { path: "/profile", icon: UserIcon, label: "我的" },
-  ];
+#### 5.5.5 移动端安全区域适配
 
-  return (
-    <nav
-      className="
-      // 固定在底部
-      fixed bottom-0 left-0 right-0 z-50
-      // 背景和边框
-      bg-white/95 backdrop-blur-sm border-t border-gray-200
-      // 安全区域适配
-      pb-safe
-      // 桌面端隐藏
-      lg:hidden
-    "
-    >
-      <div className="flex items-center justify-around px-2 py-1">
-        {navItems.map(({ path, icon: Icon, label }) => {
-          const isActive = location.pathname === path;
-          return (
-            <Link
-              key={path}
-              to={path}
-              className={cn(
-                "flex flex-col items-center justify-center",
-                "min-h-[56px] px-3 py-1 rounded-lg",
-                "transition-colors duration-200",
-                isActive
-                  ? "text-blue-600 bg-blue-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              )}
-            >
-              <Icon className="w-6 h-6 mb-1" />
-              <span className="text-xs font-medium">{label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
-  );
-};
-```
-
-#### 5.5.4 移动端表单优化
-
-- **输入类型优化**：使用正确的 input type 触发合适的键盘
-- **标签和占位符**：提供清晰的输入指导
-- **验证反馈**：实时验证和错误提示
-
-```typescript
-// 移动端优化的输入组件
-export const MobileInput: React.FC<MobileInputProps> = ({
-  label,
-  type = "text",
-  error,
-  ...props
-}) => {
-  return (
-    <div className="space-y-2">
-      {label && (
-        <label className="block text-sm font-medium text-gray-700">
-          {label}
-        </label>
-      )}
-      <input
-        type={type}
-        className={cn(
-          // 基础样式
-          "w-full px-4 py-3 text-base rounded-lg border",
-          // 移动端优化：更大的触摸区域
-          "min-h-[48px]",
-          // 焦点样式
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-          // 错误状态
-          error ? "border-red-300 bg-red-50" : "border-gray-300 bg-white",
-          // 禁用缩放（防止iOS Safari缩放）
-          "text-[16px] sm:text-sm"
-        )}
-        {...props}
-      />
-      {error && (
-        <p className="text-sm text-red-600 flex items-center gap-1">
-          <ExclamationCircleIcon className="w-4 h-4" />
-          {error}
-        </p>
-      )}
-    </div>
-  );
-};
-```
-
-#### 5.5.5 移动端性能优化
-
-- **图片优化**：使用 WebP 格式，实现懒加载
-- **代码分割**：按路由和功能分割代码
-- **预加载策略**：预加载关键资源
-- **缓存策略**：合理使用浏览器缓存
-
-```typescript
-// 移动端图片组件
-export const MobileImage: React.FC<MobileImageProps> = ({
-  src,
-  alt,
-  className,
-  priority = false,
-  ...props
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  // 懒加载实现
-  useEffect(() => {
-    if (!priority && imgRef.current) {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            const img = entry.target as HTMLImageElement;
-            img.src = src;
-            observer.disconnect();
-          }
-        },
-        { threshold: 0.1 }
-      );
-      observer.observe(imgRef.current);
-      return () => observer.disconnect();
-    }
-  }, [src, priority]);
-
-  return (
-    <div className={cn("relative overflow-hidden", className)}>
-      <img
-        ref={imgRef}
-        src={priority ? src : undefined}
-        alt={alt}
-        className={cn(
-          "w-full h-full object-cover transition-opacity duration-300",
-          isLoaded ? "opacity-100" : "opacity-0"
-        )}
-        onLoad={() => setIsLoaded(true)}
-        onError={() => setError(true)}
-        loading={priority ? "eager" : "lazy"}
-        {...props}
-      />
-      {!isLoaded && !error && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-      )}
-      {error && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-          <PhotoIcon className="w-8 h-8 text-gray-400" />
-        </div>
-      )}
-    </div>
-  );
-};
-```
-
-#### 5.5.6 移动端手势支持
-
-- **滑动手势**：支持左右滑动导航
-- **下拉刷新**：实现下拉刷新功能
-- **无限滚动**：长列表使用无限滚动
-
-```typescript
-// 滑动手势 Hook
-export const useSwipeGesture = ({
-  onSwipeLeft,
-  onSwipeRight,
-  threshold = 50,
-}: SwipeGestureOptions) => {
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-
-  const onTouchStart = (e: TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > threshold;
-    const isRightSwipe = distance < -threshold;
-
-    if (isLeftSwipe && onSwipeLeft) {
-      onSwipeLeft();
-    }
-    if (isRightSwipe && onSwipeRight) {
-      onSwipeRight();
-    }
-  };
-
-  return {
-    onTouchStart,
-    onTouchMove,
-    onTouchEnd,
-  };
-};
-```
-
-#### 5.5.7 移动端安全区域适配
-
-- **安全区域**：适配 iPhone 刘海屏和底部指示器
-- **状态栏**：考虑状态栏高度
-- **虚拟键盘**：处理虚拟键盘弹出时的布局调整
-
-```css
-/* 安全区域 CSS 变量 */
-:root {
-  --safe-area-inset-top: env(safe-area-inset-top);
-  --safe-area-inset-right: env(safe-area-inset-right);
-  --safe-area-inset-bottom: env(safe-area-inset-bottom);
-  --safe-area-inset-left: env(safe-area-inset-left);
-}
-
-/* TailwindCSS 自定义类 */
-@layer utilities {
-  .pt-safe {
-    padding-top: env(safe-area-inset-top);
-  }
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .pl-safe {
-    padding-left: env(safe-area-inset-left);
-  }
-  .pr-safe {
-    padding-right: env(safe-area-inset-right);
-  }
-}
-```
+固定在屏幕边缘的元素（吸底栏、全屏浮层）用 `env(safe-area-inset-*)` 留出安全区，
+避开刘海屏和底部指示器。工具类等到确有元素需要时再加到 `style.css`。
 
 ### 5.6 API 调用规范
 
 #### 5.6.1 API 客户端
 
-```typescript
-// lib/client.ts
-import axios from "axios";
+统一使用 `src/lib/client.ts` 中的 axios 实例，不要在页面里另建实例：
 
-const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
-  timeout: 10000,
-});
-
-// 请求拦截器
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// 响应拦截器
-apiClient.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    if (error.response?.status === 401) {
-      // 处理未授权
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
-```
+- **凭据**：`withCredentials: true`，会话靠 HttpOnly Cookie 携带，前端不接触也不存储 token
+- **错误**：响应拦截器把失败统一包装成 `ApiError`（保留 `status` 与业务 `code`），调用方按状态码分支处理，而不是只拿到一句文案
+- **401**：拦截器触发 `triggerUnauthorized()` 事件，由 `authStore` 统一清理状态并跳转，拦截器里不直接操作 `window.location`
 
 #### 5.6.2 API 服务层
 
@@ -1078,59 +481,52 @@ export const userApi = {
 };
 ```
 
+#### 5.6.3 表单提交与异步状态
+
+表单提交统一用 `src/lib/useAsyncAction.ts`，不要在页面里自己写 try/catch + loading：
+
+```tsx
+const { error, pending, run } = useAsyncAction();
+
+const onSubmit = async () => {
+  const ok = await run(() => userApi.update(form));
+  if (ok) navigate("/dashboard");
+};
+```
+
+- 它一并处理了三件事：捕获错误文案、暴露 `pending`、用 ref 防重复提交
+- 提交中必须用 `pending` 禁用按钮；仅靠状态判断挡不住同一轮事件里的双击
+- 错误以内联红字展示在表单内，不弹全局提示（项目未引入通知组件）
+
 ### 5.7 性能优化
 
-#### 5.7.1 代码分割
+先测量再优化。没有实测到卡顿之前，不要预先加 `React.memo`/`useMemo`/`useCallback`——
+它们本身有成本，且会掩盖真正的性能问题。
 
-- **路由级分割**：使用 `React.lazy` 分割页面组件
-- **组件级分割**：大型组件使用动态导入
-- **第三方库分割**：大型依赖库单独打包
-
-#### 5.7.2 渲染优化
-
-- **使用 React.memo**：防止不必要的重渲染
-- **使用 useMemo/useCallback**：缓存计算结果和函数
-- **虚拟滚动**：长列表使用虚拟滚动
+- **路由级代码分割**：页面组件用 `React.lazy` 分割，这是唯一默认就该做的优化
+- **列表渲染**：`key` 用稳定的业务 id，不要用数组下标
+- **其余优化**：定位到具体瓶颈后再针对性处理，并在注释里说明测量结论
 
 ### 5.8 类型定义规范
 
-#### 5.8.1 接口定义
+请求/响应类型与调用它们的接口写在同一个 `src/api/*.ts` 中，由 `src/api/index.ts` 统一导出，
+不单独建 `types/` 目录——类型和用它的代码放在一起才不会失同步。
 
 ```typescript
 // api/user.ts
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  avatar?: string;
+}
 
 export interface CreateUserRequest {
   email: string;
   name: string;
   password: string;
 }
-
-export interface UpdateUserRequest {
-  name?: string;
-  avatar?: string;
-}
 ```
-
-#### 5.8.1 类型定义
-
-```typescript
-// types/user.d.ts
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-```
-
-### 5.9 注释规范
-
-- **组件注释**：复杂组件需要说明其用途和主要功能
-- **业务逻辑注释**：对于复杂的业务逻辑，添加必要的注释说明
-- **类型注释**：复杂类型定义需要注释说明
-- **API 注释**：API 调用需要注释说明用途和参数
 
 ## 6. 国际化 (i18n) 规范 🌍
 
@@ -1167,9 +563,14 @@ export interface User {
 - **ESLint**: 代码检查，`bun run lint`
 - **Prettier**: 代码格式化，`bun run format`（CI 会校验格式）
 
-## 8. 项目特定规约
+## 8. 常用命令
 
-### 8.1 代码规范
-
-- 记住，代码是写给人看的，只是机器恰好可以运行而已！
-- 保持代码简洁、可读、可维护，遵循项目约定，让团队协作更加高效。
+| 命令                 | 用途                                        |
+| -------------------- | ------------------------------------------- |
+| `make dev`           | 同时启动后端与前端开发环境                  |
+| `make lint`          | 前后端全部检查，提交前必跑                  |
+| `make test`          | 运行前后端测试                              |
+| `make sqlc-generate` | 改完 `db/query/` 下的 SQL 后重新生成查询代码 |
+| `make sqlc-verify`   | 校验生成代码是否最新（CI 会跑同样的检查）   |
+| `make build`         | 构建前端并打包进 Go 二进制                  |
+| `make tools`         | 安装 air、golangci-lint 等开发工具          |

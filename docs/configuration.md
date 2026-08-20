@@ -2,6 +2,13 @@
 
 项目通过环境变量配置，示例见根目录 `.env.example`。
 
+## 服务
+
+```env
+SERVER_HOST=0.0.0.0
+SERVER_PORT=1323
+```
+
 ## SQLite
 
 ```env
