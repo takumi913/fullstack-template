@@ -1,4 +1,4 @@
-module go-react-template
+module fullstack-template
 
 go 1.25.8
 

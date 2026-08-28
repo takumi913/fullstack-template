@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"go-react-template/pkg/model"
-	"go-react-template/pkg/service"
+	"fullstack-template/pkg/model"
+	"fullstack-template/pkg/service"
 	"net/http"
 
 	"github.com/labstack/echo/v5"

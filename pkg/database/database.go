@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"go-react-template/configs"
+	"fullstack-template/configs"
 
 	_ "github.com/jackc/pgx/v5/stdlib" // 注册 PostgreSQL database/sql 驱动。
 	_ "modernc.org/sqlite"             // 注册 SQLite database/sql 驱动。

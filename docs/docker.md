@@ -28,7 +28,7 @@ docker compose --profile postgres up -d postgres
 ## 只构建镜像
 
 ```bash
-make docker              # 等价于 docker build -t go-react-template .
+make docker              # 等价于 docker build -t fullstack-template .
 ```
 
 不需要先跑 `make build`：Dockerfile 自带完整构建阶段，而 `.dockerignore`

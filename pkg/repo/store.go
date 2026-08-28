@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	postgresdb "go-react-template/db/generated/postgres"
-	sqlitedb "go-react-template/db/generated/sqlite"
+	postgresdb "fullstack-template/db/generated/postgres"
+	sqlitedb "fullstack-template/db/generated/sqlite"
 )
 
 type Store struct {

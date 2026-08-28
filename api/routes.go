@@ -1,9 +1,9 @@
 package api
 
 import (
-	"go-react-template/pkg/handler"
-	"go-react-template/pkg/middleware"
-	"go-react-template/pkg/model"
+	"fullstack-template/pkg/handler"
+	"fullstack-template/pkg/middleware"
+	"fullstack-template/pkg/model"
 	"net/http"
 	"time"
 

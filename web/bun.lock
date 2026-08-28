@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "go-react-template",
+      "name": "fullstack-template",
       "dependencies": {
         "@tailwindcss/vite": "^4.1.10",
         "axios": "^1.19.0",

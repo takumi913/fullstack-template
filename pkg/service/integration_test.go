@@ -6,11 +6,11 @@ import (
 	"os"
 	"testing"
 
-	"go-react-template/configs"
-	"go-react-template/db/migrations"
-	"go-react-template/pkg/model"
-	"go-react-template/pkg/repo"
-	"go-react-template/pkg/service"
+	"fullstack-template/configs"
+	"fullstack-template/db/migrations"
+	"fullstack-template/pkg/model"
+	"fullstack-template/pkg/repo"
+	"fullstack-template/pkg/service"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "modernc.org/sqlite"

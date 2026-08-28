@@ -126,7 +126,7 @@ docker: ## 构建 Docker 镜像
 	@echo "🐳 构建 Docker 镜像..."
 	@# 不需要先本地构建：Dockerfile 自带前后端构建阶段，
 	@# 且 .dockerignore 会排除 web/dist、static、server，本地产物根本进不了镜像
-	docker build -t go-react-template .
+	docker build -t fullstack-template .
 
 # 工具安装
 tools: ## 安装开发工具

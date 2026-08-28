@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"go-react-template/configs"
-	"go-react-template/pkg/middleware"
-	"go-react-template/pkg/model"
-	"go-react-template/pkg/service"
+	"fullstack-template/configs"
+	"fullstack-template/pkg/middleware"
+	"fullstack-template/pkg/model"
+	"fullstack-template/pkg/service"
 	"net/http"
 	"time"
 

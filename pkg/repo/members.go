@@ -2,9 +2,9 @@ package repo
 
 import (
 	"context"
-	postgresdb "go-react-template/db/generated/postgres"
-	sqlitedb "go-react-template/db/generated/sqlite"
-	"go-react-template/pkg/model"
+	postgresdb "fullstack-template/db/generated/postgres"
+	sqlitedb "fullstack-template/db/generated/sqlite"
+	"fullstack-template/pkg/model"
 )
 
 func (s *Store) CreateMember(ctx context.Context, m *model.TenantMember) error {

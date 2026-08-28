@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"errors"
-	"go-react-template/pkg/model"
-	"go-react-template/pkg/repo"
+	"fullstack-template/pkg/model"
+	"fullstack-template/pkg/repo"
 	"strings"
 
 	"github.com/google/uuid"
