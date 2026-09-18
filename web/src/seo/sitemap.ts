@@ -23,9 +23,7 @@ export function createSitemapXml(siteUrl: string, pages: readonly SeoPage[]) {
     }
   }
 
-  const namespace = hasAlternates
-    ? ' xmlns:xhtml="http://www.w3.org/1999/xhtml"'
-    : "";
+  const namespace = hasAlternates ? ' xmlns:xhtml="http://www.w3.org/1999/xhtml"' : "";
 
   const entries = pages
     .map((page) => {
