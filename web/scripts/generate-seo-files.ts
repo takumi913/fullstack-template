@@ -1,7 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { routableToolPages } from "../src/content/tool-pages";
 import { indexableSeoPages } from "../src/seo/pages";
+import { createToolSeoPage } from "../src/seo/tool-page";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const outputDir = join(scriptDir, "..", "dist", "client");
@@ -16,9 +18,12 @@ function escapeXml(value: string) {
     .replaceAll("'", "&apos;");
 }
 
+const toolSeoPages = routableToolPages.map(createToolSeoPage).filter((page) => !page.noindex);
+const sitemapPages = [...indexableSeoPages, ...toolSeoPages];
+
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${indexableSeoPages
+${sitemapPages
   .map(
     (page) => `  <url>
     <loc>${escapeXml(siteUrl + page.path)}</loc>${
@@ -61,4 +66,4 @@ await Promise.all([
   writeFile(join(outputDir, "404.html"), notFound),
 ]);
 
-console.log(`SEO files generated for ${indexableSeoPages.length} indexable pages.`);
+console.log(`SEO files generated for ${sitemapPages.length} indexable pages.`);
