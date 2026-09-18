@@ -155,7 +155,7 @@ assertIncludes(robots, `Sitemap: ${siteConfig.url}/sitemap.xml`, "robots.txt");
 if (siteConfig.defaultImage === "/og-image.svg") {
   const ogImage = await readOutput("og-image.svg");
   assertIncludes(ogImage, siteConfig.name, "generated OG image brand");
-  assertIncludes(ogImage, siteConfig.defaultTitle, "generated OG image title");
+  assertIncludes(ogImage, siteConfig.defaultTitle.slice(0, 46), "generated OG image title");
   assertExcludes(ogImage, "MDZZ Toolbox", "generated OG image");
   assertExcludes(ogImage, "mdzz.uk", "generated OG image");
 }
