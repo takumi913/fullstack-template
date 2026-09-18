@@ -42,6 +42,12 @@ function assertExcludes(content: string, unexpected: string, label: string) {
   }
 }
 
+function assertMatches(content: string, pattern: RegExp, label: string) {
+  if (!pattern.test(content)) {
+    throw new Error(`${label}: expected to match ${pattern}`);
+  }
+}
+
 const home = await readOutput("index.html");
 assertIncludes(home, publicSeoPages.home.title, "home HTML");
 assertIncludes(home, 'rel="canonical"', "home HTML");
@@ -73,7 +79,7 @@ for (const tool of routableToolPages) {
   }
 
   for (const alternate of tool.alternates || []) {
-    assertIncludes(html, `hreflang="${alternate.hreflang}"`, `${tool.slug} hreflang`);
+    assertMatches(html, new RegExp(`hrefLang="${alternate.hreflang}"`, "i"), `${tool.slug} hreflang`);
     assertIncludes(html, `href="${siteConfig.url}${alternate.path}"`, `${tool.slug} alternate URL`);
   }
 }
