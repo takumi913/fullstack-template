@@ -39,6 +39,15 @@ describe("landing page definitions", () => {
     }
   });
 
+  it("keeps every routable resource discoverable from the directory unless hidden", async () => {
+    const module = await import("./landing-pages");
+
+    for (const page of module.routableLandingPages) {
+      if (page.showInDirectory === false) continue;
+      expect(module.directoryLandingPages).toContain(page);
+    }
+  });
+
   it("keeps example landing pages out of the index", () => {
     for (const page of routableLandingPages.filter((item) => item.status === "example")) {
       expect(createLandingSeoPage(page).noindex).toBe(true);
