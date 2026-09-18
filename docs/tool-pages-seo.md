@@ -137,7 +137,7 @@ CI 会检查：
 
 ## 多语言 SEO
 
-模板支持在 `SeoPage.alternates` 中声明真实存在的语言版本，并自动输出
+模板支持在 `ToolPageDefinition.alternates`（底层映射为 `SeoPage.alternates`）中声明真实存在的语言版本，并自动输出
 `<link rel="alternate" hreflang="...">`。只有当主要内容真正完成本地化后才应该声明 alternate。
 
 可以用 `createHreflangAlternates()` 生成配置：
