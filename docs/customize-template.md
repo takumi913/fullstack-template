@@ -100,7 +100,26 @@ web/src/content/legal-pages.ts
 
 上线前必须根据实际产品的数据收集、支付、第三方服务和运营地区更新隐私政策与服务条款。
 
-## 6. OG 图片
+## 6. Favicon 与 Manifest
+
+默认：
+
+```text
+VITE_SITE_FAVICON=/favicon.svg
+```
+
+production build 会根据当前 `VITE_SITE_MARK` 和 `site-config.ts` 中的颜色自动生成 SVG favicon，
+同时生成包含当前站点 name、shortName、theme color 的 `manifest.webmanifest`。
+
+使用正式图标时可以：
+
+```env
+VITE_SITE_FAVICON=/brand-icon.svg
+```
+
+并把文件放进 `web/public/`。构建验证会检查本地 favicon 路径对应的文件确实存在。
+
+## 7. OG 图片
 
 默认：
 
@@ -126,7 +145,7 @@ VITE_SITE_IMAGE=/og-image.png
 
 并把对应文件放入 `web/public/`。
 
-## 7. 删除不需要的示例
+## 8. 删除不需要的示例
 
 母模板示例均默认 noindex，但正式项目仍建议删除不用的示例：
 
@@ -139,7 +158,7 @@ VITE_SITE_IMAGE=/og-image.png
 
 保留示例不会进入 sitemap，但删除后项目更干净。
 
-## 8. 最终生产检查
+## 9. 最终生产检查
 
 运行：
 
