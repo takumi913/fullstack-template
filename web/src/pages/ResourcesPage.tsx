@@ -13,9 +13,7 @@ export default function ResourcesPage() {
   return (
     <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
       <header className="max-w-3xl">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
-          Resources
-        </p>
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">Resources</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
           {publicSeoPages.resources.h1}
         </h1>
