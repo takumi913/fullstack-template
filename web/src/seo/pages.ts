@@ -10,7 +10,7 @@ export const publicSeoPages = {
     h1: "Go + React 多租户 SaaS 全栈模板",
     intent: "commercial",
     updatedAt: "2026-09-18",
-    relatedPages: ["/legal/privacy-policy", "/legal/terms"],
+    relatedPages: ["/tools", "/resources", "/legal/privacy-policy", "/legal/terms"],
     schema: [
       {
         "@context": "https://schema.org",
@@ -38,6 +38,18 @@ export const publicSeoPages = {
       "Browse the reusable example tools included with the SEO-ready fullstack template.",
     h1: "Online Tools",
     intent: "commercial",
+    updatedAt: "2026-09-18",
+    noindex: true,
+  },
+  resources: {
+    path: "/resources",
+    primaryKeyword: "tool guides",
+    locale: "en",
+    title: "Resources | Fullstack Template",
+    description:
+      "Browse example use cases, comparisons, and guides connected to the template's tool pages.",
+    h1: "Resources",
+    intent: "informational",
     updatedAt: "2026-09-18",
     noindex: true,
   },
