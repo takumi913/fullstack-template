@@ -14,8 +14,10 @@ export interface ToolPageDefinition {
   name: string;
   category: string;
   primaryKeyword: string;
+  path?: string;
   locale?: string;
   alternates?: SeoAlternate[];
+  showInDirectory?: boolean;
   title: string;
   description: string;
   h1: string;
@@ -30,12 +32,19 @@ export interface ToolPageDefinition {
   isFree?: boolean;
 }
 
+const jsonFormatterAlternates: SeoAlternate[] = [
+  { hreflang: "en", path: "/tools/json-formatter" },
+  { hreflang: "ja", path: "/ja/tools/json-formatter" },
+  { hreflang: "x-default", path: "/tools/json-formatter" },
+];
+
 export const toolPages: ToolPageDefinition[] = [
   {
     slug: "json-formatter",
     componentKey: "json-formatter",
     status: "example",
     locale: "en",
+    alternates: jsonFormatterAlternates,
     name: "JSON Formatter",
     category: "Developer Tool",
     primaryKeyword: "json formatter",
@@ -64,6 +73,45 @@ export const toolPages: ToolPageDefinition[] = [
       {
         question: "Can it detect invalid JSON?",
         answer: "Yes. Parsing errors are shown before any formatted output is produced.",
+      },
+    ],
+    relatedSlugs: ["word-counter"],
+    updatedAt: "2026-09-18",
+    noindex: true,
+    isFree: true,
+  },
+  {
+    slug: "json-formatter-ja",
+    componentKey: "json-formatter",
+    status: "example",
+    path: "/ja/tools/json-formatter",
+    locale: "ja",
+    alternates: jsonFormatterAlternates,
+    showInDirectory: false,
+    name: "JSON Formatter",
+    category: "開発ツール",
+    primaryKeyword: "json 整形",
+    title: "JSON 整形ツール - オンラインで JSON を整形・検証",
+    description:
+      "ブラウザ上で JSON を整形、検証、圧縮できる日本語版のサンプルページです。",
+    h1: "JSON 整形ツール",
+    intro:
+      "JSON を貼り付けるだけで、読みやすい形式への整形、構文検証、圧縮をブラウザ内で実行できます。",
+    features: [
+      "JSON を読みやすくインデントして整形",
+      "不正な JSON の構文エラーを表示",
+      "JSON をコンパクトに圧縮",
+      "処理はブラウザ内で完結",
+    ],
+    howToSteps: [
+      "入力欄に JSON を貼り付けます。",
+      "Format で整形、Minify で圧縮します。",
+      "生成された JSON をコピーして利用します。",
+    ],
+    faq: [
+      {
+        question: "入力した JSON はサーバーに送信されますか？",
+        answer: "いいえ。このサンプルでは JSON の処理はブラウザ内だけで実行されます。",
       },
     ],
     relatedSlugs: ["word-counter"],
@@ -113,17 +161,29 @@ export const toolPages: ToolPageDefinition[] = [
   },
 ];
 
-export function toolPath(slug: string) {
-  return `/tools/${slug}`;
+export function toolPath(tool: ToolPageDefinition | string) {
+  if (typeof tool === "string") {
+    const definition = toolPages.find((candidate) => candidate.slug === tool);
+    return definition?.path || `/tools/${tool}`;
+  }
+  return tool.path || `/tools/${tool.slug}`;
 }
 
 export const routableToolPages = toolPages.filter((tool) => tool.status !== "draft");
 
-export const toolPrerenderPaths = routableToolPages.map((tool) => toolPath(tool.slug));
+export const directoryToolPages = routableToolPages.filter((tool) => tool.showInDirectory !== false);
+
+export const toolPrerenderPaths = routableToolPages.map((tool) => toolPath(tool));
 
 export function getToolPageBySlug(slug: string | undefined) {
   if (!slug) return undefined;
   return routableToolPages.find((tool) => tool.slug === slug);
+}
+
+export function getToolPageByPath(pathname: string | undefined) {
+  if (!pathname) return undefined;
+  const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
+  return routableToolPages.find((tool) => toolPath(tool) === normalized);
 }
 
 export function getRelatedToolPages(tool: ToolPageDefinition) {
