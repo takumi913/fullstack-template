@@ -79,6 +79,14 @@ jobs:
     timeout-minutes: 15
     env:
       VITE_SITE_URL: https://template-ci.fullstack.dev
+      VITE_SITE_NAME: Template CI
+      VITE_SITE_SHORT_NAME: Template CI
+      VITE_SITE_MARK: T
+      VITE_SITE_LOCALE: en
+      VITE_SITE_PRIMARY_KEYWORD: template ci tools
+      VITE_SITE_TITLE: Template CI SEO Verification
+      VITE_SITE_DESCRIPTION: CI build used to verify production SEO output and template safeguards.
+      VITE_SITE_IMAGE: /og-image.svg
       SEO_STRICT: "true"
 
     steps:
