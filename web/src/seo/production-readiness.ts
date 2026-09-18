@@ -27,13 +27,23 @@ export function assertProductionContentReady({
 
   if (!allowTemplateExamples) {
     const examples = [
-      ...tools.filter((tool) => tool.status === "example").map((tool) => toolPath(tool)),
-      ...landings.filter((page) => page.status === "example").map((page) => page.path),
+      ...tools
+        .filter(
+          (tool) =>
+            tool.status === "example" || (tool.templateExample && tool.status !== "draft"),
+        )
+        .map((tool) => toolPath(tool)),
+      ...landings
+        .filter(
+          (page) =>
+            page.status === "example" || (page.templateExample && page.status !== "draft"),
+        )
+        .map((page) => page.path),
     ];
 
     if (examples.length > 0) {
       throw new Error(
-        `SEO_STRICT=true does not allow template example content: ${examples.join(", ")}. Remove it, mark it draft, or replace it with real published content. Use SEO_ALLOW_TEMPLATE_EXAMPLES=true only for template CI/testing.`,
+        `SEO_STRICT=true does not allow template example content: ${examples.join(", ")}. Remove it, mark it draft, or replace it with real content and remove templateExample. Use SEO_ALLOW_TEMPLATE_EXAMPLES=true only for template CI/testing.`,
       );
     }
   }
