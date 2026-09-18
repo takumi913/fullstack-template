@@ -152,9 +152,19 @@ alternates: createHreflangAlternates(
 )
 ```
 
-每个语言版本都必须有自己的 `ToolPageDefinition`，上面的日语版本例如使用
-`slug: "image-translator-ja"`、`locale: "ja"`，同时继续复用
-`componentKey: "image-translator"`。每个版本都应该包含自己和其它版本，并保持双向对应；
+每个语言版本都必须有自己的 `ToolPageDefinition`。本地化版本使用显式 `path`
+作为 canonical URL，例如：
+
+```ts
+{
+  slug: "image-translator-ja",
+  path: "/ja/tools/image-translator",
+  locale: "ja",
+  componentKey: "image-translator",
+}
+```
+
+这样 slug 只作为内部唯一标识，实际 SEO URL 由 `path` 决定，并继续复用同一个工具实现。每个版本都应该包含自己和其它版本，并保持双向对应；
 CI 会检查目标页面存在、语言匹配和反向链接。`x-default` 用于没有匹配语言时的兜底页面。
 
 模板只采用 HTML hreflang，不在 sitemap 再复制一套相同声明，减少两套配置漂移。
