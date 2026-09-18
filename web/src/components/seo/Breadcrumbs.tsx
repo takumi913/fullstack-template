@@ -13,7 +13,7 @@ export function Breadcrumbs({ tool }: { tool: ToolPageDefinition }) {
         <li aria-hidden="true">/</li>
         <li>
           <Link className="hover:text-zinc-950" to="/tools">
-            Tools
+            {tool.locale === "ja" ? "ツール" : "Tools"}
           </Link>
         </li>
         <li aria-hidden="true">/</li>
