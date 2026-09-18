@@ -17,6 +17,7 @@ export interface SeoPage {
   alternates?: SeoAlternate[];
   image?: string;
   noindex?: boolean;
+  nofollow?: boolean;
   updatedAt?: string;
   relatedPages?: string[];
   schema?: JsonLd;
@@ -25,7 +26,10 @@ export interface SeoPage {
 export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
   const canonical = absoluteUrl(page.path);
   const image = absoluteUrl(page.image || siteConfig.defaultImage);
-  const robots = page.noindex ? "noindex, nofollow" : "index, follow";
+  const robots = [
+    page.noindex ? "noindex" : "index",
+    page.nofollow ? "nofollow" : "follow",
+  ].join(", ");
   const locale = page.locale || siteConfig.locale;
 
   const meta: MetaDescriptor[] = [
