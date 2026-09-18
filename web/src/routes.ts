@@ -5,6 +5,7 @@ export default [
     index("./routes/home.tsx"),
     route("tools", "./routes/tools-index.tsx"),
     route("tools/:slug", "./routes/tool.tsx"),
+    route(":locale/tools/:slug", "./routes/localized-tool.tsx"),
     route("404", "./routes/not-found.tsx"),
 
     route("legal/privacy-policy", "./routes/privacy.tsx"),
