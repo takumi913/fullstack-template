@@ -1,8 +1,8 @@
-const fallbackUrl = "https://example.com";
+import { normalizeSiteUrl, placeholderSiteUrl } from "./site-url";
 
 export const siteConfig = {
   name: import.meta.env.VITE_SITE_NAME || "Fullstack Template",
-  url: (import.meta.env.VITE_SITE_URL || fallbackUrl).replace(/\/$/, ""),
+  url: normalizeSiteUrl(import.meta.env.VITE_SITE_URL || placeholderSiteUrl),
   locale: import.meta.env.VITE_SITE_LOCALE || "zh-CN",
   defaultTitle: "Go + React 多租户 SaaS 全栈模板",
   defaultDescription: "基于 Go、React、sqlc、PostgreSQL/SQLite 与多租户 RBAC 的 SaaS 全栈母模板。",
