@@ -1,6 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router";
-import { HomePrimaryToolDetails } from "@/components/home/HomePrimaryToolDetails";
+import { ToolContentSections } from "@/components/tools/ToolContentSections";
 import { templateSiteConfig } from "@/config/site-config";
 import { resolveHomepageTool } from "@/content/homepage-tool";
 import { directoryToolPages, toolPath } from "@/content/tool-pages";
@@ -46,7 +46,7 @@ export default function HomePage() {
       </section>
 
       {primaryTool ? (
-        <HomePrimaryToolDetails tool={primaryTool} />
+        <ToolContentSections surface="home" tool={primaryTool} />
       ) : (
         <>
           <section className="shell border-x border-t px-6 py-10 sm:px-12">
