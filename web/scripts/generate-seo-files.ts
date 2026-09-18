@@ -1,8 +1,10 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { indexableSeoPages } from "../src/seo/pages";
 
-const outputDir = join(import.meta.dir, "..", "dist", "client");
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const outputDir = join(scriptDir, "..", "dist", "client");
 const siteUrl = (process.env.VITE_SITE_URL || "https://example.com").replace(/\/$/, "");
 
 function escapeXml(value: string) {
