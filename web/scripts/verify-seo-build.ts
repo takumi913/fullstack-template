@@ -1,7 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { templateSiteConfig } from "../src/config/site-config";
 import { resolveHomepageTool } from "../src/content/homepage-tool";
 import {
   directoryLandingPages,
