@@ -66,7 +66,7 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
     locale: tool.locale,
     alternates: tool.alternates,
     updatedAt: tool.updatedAt,
-    noindex: tool.noindex || tool.status !== "published",
+    noindex: tool.noindex || tool.templateExample || tool.status !== "published",
     relatedPages: tool.relatedSlugs.map((slug) => toolPath(slug)),
     schema: [applicationSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])],
     image: siteConfig.defaultImage,
