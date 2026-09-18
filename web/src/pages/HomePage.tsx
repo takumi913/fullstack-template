@@ -1,6 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
-import { routableToolPages, toolPath } from "@/content/tool-pages";
+import { directoryToolPages, toolPath } from "@/content/tool-pages";
 import { publicSeoPages } from "@/seo/pages";
 
 const capabilities = [
@@ -75,11 +75,11 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="mt-7 grid gap-3 sm:grid-cols-2">
-          {routableToolPages.map((tool) => (
+          {directoryToolPages.map((tool) => (
             <Link
               className="group rounded-xl border p-5 transition hover:border-zinc-400"
               key={tool.slug}
-              to={toolPath(tool.slug)}
+              to={toolPath(tool)}
             >
               <p className="text-xs text-zinc-500">{tool.category}</p>
               <h3 className="mt-2 font-medium text-zinc-950">{tool.name}</h3>
