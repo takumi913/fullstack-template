@@ -64,6 +64,7 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
     h1: tool.h1,
     intent: "tool",
     locale: tool.locale,
+    alternates: tool.alternates,
     updatedAt: tool.updatedAt,
     noindex: tool.noindex || tool.status !== "published",
     relatedPages: tool.relatedSlugs.map(toolPath),
