@@ -119,6 +119,17 @@ assertIncludes(spaFallback, "noindex, nofollow", "SPA fallback HTML");
 
 const redirects = await readOutput("_redirects");
 assertExcludes(redirects, "/404.html                404", "Cloudflare redirects");
+for (const rule of [
+  "/tools/                 /tools                  301",
+  "/tools/:slug/           /tools/:slug            301",
+  "/:locale/tools/:slug/   /:locale/tools/:slug    301",
+  "/resources/             /resources              301",
+  "/use-cases/:slug/       /use-cases/:slug        301",
+  "/compare/:slug/         /compare/:slug          301",
+  "/guides/:slug/          /guides/:slug           301",
+]) {
+  assertIncludes(redirects, rule, "Cloudflare canonical redirects");
+}
 
 const robots = await readOutput("robots.txt");
 assertIncludes(robots, `Sitemap: ${siteConfig.url}/sitemap.xml`, "robots.txt");
