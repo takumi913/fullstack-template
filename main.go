@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -128,68 +129,87 @@ func regularFile(path string) bool {
 	return err == nil && info.Mode().IsRegular()
 }
 
+// spaFallbackPath 判断路径是否属于只在浏览器中运行的应用页面。
+// 公开 SEO 页面必须由真实静态 HTML 命中；这里只允许登录和后台路由使用 SPA fallback。
+func spaFallbackPath(path string) bool {
+	switch path {
+	case "/login", "/register", "/dashboard":
+		return true
+	}
+	return strings.HasPrefix(path, "/settings/") || strings.HasPrefix(path, "/tenant/")
+}
+
+// staticPagePath 解析静态文件和预渲染目录。
+// React Router 会把 /legal/terms 输出为 static/legal/terms/index.html。
+func staticPagePath(staticDir, urlPath string) (string, bool) {
+	filePath := staticFilePath(staticDir, urlPath)
+	if regularFile(filePath) {
+		return filePath, true
+	}
+	if info, err := os.Stat(filePath); err == nil && info.IsDir() {
+		indexPath := filepath.Join(filePath, "index.html")
+		if regularFile(indexPath) {
+			return indexPath, true
+		}
+	}
+	return "", false
+}
+
 // setupStaticFiles 设置静态文件服务.
 func setupStaticFiles(e *echo.Echo) {
-	// 静态文件目录
 	staticDir := "static"
 
-	// 检查静态文件目录是否存在
 	if _, err := os.Stat(staticDir); os.IsNotExist(err) {
 		slog.Warn("静态文件目录不存在，跳过静态文件服务", "dir", staticDir)
 		return
 	}
 
-	// 服务带有哈希的静态资源文件（长期缓存）
 	e.GET("/assets/*", func(c *echo.Context) error {
 		filePath := staticFilePath(staticDir, c.Request().URL.Path)
 		if !regularFile(filePath) {
 			return echo.NewHTTPError(http.StatusNotFound, "File not found")
 		}
-		// 设置强缓存：1年，因为文件名包含哈希值
 		c.Response().Header().Set("Cache-Control", "public, max-age=31536000, immutable")
-
 		return c.File(filePath)
 	})
 
-	// 服务 favicon（短期缓存）
-	e.GET("/favicon.ico", func(c *echo.Context) error {
-		c.Response().Header().Set("Cache-Control", "public, max-age=86400") // 1天
-		return c.File(filepath.Join(staticDir, "favicon.ico"))
-	})
-
-	// 服务网站图标 SVG（长期缓存）
-	e.GET("/vite.svg", func(c *echo.Context) error {
-		c.Response().Header().Set("Cache-Control", "public, max-age=604800") // 7天
-		return c.File(filepath.Join(staticDir, "vite.svg"))
-	})
-
-	// 处理SPA路由，所有非API请求都返回index.html
 	e.GET("/*", func(c *echo.Context) error {
 		path := c.Request().URL.Path
 
-		// 如果是API请求，返回404
-		if len(path) >= 4 && path[:4] == "/api" {
+		if strings.HasPrefix(path, "/api") {
 			return echo.NewHTTPError(http.StatusNotFound, "API endpoint not found")
 		}
 
-		// 检查请求的文件是否存在
-		filePath := staticFilePath(staticDir, path)
 		if path == "/" {
-			filePath = filepath.Join(staticDir, "index.html")
+			c.Response().Header().Set("Cache-Control", "no-cache")
+			return c.File(filepath.Join(staticDir, "index.html"))
 		}
 
-		if regularFile(filePath) {
-			// 对于 HTML 文件，使用协商缓存
+		if filePath, ok := staticPagePath(staticDir, path); ok {
 			if filepath.Ext(filePath) == ".html" {
 				c.Response().Header().Set("Cache-Control", "no-cache")
 			}
-
 			return c.File(filePath)
 		}
 
-		// 文件不存在，返回index.html（SPA路由）
-		c.Response().Header().Set("Cache-Control", "no-cache")
+		if spaFallbackPath(path) {
+			fallback := filepath.Join(staticDir, "__spa-fallback.html")
+			if !regularFile(fallback) {
+				return echo.NewHTTPError(http.StatusNotFound, "SPA fallback not found")
+			}
+			c.Response().Header().Set("Cache-Control", "no-cache")
+			c.Response().Header().Set("X-Robots-Tag", "noindex, nofollow")
+			return c.File(fallback)
+		}
 
-		return c.File(filepath.Join(staticDir, "index.html"))
+		notFound := filepath.Join(staticDir, "404.html")
+		if regularFile(notFound) {
+			c.Response().Header().Set("Cache-Control", "no-cache")
+			c.Response().Header().Set("X-Robots-Tag", "noindex, nofollow")
+			c.Response().WriteHeader(http.StatusNotFound)
+			return c.File(notFound)
+		}
+
+		return echo.NewHTTPError(http.StatusNotFound, "Page not found")
 	})
 }
