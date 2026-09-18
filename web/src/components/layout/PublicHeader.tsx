@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { templateSiteConfig } from "@/config/site-config";
 import { siteConfig } from "@/seo/site";
 

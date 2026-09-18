@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { useAsyncAction } from "@/lib/useAsyncAction";
 import { useAuthStore } from "@/store/authStore";
 import { useTenantStore } from "@/store/tenantStore";

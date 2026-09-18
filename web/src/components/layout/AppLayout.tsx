@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { ProtectedRoute } from "@/router/RouteGuards";
 import { AppHeader } from "./AppHeader";
 import { Footer } from "./Footer";

@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { RelatedResources } from "@/components/seo/RelatedResources";
 import { RelatedTools } from "@/components/seo/RelatedTools";

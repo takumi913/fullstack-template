@@ -1,4 +1,4 @@
-import { Link, useRouteError } from "react-router-dom";
+import { Link, useRouteError } from "react-router";
 
 // 路由级错误边界。没有它时，任何渲染期抛错都会让页面变成一片空白。
 export default function ErrorPage() {

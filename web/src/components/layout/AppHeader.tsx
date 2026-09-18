@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { templateSiteConfig } from "@/config/site-config";
 import { siteConfig } from "@/seo/site";
 import { useAuthStore } from "@/store/authStore";
