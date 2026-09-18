@@ -64,6 +64,7 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	writeStaticTestFile(t, staticDir, "resources/index.html", "<h1>resources</h1>")
 	writeStaticTestFile(t, staticDir, "ja/tools/example/index.html", "<h1>localized tool</h1>")
 	writeStaticTestFile(t, staticDir, "use-cases/example/index.html", "<h1>use case</h1>")
+	writeStaticTestFile(t, staticDir, "api-tools/index.html", "<h1>api tools</h1>")
 	writeStaticTestFile(
 		t,
 		staticDir,
@@ -89,6 +90,7 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		{name: "resources hub", path: "/resources", want: "resources"},
 		{name: "localized tool", path: "/ja/tools/example", want: "localized tool"},
 		{name: "use case", path: "/use-cases/example", want: "use case"},
+		{name: "api-prefixed public page", path: "/api-tools", want: "api tools"},
 	} {
 		t.Run("serves prerendered "+tt.name, func(t *testing.T) {
 			rec := performStaticRequest(e, tt.path)
@@ -174,6 +176,18 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		}
 		if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
 			t.Fatalf("Cache-Control = %q, want %q", got, "no-cache")
+		}
+	})
+
+	t.Run("only the real API namespace is reserved", func(t *testing.T) {
+		for _, path := range []string{"/api", "/api/definitely-missing"} {
+			rec := performStaticRequest(e, path)
+			if rec.Code != http.StatusNotFound {
+				t.Fatalf("%s status = %d, want %d", path, rec.Code, http.StatusNotFound)
+			}
+			if strings.Contains(rec.Body.String(), "<h1>") {
+				t.Fatalf("%s body = %q, API request unexpectedly received HTML", path, rec.Body.String())
+			}
 		}
 	})
 
