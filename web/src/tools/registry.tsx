@@ -27,9 +27,7 @@ export function ToolRuntime({ slug }: { slug: string }) {
   return (
     <Suspense
       fallback={
-        <div className="rounded-xl border bg-zinc-50 p-8 text-sm text-zinc-500">
-          Loading tool…
-        </div>
+        <div className="rounded-xl border bg-zinc-50 p-8 text-sm text-zinc-500">Loading tool…</div>
       }
     >
       <Component />
