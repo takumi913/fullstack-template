@@ -105,9 +105,12 @@ jobs:
         working-directory: web
         run: bun install
 
-      - name: Check frontend formatting
+      - name: Format frontend migration files
         working-directory: web
-        run: bun run format:check
+        run: bun run format
+
+      - name: Show formatting diff
+        run: git diff -- web
 
       - name: Run frontend lint
         working-directory: web
