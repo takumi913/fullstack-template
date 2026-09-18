@@ -9,6 +9,9 @@ export const Footer = () => (
         <Link className="hover:text-zinc-950" to="/tools">
           Tools
         </Link>
+        <Link className="hover:text-zinc-950" to="/resources">
+          Resources
+        </Link>
         {directoryToolPages.map((tool) => (
           <Link className="hover:text-zinc-950" key={tool.slug} to={toolPath(tool)}>
             {tool.name}
