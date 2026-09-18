@@ -35,6 +35,18 @@ describe("SEO content integrity", () => {
     expect(new Set(titles).size).toBe(titles.length);
   });
 
+  it("requires indexable hreflang targets to also be indexable", () => {
+    const pagesByPath = new Map(allPages.map((page) => [page.path, page]));
+
+    for (const page of indexable(allPages)) {
+      for (const alternate of page.alternates || []) {
+        const target = pagesByPath.get(alternate.path);
+        expect(target, `${page.path} -> ${alternate.path}`).toBeDefined();
+        expect(target?.noindex, `${page.path} -> ${alternate.path}`).not.toBe(true);
+      }
+    }
+  });
+
   it("requires indexable pages to have meaningful SEO fields", () => {
     for (const page of indexable(allPages)) {
       expect(page.primaryKeyword.trim().length, page.path).toBeGreaterThan(1);
