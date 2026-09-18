@@ -8,8 +8,10 @@
 /login/                 /login                  301
 /register/              /register               301
 /dashboard/             /dashboard              301
-/settings/:path*/       /settings/:path          301
-/tenant/:path*/         /tenant/:path            301
+/settings/profile/      /settings/profile       301
+/settings/security/     /settings/security      301
+/tenant/settings/       /tenant/settings        301
+/tenant/members/        /tenant/members         301
 
 /login                  /__spa-fallback.html     200
 /register               /__spa-fallback.html     200
