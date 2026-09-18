@@ -105,12 +105,9 @@ jobs:
         working-directory: web
         run: bun install --frozen-lockfile
 
-      - name: Format frontend migration files
+      - name: Check frontend formatting
         working-directory: web
-        run: bun run format
-
-      - name: Show frontend formatting diff
-        run: git diff -- web
+        run: bun run format:check
 
       - name: Run frontend lint
         working-directory: web
