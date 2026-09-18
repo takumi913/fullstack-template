@@ -6,7 +6,7 @@
 
 - Go 1.25、Echo v5、`database/sql`、sqlc
 - SQLite（本地开发）和 PostgreSQL（生产部署）
-- React 19、TypeScript、Vite、Tailwind CSS、Zustand
+- React 19、React Router Framework Mode、TypeScript、Vite、Tailwind CSS、Zustand
 - bcrypt 密码哈希、HttpOnly Cookie Session
 
 前端不预装 UI 组件库，页面使用 `style.css` 中的 `.panel`、`.button-primary`、`.field` 等类。
@@ -20,6 +20,8 @@
 - Owner、Admin、Member 三种租户角色
 - SQLite/PostgreSQL 独立 migrations 和 sqlc 查询
 - 权限矩阵与租户隔离的接口级测试，前后端均有测试
+- Public SSG + Private SPA，适合 SEO 工具站
+- Tool Page Schema 自动生成 meta、JSON-LD、sitemap 与相关工具内链
 
 ## 快速开始
 
@@ -87,6 +89,7 @@ make build           # 构建
 
 ## 文档
 
+- [工具页 SEO / SSG](docs/tool-pages-seo.md) — 新增工具、关键词配置、预渲染和内链规则
 - [配置说明](docs/configuration.md) — 全部环境变量
 - [Docker 部署](docs/docker.md) — 镜像构建、生产配置与已知限制
 - [Go 代码检查](docs/golangci-lint.md) — golangci-lint 版本要求与用法
