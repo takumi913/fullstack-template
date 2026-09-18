@@ -1,7 +1,11 @@
 import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { directoryLandingPages, getLandingPagesForTool, routableLandingPages } from "../src/content/landing-pages";
+import {
+  directoryLandingPages,
+  getLandingPagesForTool,
+  routableLandingPages,
+} from "../src/content/landing-pages";
 import { routableToolPages, toolPath } from "../src/content/tool-pages";
 import { createLandingSeoPage } from "../src/seo/landing-page";
 import { publicSeoPages } from "../src/seo/pages";
