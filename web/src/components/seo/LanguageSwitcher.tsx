@@ -21,7 +21,10 @@ export function LanguageSwitcher({
   if (versions.length < 2) return null;
 
   return (
-    <nav aria-label={copy.languageVersions} className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+    <nav
+      aria-label={copy.languageVersions}
+      className="mt-4 flex flex-wrap items-center gap-2 text-xs"
+    >
       <span className="text-zinc-500">{copy.language}</span>
       {versions.map((alternate) =>
         alternate.path === currentPath ? (
