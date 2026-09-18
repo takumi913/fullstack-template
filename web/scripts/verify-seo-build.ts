@@ -1,10 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  routableToolPages,
-  toolPath,
-} from "../src/content/tool-pages";
+import { routableToolPages, toolPath } from "../src/content/tool-pages";
 import { publicSeoPages } from "../src/seo/pages";
 import { createToolSeoPage } from "../src/seo/tool-page";
 
