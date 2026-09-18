@@ -3,6 +3,7 @@ import { index, layout, route, type RouteConfig } from "@react-router/dev/routes
 export default [
   layout("./routes/site-layout.tsx", [
     index("./routes/home.tsx"),
+    route("tools", "./routes/tools-index.tsx"),
     route("tools/:slug", "./routes/tool.tsx"),
     route("404", "./routes/not-found.tsx"),
 
