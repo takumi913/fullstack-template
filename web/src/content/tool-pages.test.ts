@@ -6,7 +6,7 @@ import { toolComponents } from "../tools/registry";
 describe("tool page definitions", () => {
   it("uses unique slugs and paths", () => {
     const slugs = toolPages.map((tool) => tool.slug);
-    const paths = toolPages.map((tool) => toolPath(tool.slug));
+    const paths = toolPages.map((tool) => toolPath(tool));
 
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(new Set(paths).size).toBe(paths.length);
@@ -33,7 +33,7 @@ describe("tool page definitions", () => {
   });
 
   it("keeps hreflang sets self-referencing and reciprocal", () => {
-    const pagesByPath = new Map(routableToolPages.map((tool) => [toolPath(tool.slug), tool]));
+    const pagesByPath = new Map(routableToolPages.map((tool) => [toolPath(tool), tool]));
 
     for (const tool of routableToolPages) {
       if (!tool.alternates?.length) continue;
@@ -45,7 +45,7 @@ describe("tool page definitions", () => {
       expect(
         tool.alternates.some(
           (alternate) =>
-            alternate.hreflang === tool.locale && alternate.path === toolPath(tool.slug),
+            alternate.hreflang === tool.locale && alternate.path === toolPath(tool),
         ),
         `${tool.slug} self hreflang`,
       ).toBe(true);
@@ -59,10 +59,21 @@ describe("tool page definitions", () => {
         expect(
           target?.alternates?.some(
             (backlink) =>
-              backlink.hreflang === tool.locale && backlink.path === toolPath(tool.slug),
+              backlink.hreflang === tool.locale && backlink.path === toolPath(tool),
           ),
-          `${alternate.path} -> ${toolPath(tool.slug)}`,
+          `${alternate.path} -> ${toolPath(tool)}`,
         ).toBe(true);
+      }
+    }
+  });
+
+  it("keeps localized URL prefixes aligned with locale metadata", () => {
+    for (const tool of routableToolPages) {
+      const path = toolPath(tool);
+      const localizedMatch = path.match(/^\/([^/]+)\/tools\//);
+
+      if (localizedMatch) {
+        expect(tool.locale, `${tool.slug} locale`).toBe(localizedMatch[1]);
       }
     }
   });
