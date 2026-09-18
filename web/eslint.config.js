@@ -22,4 +22,18 @@ export default tseslint.config(
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
   },
+  {
+    // React Router Framework Mode route modules intentionally export meta/links/loaders
+    // next to the route component. Registry/context modules are infrastructure rather
+    // than Fast Refresh leaf components, so the same React Refresh rule is not useful.
+    files: [
+      "src/root.tsx",
+      "src/routes/**/*.tsx",
+      "src/tools/context.tsx",
+      "src/tools/registry.tsx",
+    ],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );
