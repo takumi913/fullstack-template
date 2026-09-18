@@ -17,7 +17,27 @@ export default function LandingPage() {
 
   return (
     <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
-      <header className="max-w-3xl">
+      <nav aria-label="Breadcrumb" className="text-sm text-zinc-500">
+        <ol className="flex items-center gap-2">
+          <li>
+            <Link className="hover:text-zinc-950" to="/">
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link className="hover:text-zinc-950" to="/resources">
+              Resources
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-zinc-700">
+            {page.h1}
+          </li>
+        </ol>
+      </nav>
+
+      <header className="mt-8 max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
           {page.kind.replace("-", " ")}
         </p>
