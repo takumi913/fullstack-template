@@ -11,6 +11,12 @@ export function Breadcrumbs({ tool }: { tool: ToolPageDefinition }) {
           </Link>
         </li>
         <li aria-hidden="true">/</li>
+        <li>
+          <Link className="hover:text-zinc-950" to="/tools">
+            Tools
+          </Link>
+        </li>
+        <li aria-hidden="true">/</li>
         <li aria-current="page" className="text-zinc-700">
           {tool.name}
         </li>
