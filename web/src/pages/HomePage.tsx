@@ -67,6 +67,9 @@ export default function HomePage() {
           <p className="mt-3 text-sm leading-6 text-zinc-600">
             示例页默认 noindex，用于演示 Tool Page Schema、面包屑、相关工具和路由级代码拆分。
           </p>
+          <Link className="mt-4 inline-flex text-sm font-medium text-zinc-700 hover:text-zinc-950" to="/tools">
+            View tool directory →
+          </Link>
         </div>
         <div className="mt-7 grid gap-3 sm:grid-cols-2">
           {routableToolPages.map((tool) => (
