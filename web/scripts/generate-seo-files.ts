@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { routableToolPages } from "../src/content/tool-pages";
@@ -43,25 +43,8 @@ Allow: /
 Sitemap: ${siteUrl}/sitemap.xml
 `;
 
-const notFound = `<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex, nofollow">
-    <title>404 - 页面不存在</title>
-  </head>
-  <body>
-    <main>
-      <h1>404</h1>
-      <p>页面不存在。</p>
-      <a href="/">返回首页</a>
-    </main>
-  </body>
-</html>
-`;
-
 await mkdir(outputDir, { recursive: true });
+const notFound = await readFile(join(outputDir, "404", "index.html"), "utf8");
 await Promise.all([
   writeFile(join(outputDir, "sitemap.xml"), sitemap),
   writeFile(join(outputDir, "robots.txt"), robots),
