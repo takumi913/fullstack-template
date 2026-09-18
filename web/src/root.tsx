@@ -1,4 +1,12 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation, useMatches } from "react-router";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLocation,
+  useMatches,
+} from "react-router";
 import type { LinksFunction } from "react-router";
 import { templateSiteConfig } from "@/config/site-config";
 import { shouldHydrateDocument } from "@/runtime/client-runtime";
