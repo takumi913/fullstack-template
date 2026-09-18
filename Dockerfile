@@ -9,7 +9,7 @@ WORKDIR /app
 COPY web/package.json web/bun.lock ./
 
 # 安装前端依赖
-RUN bun install
+RUN bun install --frozen-lockfile
 
 # 复制前端源码并构建
 COPY web/ ./
