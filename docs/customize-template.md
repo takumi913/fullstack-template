@@ -49,6 +49,7 @@ strict 模式会阻止：
 - 原始母模板 title
 - 原始母模板 description
 - 仍处于 `status: "example"` 的 Tool / Landing 页面
+- 仍带有 `templateExample: true` 的非 draft 页面
 - 已发布页面中残留的原始 `Fullstack Template` 品牌
 
 这样可以避免复制模板后忘记改品牌或清理 demo 就部署。
@@ -72,7 +73,11 @@ web/src/tools/registry.tsx
 docs/tool-pages-seo.md
 ```
 
-正式工具从 `draft` / `example` 改成 `published` 后，才会默认进入 sitemap。
+正式工具不能只改 `status`。把内置 demo 替换成真实工具后，需要：
+1. 将 `status` 改成 `published`；
+2. 删除 `templateExample: true`。
+
+只做第一步时页面仍会保持 noindex，production strict build 也会拒绝发布。
 
 ## 4. 添加 SEO 内容页
 
