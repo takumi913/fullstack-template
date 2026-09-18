@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { routableToolPages, toolPages, toolPath } from "./tool-pages";
 import { createToolSeoPage } from "../seo/tool-page";
+import { isValidHreflang } from "../seo/localization";
 import { toolComponents } from "../tools/registry";
 
 describe("tool page definitions", () => {
@@ -54,6 +55,9 @@ describe("tool page definitions", () => {
 
       const hreflangs = tool.alternates.map((alternate) => alternate.hreflang);
       expect(new Set(hreflangs).size, `${tool.slug} hreflang uniqueness`).toBe(hreflangs.length);
+      for (const hreflang of hreflangs) {
+        expect(isValidHreflang(hreflang), `${tool.slug} invalid hreflang: ${hreflang}`).toBe(true);
+      }
       expect(
         tool.alternates.some(
           (alternate) => alternate.hreflang === tool.locale && alternate.path === toolPath(tool),
