@@ -79,7 +79,11 @@ for (const tool of routableToolPages) {
   }
 
   for (const alternate of tool.alternates || []) {
-    assertMatches(html, new RegExp(`hrefLang="${alternate.hreflang}"`, "i"), `${tool.slug} hreflang`);
+    assertMatches(
+      html,
+      new RegExp(`hrefLang="${alternate.hreflang}"`, "i"),
+      `${tool.slug} hreflang`,
+    );
     assertIncludes(html, `href="${siteConfig.url}${alternate.path}"`, `${tool.slug} alternate URL`);
   }
 }
