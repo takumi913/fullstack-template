@@ -1,13 +1,6 @@
 import RegisterPage from "@/pages/RegisterPage";
-import { PublicRoute } from "@/router/RouteGuards";
-import { privatePageMeta } from "@/seo/page";
+import { privatePageTitleMeta } from "@/seo/page";
 
-export const meta = () => [{ title: "注册 | Fullstack Template" }, ...privatePageMeta];
+export const meta = () => privatePageTitleMeta("注册");
 
-export default function RegisterRoute() {
-  return (
-    <PublicRoute>
-      <RegisterPage />
-    </PublicRoute>
-  );
-}
+export default RegisterPage;
