@@ -11,6 +11,7 @@ export interface ToolPageDefinition {
   slug: string;
   componentKey: string;
   status: ToolPageStatus;
+  templateExample?: boolean;
   name: string;
   category: string;
   primaryKeyword: string;
@@ -43,6 +44,7 @@ export const toolPages: ToolPageDefinition[] = [
     slug: "json-formatter",
     componentKey: "json-formatter",
     status: "example",
+    templateExample: true,
     locale: "en",
     alternates: jsonFormatterAlternates,
     name: "JSON Formatter",
@@ -84,6 +86,7 @@ export const toolPages: ToolPageDefinition[] = [
     slug: "json-formatter-ja",
     componentKey: "json-formatter",
     status: "example",
+    templateExample: true,
     path: "/ja/tools/json-formatter",
     locale: "ja",
     alternates: jsonFormatterAlternates,
@@ -122,6 +125,7 @@ export const toolPages: ToolPageDefinition[] = [
     slug: "word-counter",
     componentKey: "word-counter",
     status: "example",
+    templateExample: true,
     locale: "en",
     name: "Word Counter",
     category: "Text Tool",
