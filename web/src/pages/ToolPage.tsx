@@ -27,7 +27,7 @@ export default function ToolPage() {
       </header>
 
       <section className="mt-10" aria-label={tool.name}>
-        <ToolRuntime slug={tool.slug} />
+        <ToolRuntime page={tool} />
       </section>
 
       <section className="mt-14 grid gap-10 border-t pt-12 lg:grid-cols-2">
