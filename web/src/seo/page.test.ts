@@ -58,7 +58,7 @@ describe("createSeoMeta", () => {
 
     const meta = createSeoMeta(page);
 
-    expect(meta).toContainEqual({ property: "og:locale", content: "en" });
+    expect(meta).toContainEqual({ property: "og:locale", content: "en_US" });
     expect(meta).toContainEqual({
       tagName: "link",
       rel: "alternate",
@@ -73,7 +73,7 @@ describe("createSeoMeta", () => {
     });
     expect(meta).toContainEqual({
       property: "og:locale:alternate",
-      content: "ja",
+      content: "ja_JP",
     });
   });
 });
