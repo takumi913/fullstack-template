@@ -10,6 +10,7 @@ export default {
     "/",
     "/404",
     "/tools",
+    "/resources",
     "/legal/privacy-policy",
     "/legal/terms",
     ...toolPrerenderPaths,
