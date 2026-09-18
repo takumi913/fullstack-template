@@ -1,5 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import { routableToolPages, toolPath } from "@/content/tool-pages";
 import { publicSeoPages } from "@/seo/pages";
 
 const capabilities = [
@@ -51,6 +52,36 @@ export default function HomePage() {
               <h3 className="text-base font-medium text-zinc-950">{title}</h3>
               <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500">{description}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="shell border-x border-t px-6 py-16 sm:px-12">
+        <div className="max-w-2xl">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
+            Tool page examples
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-zinc-950">
+            一份配置生成工具页 SEO 与 SSG。
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-600">
+            示例页默认 noindex，用于演示 Tool Page Schema、面包屑、相关工具和路由级代码拆分。
+          </p>
+        </div>
+        <div className="mt-7 grid gap-3 sm:grid-cols-2">
+          {routableToolPages.map((tool) => (
+            <Link
+              className="group rounded-xl border p-5 transition hover:border-zinc-400"
+              key={tool.slug}
+              to={toolPath(tool.slug)}
+            >
+              <p className="text-xs text-zinc-500">{tool.category}</p>
+              <h3 className="mt-2 font-medium text-zinc-950">{tool.name}</h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-500">{tool.description}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-zinc-700">
+                Open example <ArrowRight size={14} />
+              </span>
+            </Link>
           ))}
         </div>
       </section>
