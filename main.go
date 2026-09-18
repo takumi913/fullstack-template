@@ -129,6 +129,11 @@ func regularFile(path string) bool {
 	return err == nil && info.Mode().IsRegular()
 }
 
+// apiPath 判断请求是否属于 API 命名空间。
+func apiPath(path string) bool {
+	return path == "/api" || strings.HasPrefix(path, "/api/")
+}
+
 // spaFallbackPath 判断路径是否属于只在浏览器中运行的应用页面。
 // 公开 SEO 页面必须由真实静态 HTML 命中；这里只允许登录和后台路由使用 SPA fallback。
 func spaFallbackPath(path string) bool {
@@ -193,7 +198,7 @@ func setupStaticFilesFromDir(e *echo.Echo, staticDir string) {
 	e.GET("/*", func(c *echo.Context) error {
 		path := c.Request().URL.Path
 
-		if strings.HasPrefix(path, "/api") {
+		if apiPath(path) {
 			return echo.NewHTTPError(http.StatusNotFound, "API endpoint not found")
 		}
 
