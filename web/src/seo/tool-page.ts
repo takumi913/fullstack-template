@@ -1,4 +1,4 @@
-import { toolPath, type ToolPageDefinition } from "@/content/tool-pages";
+import { toolPath, type ToolPageDefinition } from "../content/tool-pages";
 import { absoluteUrl, siteConfig } from "./site";
 import type { SeoPage } from "./page";
 
