@@ -92,8 +92,7 @@ export const toolPages: ToolPageDefinition[] = [
     category: "開発ツール",
     primaryKeyword: "json 整形",
     title: "JSON 整形ツール - オンラインで JSON を整形・検証",
-    description:
-      "ブラウザ上で JSON を整形、検証、圧縮できる日本語版のサンプルページです。",
+    description: "ブラウザ上で JSON を整形、検証、圧縮できる日本語版のサンプルページです。",
     h1: "JSON 整形ツール",
     intro:
       "JSON を貼り付けるだけで、読みやすい形式への整形、構文検証、圧縮をブラウザ内で実行できます。",
@@ -171,7 +170,9 @@ export function toolPath(tool: ToolPageDefinition | string) {
 
 export const routableToolPages = toolPages.filter((tool) => tool.status !== "draft");
 
-export const directoryToolPages = routableToolPages.filter((tool) => tool.showInDirectory !== false);
+export const directoryToolPages = routableToolPages.filter(
+  (tool) => tool.showInDirectory !== false,
+);
 
 export const toolPrerenderPaths = routableToolPages.map((tool) => toolPath(tool));
 
