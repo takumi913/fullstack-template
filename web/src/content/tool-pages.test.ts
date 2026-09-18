@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  routableToolPages,
-  toolPages,
-  toolPath,
-} from "./tool-pages";
+import { routableToolPages, toolPages, toolPath } from "./tool-pages";
 import { createToolSeoPage } from "../seo/tool-page";
 
 describe("tool page definitions", () => {
