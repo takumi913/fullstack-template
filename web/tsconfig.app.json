@@ -13,6 +13,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "rootDirs": [".", "./.react-router/types"],
 
     "strict": true,
     "noUnusedLocals": true,
@@ -26,5 +27,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "app", ".react-router/types"]
+  "include": ["src", ".react-router/types/**/*"]
 }
