@@ -4,7 +4,7 @@
 
 ## 技术栈
 
-- Go 1.25、Echo v5、`database/sql`、sqlc
+- Go 1.26、Echo v5、`database/sql`、sqlc
 - SQLite（本地开发）和 PostgreSQL（生产部署）
 - React 19、React Router Framework Mode、TypeScript、Vite、Tailwind CSS、Zustand
 - bcrypt 密码哈希、HttpOnly Cookie Session
