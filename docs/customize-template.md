@@ -119,7 +119,7 @@ web/src/content/legal-pages.ts
 VITE_SITE_FAVICON=/favicon.svg
 ```
 
-production build 会根据当前 `VITE_SITE_MARK` 和 `site-config.ts` 中的颜色自动生成 SVG favicon，
+production build 会根据最终解析后的站点 mark（`site-config.ts`，或可选的 `VITE_SITE_MARK` 覆盖）和站点颜色自动生成 SVG favicon，
 同时生成包含当前站点 name、shortName、theme color 的 `manifest.webmanifest`。
 
 使用正式图标时可以：
@@ -138,15 +138,16 @@ VITE_SITE_FAVICON=/brand-icon.svg
 VITE_SITE_IMAGE=/og-image.svg
 ```
 
-如果继续使用这个路径，production build 会根据当前：
+如果继续使用这个路径，production build 会根据最终解析后的：
 
-- VITE_SITE_NAME
-- VITE_SITE_MARK
-- VITE_SITE_TITLE
-- VITE_SITE_DESCRIPTION
+- site name
+- site mark
+- SEO title
+- SEO description
 - VITE_SITE_URL
 
-自动生成一张不会泄漏母模板旧品牌的 OG SVG。
+自动生成一张不会泄漏母模板旧品牌的 OG SVG。品牌值默认来自 `site-config.ts`，
+只有存在对应 `VITE_SITE_*` 时才使用部署覆盖。
 
 有正式视觉设计时，直接改成：
 
