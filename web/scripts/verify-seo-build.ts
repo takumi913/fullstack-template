@@ -57,6 +57,12 @@ function assertMatches(content: string, pattern: RegExp, label: string) {
   }
 }
 
+function assertPublicHtmlDoesNotLoadPrivateApp(html: string, label: string) {
+  for (const privateChunk of ["authStore-", "RouteGuards-", "tenantStore-"]) {
+    assertExcludes(html, privateChunk, `${label} private app bundle`);
+  }
+}
+
 const home = await readOutput("index.html");
 assertIncludes(home, publicSeoPages.home.title, "home HTML");
 assertIncludes(home, `href="${siteConfig.favicon}"`, "home favicon");
@@ -64,15 +70,18 @@ assertIncludes(home, 'rel="manifest"', "home manifest link");
 assertIncludes(home, 'rel="canonical"', "home HTML");
 assertIncludes(home, `href="${siteConfig.url}/"`, "home canonical");
 assertIncludes(home, "application/ld+json", "home HTML");
+assertPublicHtmlDoesNotLoadPrivateApp(home, "home HTML");
 
 const toolsHub = await readOutput("tools", "index.html");
 assertIncludes(toolsHub, publicSeoPages.tools.title, "tools hub HTML");
 assertIncludes(toolsHub, "noindex, follow", "tools hub HTML");
 assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
+assertPublicHtmlDoesNotLoadPrivateApp(toolsHub, "tools hub HTML");
 
 const resourcesHub = await readOutput("resources", "index.html");
 assertIncludes(resourcesHub, publicSeoPages.resources.title, "resources hub HTML");
 assertIncludes(resourcesHub, "noindex, follow", "resources hub HTML");
+assertPublicHtmlDoesNotLoadPrivateApp(resourcesHub, "resources hub HTML");
 
 for (const page of Object.values(publicSeoPages)) {
   if (!("noindex" in page) || !page.noindex) continue;
@@ -88,6 +97,7 @@ for (const tool of routableToolPages) {
   const html = await readOutput(...htmlOutputParts(toolPath(tool)));
   const seo = createToolSeoPage(tool);
 
+  assertPublicHtmlDoesNotLoadPrivateApp(html, `${tool.slug} HTML`);
   assertIncludes(html, tool.title, `${tool.slug} HTML`);
   assertIncludes(html, tool.h1, `${tool.slug} HTML`);
   assertIncludes(html, 'rel="canonical"', `${tool.slug} HTML`);
@@ -188,6 +198,7 @@ for (const page of routableLandingPages) {
   const html = await readOutput(...htmlOutputParts(page.path));
   const seo = createLandingSeoPage(page);
 
+  assertPublicHtmlDoesNotLoadPrivateApp(html, `${page.slug} landing HTML`);
   assertIncludes(html, page.title, `${page.slug} landing HTML`);
   assertIncludes(html, page.h1, `${page.slug} landing HTML`);
   assertIncludes(html, 'rel="canonical"', `${page.slug} landing HTML`);
