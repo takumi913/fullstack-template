@@ -70,6 +70,7 @@ VITE_SITE_URL=https://example.com
 VITE_SITE_NAME=Example
 VITE_SITE_SHORT_NAME=Example
 VITE_SITE_MARK=E
+VITE_SITE_FAVICON=/favicon.svg
 VITE_SITE_LOCALE=zh-CN
 VITE_SITE_PRIMARY_KEYWORD=example online tool
 VITE_SITE_TITLE=Example Online Tool
@@ -95,7 +96,7 @@ https://example.com?a=1    ❌
 
 品牌与长文案的默认值集中在 `web/src/config/site-config.ts`。复制模板创建新站时，
 优先修改这个文件以及 `web/src/content/` 下的页面数据；`VITE_SITE_*` 变量用于部署时覆盖
-品牌名、标题、描述、主关键词、OG 图片等构建期值。
+品牌名、标题、描述、主关键词、favicon、OG 图片等构建期值。
 
 本地开发可以不设置 `SEO_STRICT`。开启 strict 后，除了生产域名外，还必须显式提供
 `VITE_SITE_NAME`、`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION`，且不能继续使用
@@ -115,6 +116,7 @@ docker build \
   --build-arg VITE_SITE_NAME="Your Product" \
   --build-arg VITE_SITE_SHORT_NAME="Your Product" \
   --build-arg VITE_SITE_MARK=Y \
+  --build-arg VITE_SITE_FAVICON=/favicon.svg \
   --build-arg VITE_SITE_LOCALE=en \
   --build-arg VITE_SITE_PRIMARY_KEYWORD="your primary keyword" \
   --build-arg VITE_SITE_TITLE="Your SEO Title" \
