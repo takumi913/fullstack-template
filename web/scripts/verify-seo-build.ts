@@ -24,6 +24,11 @@ function htmlOutputParts(pathname: string) {
   return [...segments, "index.html"];
 }
 
+async function assertOutputExists(...parts: string[]) {
+  const path = join(clientDir, ...parts);
+  await access(path);
+}
+
 async function assertOutputMissing(...parts: string[]) {
   const path = join(clientDir, ...parts);
   try {
@@ -54,6 +59,8 @@ function assertMatches(content: string, pattern: RegExp, label: string) {
 
 const home = await readOutput("index.html");
 assertIncludes(home, publicSeoPages.home.title, "home HTML");
+assertIncludes(home, `href="${siteConfig.favicon}"`, "home favicon");
+assertIncludes(home, 'rel="manifest"', "home manifest link");
 assertIncludes(home, 'rel="canonical"', "home HTML");
 assertIncludes(home, `href="${siteConfig.url}/"`, "home canonical");
 assertIncludes(home, "application/ld+json", "home HTML");
@@ -152,12 +159,29 @@ for (const rule of [
 const robots = await readOutput("robots.txt");
 assertIncludes(robots, `Sitemap: ${siteConfig.url}/sitemap.xml`, "robots.txt");
 
+const manifest = await readOutput("manifest.webmanifest");
+assertIncludes(manifest, `"name": "${siteConfig.name}"`, "web manifest brand");
+assertIncludes(manifest, `"short_name": "${siteConfig.shortName}"`, "web manifest short name");
+assertIncludes(manifest, `"src": "${siteConfig.favicon}"`, "web manifest favicon");
+
+if (siteConfig.favicon === "/favicon.svg") {
+  const favicon = await readOutput("favicon.svg");
+  assertIncludes(favicon, siteConfig.mark.slice(0, 2), "generated favicon mark");
+} else if (siteConfig.favicon.startsWith("/")) {
+  await assertOutputExists(...siteConfig.favicon.split("/").filter(Boolean));
+}
+
+await assertOutputMissing("favicon.ico");
+await assertOutputMissing("vite.svg");
+
 if (siteConfig.defaultImage === "/og-image.svg") {
   const ogImage = await readOutput("og-image.svg");
   assertIncludes(ogImage, siteConfig.name, "generated OG image brand");
   assertIncludes(ogImage, siteConfig.defaultTitle.slice(0, 46), "generated OG image title");
   assertExcludes(ogImage, "MDZZ Toolbox", "generated OG image");
   assertExcludes(ogImage, "mdzz.uk", "generated OG image");
+} else if (siteConfig.defaultImage.startsWith("/")) {
+  await assertOutputExists(...siteConfig.defaultImage.split("/").filter(Boolean));
 }
 
 for (const page of routableLandingPages) {
