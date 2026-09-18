@@ -36,6 +36,19 @@ describe("createSeoMeta", () => {
     });
   });
 
+  it("uses the page title as social image alt text", () => {
+    const meta = createSeoMeta(basePage);
+
+    expect(meta).toContainEqual({
+      property: "og:image:alt",
+      content: basePage.title,
+    });
+    expect(meta).toContainEqual({
+      name: "twitter:image:alt",
+      content: basePage.title,
+    });
+  });
+
   it("emits an absolute canonical URL", () => {
     const meta = createSeoMeta(basePage);
 
