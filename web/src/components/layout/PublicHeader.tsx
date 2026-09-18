@@ -6,7 +6,10 @@ export function PublicHeader() {
   return (
     <header className="border-b bg-white">
       <div className="shell flex min-h-14 items-center justify-between gap-4 py-2">
-        <Link to="/" className="flex shrink-0 items-center gap-2 text-sm font-semibold tracking-[-0.01em]">
+        <Link
+          to="/"
+          className="flex shrink-0 items-center gap-2 text-sm font-semibold tracking-[-0.01em]"
+        >
           <span className="grid size-5 place-items-center rounded-[4px] bg-zinc-900 text-[10px] text-white">
             {siteConfig.mark}
           </span>
