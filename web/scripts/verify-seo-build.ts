@@ -45,7 +45,7 @@ for (const tool of routableToolPages) {
   assertIncludes(html, 'rel="canonical"', `${tool.slug} HTML`);
   assertIncludes(html, "BreadcrumbList", `${tool.slug} HTML`);
   assertIncludes(html, "WebApplication", `${tool.slug} HTML`);
-  assertIncludes(html, `lang="${tool.locale || "zh-CN"}"`, `${tool.slug} document language`);
+  assertIncludes(html, `lang="${tool.locale || siteConfig.locale}"`, `${tool.slug} document language`);
 
   if (seo.noindex) {
     assertIncludes(html, "noindex, nofollow", `${tool.slug} HTML`);
@@ -57,6 +57,10 @@ assertIncludes(jsonFormatterHtml, "JSON input", "json formatter prerender");
 
 const wordCounterHtml = await readOutput("tools", "word-counter", "index.html");
 assertIncludes(wordCounterHtml, "word-counter-input", "word counter prerender");
+
+const notFound = await readOutput("404.html");
+assertIncludes(notFound, "404 - Page not found", "404 HTML");
+assertIncludes(notFound, "noindex, nofollow", "404 HTML");
 
 const sitemap = await readOutput("sitemap.xml");
 
