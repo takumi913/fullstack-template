@@ -4,6 +4,7 @@ export default [
   layout("./routes/site-layout.tsx", [
     index("./routes/home.tsx"),
     route("tools", "./routes/tools-index.tsx"),
+    route("resources", "./routes/resources.tsx"),
     route("tools/:slug", "./routes/tool.tsx"),
     route(":locale/tools/:slug", "./routes/localized-tool.tsx"),
     route("use-cases/:slug", "./routes/use-case.tsx"),
