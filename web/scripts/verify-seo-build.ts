@@ -152,6 +152,14 @@ for (const rule of [
 const robots = await readOutput("robots.txt");
 assertIncludes(robots, `Sitemap: ${siteConfig.url}/sitemap.xml`, "robots.txt");
 
+if (siteConfig.defaultImage === "/og-image.svg") {
+  const ogImage = await readOutput("og-image.svg");
+  assertIncludes(ogImage, siteConfig.name, "generated OG image brand");
+  assertIncludes(ogImage, siteConfig.defaultTitle, "generated OG image title");
+  assertExcludes(ogImage, "MDZZ Toolbox", "generated OG image");
+  assertExcludes(ogImage, "mdzz.uk", "generated OG image");
+}
+
 for (const page of routableLandingPages) {
   const html = await readOutput(...htmlOutputParts(page.path));
   const seo = createLandingSeoPage(page);
