@@ -6,8 +6,7 @@ export const publicSeoPages = {
     path: "/",
     primaryKeyword: "go react saas template",
     title: "Go + React 多租户 SaaS 全栈模板",
-    description:
-      "基于 Go、React、sqlc、SQLite/PostgreSQL 和多租户 RBAC 的精简 SaaS 全栈母模板。",
+    description: "基于 Go、React、sqlc、SQLite/PostgreSQL 和多租户 RBAC 的精简 SaaS 全栈母模板。",
     h1: "Go + React 多租户 SaaS 全栈模板",
     intent: "commercial",
     updatedAt: "2026-09-18",
