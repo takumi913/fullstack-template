@@ -1,6 +1,12 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_SITE_URL: ${VITE_SITE_URL:-http://localhost:1323}
+        VITE_SITE_NAME: ${VITE_SITE_NAME:-Fullstack Template}
+        VITE_SITE_LOCALE: ${VITE_SITE_LOCALE:-zh-CN}
+        SEO_STRICT: ${SEO_STRICT:-false}
     ports:
       - "1323:1323"
     environment:
