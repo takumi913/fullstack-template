@@ -5,6 +5,7 @@ export const siteConfig = {
   name: import.meta.env.VITE_SITE_NAME || templateSiteConfig.brand.name,
   shortName: import.meta.env.VITE_SITE_SHORT_NAME || templateSiteConfig.brand.shortName,
   mark: import.meta.env.VITE_SITE_MARK || templateSiteConfig.brand.mark,
+  favicon: import.meta.env.VITE_SITE_FAVICON || templateSiteConfig.brand.favicon,
   url: normalizeSiteUrl(import.meta.env.VITE_SITE_URL || placeholderSiteUrl),
   locale: import.meta.env.VITE_SITE_LOCALE || templateSiteConfig.seo.locale,
   primaryKeyword:
