@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { routableToolPages, toolPath } from "../src/content/tool-pages";
@@ -11,6 +11,16 @@ const clientDir = join(scriptDir, "..", "dist", "client");
 
 async function readOutput(...parts: string[]) {
   return readFile(join(clientDir, ...parts), "utf8");
+}
+
+async function assertOutputMissing(...parts: string[]) {
+  const path = join(clientDir, ...parts);
+  try {
+    await access(path);
+  } catch {
+    return;
+  }
+  throw new Error(`expected generated output to be absent: ${path}`);
 }
 
 function assertIncludes(content: string, expected: string, label: string) {
@@ -61,11 +71,19 @@ assertIncludes(wordCounterHtml, "word-counter-input", "word counter prerender");
 const notFound = await readOutput("404.html");
 assertIncludes(notFound, "404 - Page not found", "404 HTML");
 assertIncludes(notFound, "noindex, nofollow", "404 HTML");
+await assertOutputMissing("404", "index.html");
 
 const spaFallback = await readOutput("__spa-fallback.html");
 assertIncludes(spaFallback, "noindex, nofollow", "SPA fallback HTML");
 
+const redirects = await readOutput("_redirects");
+assertExcludes(redirects, "/404.html                404", "Cloudflare redirects");
+
+const robots = await readOutput("robots.txt");
+assertIncludes(robots, `Sitemap: ${siteConfig.url}/sitemap.xml`, "robots.txt");
+
 const sitemap = await readOutput("sitemap.xml");
+assertIncludes(sitemap, `<loc>${siteConfig.url}/</loc>`, "sitemap");
 
 for (const page of Object.values(publicSeoPages)) {
   if ("noindex" in page && page.noindex) {
