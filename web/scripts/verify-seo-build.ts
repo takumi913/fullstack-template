@@ -65,6 +65,8 @@ function assertPublicHtmlDoesNotLoadPrivateApp(html: string, label: string) {
 
 function assertStaticHtmlDoesNotHydrate(html: string, label: string) {
   assertExcludes(html, "entry.client-", `${label} client runtime`);
+  assertExcludes(html, 'rel="modulepreload"', `${label} module preload`);
+  assertExcludes(html, 'type="module"', `${label} module script`);
 }
 
 function assertHydratedHtml(html: string, label: string) {
