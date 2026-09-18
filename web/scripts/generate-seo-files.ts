@@ -5,6 +5,7 @@ import { templateSiteConfig } from "../src/config/site-config";
 import { routableLandingPages } from "../src/content/landing-pages";
 import { routableToolPages } from "../src/content/tool-pages";
 import { indexableSeoPages } from "../src/seo/pages";
+import { publicAssetMimeType } from "../src/seo/public-asset";
 import { createLandingSeoPage } from "../src/seo/landing-page";
 import { createToolSeoPage } from "../src/seo/tool-page";
 import { createSitemapXml } from "../src/seo/sitemap";
@@ -39,13 +40,6 @@ function generateDefaultFavicon() {
 `;
 }
 
-function faviconMimeType(path: string) {
-  if (path.endsWith(".svg")) return "image/svg+xml";
-  if (path.endsWith(".png")) return "image/png";
-  if (path.endsWith(".ico")) return "image/x-icon";
-  return "image/*";
-}
-
 const manifest = JSON.stringify(
   {
     name: siteName,
@@ -58,7 +52,7 @@ const manifest = JSON.stringify(
       {
         src: siteFavicon,
         sizes: siteFavicon.endsWith(".svg") ? "any" : "512x512",
-        type: faviconMimeType(siteFavicon),
+        type: publicAssetMimeType(siteFavicon) || "image/*",
       },
     ],
   },
