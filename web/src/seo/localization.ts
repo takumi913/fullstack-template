@@ -34,5 +34,5 @@ export function toOpenGraphLocale(locale: string) {
     // Fall through to a conservative separator normalization.
   }
 
-  return locale.replaceAll("-", "_");
+  return locale.replace(/-/g, "_");
 }
