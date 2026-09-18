@@ -11,6 +11,16 @@ COPY web/package.json web/bun.lock ./
 # 安装前端依赖
 RUN bun install --frozen-lockfile
 
+# SEO 元数据在构建期写入静态 HTML；生产构建应通过 --build-arg 覆盖这些值
+ARG VITE_SITE_URL=https://example.com
+ARG VITE_SITE_NAME="Fullstack Template"
+ARG VITE_SITE_LOCALE=zh-CN
+ARG SEO_STRICT=false
+ENV VITE_SITE_URL=$VITE_SITE_URL \
+    VITE_SITE_NAME=$VITE_SITE_NAME \
+    VITE_SITE_LOCALE=$VITE_SITE_LOCALE \
+    SEO_STRICT=$SEO_STRICT
+
 # 复制前端源码并构建
 COPY web/ ./
 RUN bun run build
