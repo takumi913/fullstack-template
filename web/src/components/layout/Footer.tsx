@@ -6,6 +6,9 @@ export const Footer = () => (
     <div className="shell flex flex-col gap-5 py-7 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
       <span>Fullstack Template</span>
       <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2">
+        <Link className="hover:text-zinc-950" to="/tools">
+          Tools
+        </Link>
         {routableToolPages.map((tool) => (
           <Link className="hover:text-zinc-950" key={tool.slug} to={toolPath(tool.slug)}>
             {tool.name}
