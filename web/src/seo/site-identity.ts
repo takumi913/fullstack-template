@@ -19,19 +19,19 @@ export function assertSeoBuildSiteIdentity(input: SeoSiteIdentityInput, strict: 
 
   if (!name || name === scaffoldSentinels.name) {
     throw new Error(
-      "SEO_STRICT=true requires VITE_SITE_NAME to be explicitly customized from the template default",
+      "SEO_STRICT=true requires the resolved site name to be customized from the original scaffold default",
     );
   }
 
   if (!title || title === scaffoldSentinels.title) {
     throw new Error(
-      "SEO_STRICT=true requires VITE_SITE_TITLE to be explicitly customized from the template default",
+      "SEO_STRICT=true requires the resolved site title to be customized from the original scaffold default",
     );
   }
 
   if (!description || description === scaffoldSentinels.description) {
     throw new Error(
-      "SEO_STRICT=true requires VITE_SITE_DESCRIPTION to be explicitly customized from the template default",
+      "SEO_STRICT=true requires the resolved site description to be customized from the original scaffold default",
     );
   }
 }

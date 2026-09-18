@@ -31,15 +31,15 @@ web/src/config/site-config.ts
 
 本地开发可以使用默认值。
 
-生产构建必须设置：
+如果第 1 步已经把 `site-config.ts` 改成真实品牌，最小生产配置只需要：
 
 ```env
 VITE_SITE_URL=https://your-domain.com
-VITE_SITE_NAME=Your Product
-VITE_SITE_TITLE=Your SEO Title
-VITE_SITE_DESCRIPTION=Your product description
 SEO_STRICT=true
 ```
+
+`VITE_SITE_NAME`、`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION` 等只用于部署时覆盖
+`site-config.ts`，不需要重复维护同一份品牌数据。
 
 strict 模式会阻止：
 
@@ -55,7 +55,8 @@ strict 模式会阻止：
 这样可以避免复制模板后忘记改品牌或清理 demo 就部署。
 
 这些“原始模板值”保存在 `web/src/config/scaffold-sentinels.ts`，用于发布保护，不要修改。
-你的真实品牌仍然只需要改 `site-config.ts`，并在生产构建中提供对应的 `VITE_SITE_*`。
+你的真实品牌只需要改 `site-config.ts`；生产环境只必须提供 canonical 域名
+`VITE_SITE_URL`。需要同一代码多品牌构建时，再使用对应的 `VITE_SITE_*` 覆盖。
 
 ## 3. 添加真实工具
 
@@ -175,9 +176,6 @@ VITE_SITE_IMAGE=/og-image.png
 ```bash
 cd web
 VITE_SITE_URL=https://your-domain.com \
-VITE_SITE_NAME="Your Product" \
-VITE_SITE_TITLE="Your SEO Title" \
-VITE_SITE_DESCRIPTION="Your product description" \
 SEO_STRICT=true \
 bun run build
 ```
@@ -217,7 +215,7 @@ landing-pages.ts
       ↓
 legal-pages.ts
       ↓
-生产 VITE_SITE_*
+生产 VITE_SITE_URL
       ↓
 bun run build
       ↓

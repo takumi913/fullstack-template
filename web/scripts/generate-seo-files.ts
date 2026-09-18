@@ -1,6 +1,7 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveSiteConfig } from "../src/config/resolve-site-config";
 import { templateSiteConfig } from "../src/config/site-config";
 import { landingPages, routableLandingPages } from "../src/content/landing-pages";
 import { routableToolPages, toolPages } from "../src/content/tool-pages";
@@ -16,11 +17,12 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const outputDir = join(scriptDir, "..", "dist", "client");
 const strictSeo = process.env.SEO_STRICT === "true";
 const siteUrl = assertSeoBuildSiteUrl(process.env.VITE_SITE_URL, strictSeo);
+const resolvedSite = resolveSiteConfig(process.env);
 assertSeoBuildSiteIdentity(
   {
-    name: process.env.VITE_SITE_NAME,
-    title: process.env.VITE_SITE_TITLE,
-    description: process.env.VITE_SITE_DESCRIPTION,
+    name: resolvedSite.name,
+    title: resolvedSite.defaultTitle,
+    description: resolvedSite.defaultDescription,
   },
   strictSeo,
 );
@@ -40,14 +42,13 @@ function escapeXml(value: string) {
     .replaceAll("'", "&apos;");
 }
 
-const siteName = process.env.VITE_SITE_NAME || templateSiteConfig.brand.name;
-const siteShortName = process.env.VITE_SITE_SHORT_NAME || templateSiteConfig.brand.shortName;
-const siteTitle = process.env.VITE_SITE_TITLE || templateSiteConfig.seo.defaultTitle;
-const siteDescription =
-  process.env.VITE_SITE_DESCRIPTION || templateSiteConfig.seo.defaultDescription;
-const siteMark = process.env.VITE_SITE_MARK || templateSiteConfig.brand.mark;
-const siteImage = process.env.VITE_SITE_IMAGE || templateSiteConfig.seo.defaultImage;
-const siteFavicon = process.env.VITE_SITE_FAVICON || templateSiteConfig.brand.favicon;
+const siteName = resolvedSite.name;
+const siteShortName = resolvedSite.shortName;
+const siteTitle = resolvedSite.defaultTitle;
+const siteDescription = resolvedSite.defaultDescription;
+const siteMark = resolvedSite.mark;
+const siteImage = resolvedSite.defaultImage;
+const siteFavicon = resolvedSite.favicon;
 
 function generateDefaultFavicon() {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">

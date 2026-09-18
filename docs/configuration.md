@@ -102,19 +102,25 @@ https://example.com?a=1    ❌
 优先修改这个文件以及 `web/src/content/` 下的页面数据；`VITE_SITE_*` 变量用于部署时覆盖
 品牌名、标题、描述、主关键词、favicon、OG 图片等构建期值。
 
-本地开发可以不设置 `SEO_STRICT`。开启 strict 后，除了生产域名外，还必须显式提供
-`VITE_SITE_NAME`、`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION`，且不能继续使用
-仓库内置的原始脚手架身份值。这个比较使用不可编辑的 `scaffold-sentinels.ts`，
-因此你可以正常把 `site-config.ts` 改成自己的品牌，再用相同品牌的 `VITE_SITE_*` 做生产构建。
+本地开发可以不设置 `SEO_STRICT`。生产 strict 模式要求显式提供真实的
+`VITE_SITE_URL`，但品牌、title、description 不需要在环境变量里重复填写：
+构建会先读取可编辑的 `site-config.ts`，再用存在的 `VITE_SITE_*` 做可选覆盖。
+
+strict 最终校验的是“解析后的站点身份”，并与不可编辑的 `scaffold-sentinels.ts`
+中的原始脚手架值比较。因此只要你已经把 `site-config.ts` 改成真实品牌，
+`VITE_SITE_NAME`、`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION` 都可以省略。
 
 strict 模式还会拒绝 `status: "example"` 的 Tool/Landing 页面；母模板自己的 CI 通过
 `SEO_ALLOW_TEMPLATE_EXAMPLES=true` 保留示例覆盖，真实生产站不要开启这个例外。
 
-生产 CI、Docker/BuildKit 或发布流水线建议显式设置：
+最小生产构建只需要：
 
 ```bash
 VITE_SITE_URL=https://your-domain.com SEO_STRICT=true bun run build
 ```
+
+只有同一份代码需要按部署环境覆盖品牌时，才额外传 `VITE_SITE_NAME`、
+`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION` 等变量。
 
 Docker 构建时通过 build args 注入：
 
