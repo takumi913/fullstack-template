@@ -63,7 +63,7 @@ export function createLandingSeoPage(page: LandingPageDefinition): SeoPage {
     locale: page.locale,
     alternates: page.alternates,
     updatedAt: page.updatedAt,
-    noindex: page.noindex || page.status !== "published",
+    noindex: page.noindex || page.templateExample || page.status !== "published",
     relatedPages: page.relatedToolSlugs.map((slug) => toolPath(slug)),
     schema: [webPageSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])],
   };
