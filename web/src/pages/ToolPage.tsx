@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from "react-router";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { LanguageSwitcher } from "@/components/seo/LanguageSwitcher";
 import { RelatedResources } from "@/components/seo/RelatedResources";
 import { RelatedTools } from "@/components/seo/RelatedTools";
 import { getToolPageByPath } from "@/content/tool-pages";
@@ -16,6 +17,7 @@ export default function ToolPage() {
   return (
     <main className="shell border-x px-6 py-10 sm:px-12 sm:py-14">
       <Breadcrumbs tool={tool} />
+      <LanguageSwitcher alternates={tool.alternates} currentPath={pathname} />
 
       <header className="mt-8 max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
