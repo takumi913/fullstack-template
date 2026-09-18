@@ -3,10 +3,23 @@ services:
     build:
       context: .
       args:
+        # canonical 域名本地默认指向当前容器；品牌类变量默认留空，
+        # 让 resolveSiteConfig() 回退到 web/src/config/site-config.ts。
         VITE_SITE_URL: ${VITE_SITE_URL:-http://localhost:1323}
-        VITE_SITE_NAME: ${VITE_SITE_NAME:-Fullstack Template}
-        VITE_SITE_LOCALE: ${VITE_SITE_LOCALE:-zh-CN}
+        VITE_SITE_NAME: ${VITE_SITE_NAME:-}
+        VITE_SITE_SHORT_NAME: ${VITE_SITE_SHORT_NAME:-}
+        VITE_SITE_MARK: ${VITE_SITE_MARK:-}
+        VITE_SITE_FAVICON: ${VITE_SITE_FAVICON:-}
+        VITE_SITE_LOCALE: ${VITE_SITE_LOCALE:-}
+        VITE_SITE_PRIMARY_KEYWORD: ${VITE_SITE_PRIMARY_KEYWORD:-}
+        VITE_SITE_TITLE: ${VITE_SITE_TITLE:-}
+        VITE_SITE_DESCRIPTION: ${VITE_SITE_DESCRIPTION:-}
+        VITE_SITE_IMAGE: ${VITE_SITE_IMAGE:-}
+        VITE_HOME_PRIMARY_TOOL_SLUG: ${VITE_HOME_PRIMARY_TOOL_SLUG:-}
         SEO_STRICT: ${SEO_STRICT:-false}
+        # 下面两个只用于母模板 CI/测试，真实生产保持 false。
+        SEO_ALLOW_TEMPLATE_EXAMPLES: ${SEO_ALLOW_TEMPLATE_EXAMPLES:-false}
+        SEO_ALLOW_SVG_SOCIAL_IMAGE: ${SEO_ALLOW_SVG_SOCIAL_IMAGE:-false}
     ports:
       - "1323:1323"
     environment:
@@ -28,7 +41,7 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    profiles: ["postgres"]
+    profiles: [postgres]
     environment:
       POSTGRES_DB: fullstack_template
       POSTGRES_USER: postgres

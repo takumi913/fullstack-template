@@ -1,7 +1,13 @@
 # 第一阶段：前端构建阶段
-# --platform=$BUILDPLATFORM：前端产物与目标架构无关，多架构构建时
-# 固定在宿主架构上只构建一次，避免在 QEMU 模拟下重复慢速构建
-FROM --platform=$BUILDPLATFORM oven/bun:1.3.14-alpine AS frontend-builder
+# Bun 负责依赖安装与 scripts；React Router/Vite 的 prerender/server build 需要
+# Node 专用的 react-dom/server API。纯 Bun runtime 会按 "bun" condition 解析到
+# server.bun.js（没有 renderToPipeableStream），因此构建镜像必须同时提供 Node。
+FROM --platform=$BUILDPLATFORM oven/bun:1.3.14-alpine AS bun-runtime
+
+FROM --platform=$BUILDPLATFORM node:22.22.0-alpine AS frontend-builder
+
+# 两个基础镜像都是 Alpine/musl，直接复用固定版本 Bun 二进制，避免 curl 安装和版本漂移。
+COPY --from=bun-runtime /usr/local/bin/bun /usr/local/bin/bun
 
 WORKDIR /app
 
