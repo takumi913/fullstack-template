@@ -7,10 +7,12 @@ export interface ToolFaqItem {
 
 export interface ToolPageDefinition {
   slug: string;
+  componentKey: string;
   status: ToolPageStatus;
   name: string;
   category: string;
   primaryKeyword: string;
+  locale?: string;
   title: string;
   description: string;
   h1: string;
@@ -19,6 +21,7 @@ export interface ToolPageDefinition {
   howToSteps: string[];
   faq: ToolFaqItem[];
   relatedSlugs: string[];
+  runtime?: Record<string, string | number | boolean>;
   updatedAt: string;
   noindex?: boolean;
   isFree?: boolean;
@@ -27,7 +30,9 @@ export interface ToolPageDefinition {
 export const toolPages: ToolPageDefinition[] = [
   {
     slug: "json-formatter",
+    componentKey: "json-formatter",
     status: "example",
+    locale: "en",
     name: "JSON Formatter",
     category: "Developer Tool",
     primaryKeyword: "json formatter",
@@ -65,7 +70,9 @@ export const toolPages: ToolPageDefinition[] = [
   },
   {
     slug: "word-counter",
+    componentKey: "word-counter",
     status: "example",
+    locale: "en",
     name: "Word Counter",
     category: "Text Tool",
     primaryKeyword: "word counter",
