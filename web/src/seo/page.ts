@@ -1,4 +1,5 @@
 import type { MetaDescriptor } from "react-router";
+import type { SeoAlternate } from "./localization";
 import { absoluteUrl, siteConfig } from "./site";
 
 export type SeoIntent = "tool" | "informational" | "comparison" | "commercial" | "legal";
@@ -12,6 +13,8 @@ export interface SeoPage {
   description: string;
   h1: string;
   intent: SeoIntent;
+  locale?: string;
+  alternates?: SeoAlternate[];
   image?: string;
   noindex?: boolean;
   updatedAt?: string;
@@ -23,6 +26,7 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
   const canonical = absoluteUrl(page.path);
   const image = absoluteUrl(page.image || siteConfig.defaultImage);
   const robots = page.noindex ? "noindex, nofollow" : "index, follow";
+  const locale = page.locale || siteConfig.locale;
 
   const meta: MetaDescriptor[] = [
     { title: page.title },
@@ -31,6 +35,7 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
     { tagName: "link", rel: "canonical", href: canonical },
     { property: "og:type", content: "website" },
     { property: "og:site_name", content: siteConfig.name },
+    { property: "og:locale", content: locale },
     { property: "og:title", content: page.title },
     { property: "og:description", content: page.description },
     { property: "og:url", content: canonical },
@@ -40,6 +45,15 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
     { name: "twitter:description", content: page.description },
     { name: "twitter:image", content: image },
   ];
+
+  for (const alternate of page.alternates || []) {
+    meta.push({
+      tagName: "link",
+      rel: "alternate",
+      hrefLang: alternate.hreflang,
+      href: absoluteUrl(alternate.path),
+    });
+  }
 
   if (page.schema) {
     meta.push({ "script:ld+json": page.schema });
