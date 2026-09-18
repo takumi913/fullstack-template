@@ -59,3 +59,47 @@ TRUST_PROXY=false
 部署在 Nginx、Traefik、云负载均衡等反向代理后面时**必须**设为 `true`，
 否则所有请求的来源 IP 都是代理地址，会被算作同一个客户端——
 一个人触发限流就会导致所有用户都无法登录。
+
+
+## 前端站点 / SEO 构建
+
+这些变量在**前端构建阶段**读取，不是 Go 服务启动时读取：
+
+```env
+VITE_SITE_URL=https://example.com
+VITE_SITE_NAME=Example
+VITE_SITE_LOCALE=zh-CN
+
+# 生产 CI / Docker 构建建议开启。
+# 开启后，如果 VITE_SITE_URL 缺失或仍是 https://example.com，构建会直接失败。
+SEO_STRICT=true
+```
+
+`VITE_SITE_URL` 必须是纯 origin：
+
+```text
+https://example.com        ✅
+https://example.com/       ✅ 会规范化
+https://example.com/app    ❌
+https://example.com?a=1    ❌
+```
+
+它会作为 canonical、Open Graph URL、JSON-LD、sitemap 和 robots.txt 的域名来源。
+因此生产环境不要依赖默认值 `https://example.com`。
+
+本地开发可以不设置 `SEO_STRICT`；生产 CI、Docker/BuildKit 或发布流水线建议显式设置：
+
+```bash
+VITE_SITE_URL=https://your-domain.com SEO_STRICT=true bun run build
+```
+
+Docker 构建时通过 build args 注入：
+
+```bash
+docker build \
+  --build-arg VITE_SITE_URL=https://your-domain.com \
+  --build-arg VITE_SITE_NAME="Your Product" \
+  --build-arg VITE_SITE_LOCALE=en \
+  --build-arg SEO_STRICT=true \
+  .
+```
