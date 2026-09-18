@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { landingPages, routableLandingPages } from "./landing-pages";
 import { getToolPageBySlug } from "./tool-pages";
 import { createLandingSeoPage } from "../seo/landing-page";
+import { isValidHreflang } from "../seo/localization";
 
 describe("landing page definitions", () => {
   it("uses unique slugs and canonical paths", () => {
@@ -60,6 +61,9 @@ describe("landing page definitions", () => {
 
       const hreflangs = page.alternates.map((alternate) => alternate.hreflang);
       expect(new Set(hreflangs).size, `${page.slug} hreflang uniqueness`).toBe(hreflangs.length);
+      for (const hreflang of hreflangs) {
+        expect(isValidHreflang(hreflang), `${page.slug} invalid hreflang: ${hreflang}`).toBe(true);
+      }
       expect(
         page.alternates.some(
           (alternate) => alternate.hreflang === page.locale && alternate.path === page.path,
