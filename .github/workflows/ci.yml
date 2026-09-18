@@ -103,7 +103,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: web
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Check frontend formatting
         working-directory: web
@@ -112,6 +112,10 @@ jobs:
       - name: Run frontend lint
         working-directory: web
         run: bun run lint
+
+      - name: Run frontend typecheck
+        working-directory: web
+        run: bun run typecheck
 
       - name: Run frontend tests
         working-directory: web
