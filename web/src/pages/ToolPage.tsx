@@ -1,12 +1,12 @@
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { RelatedTools } from "@/components/seo/RelatedTools";
-import { getToolPageBySlug } from "@/content/tool-pages";
+import { getToolPageByPath } from "@/content/tool-pages";
 import { ToolRuntime } from "@/tools/registry";
 
 export default function ToolPage() {
-  const { slug } = useParams();
-  const tool = getToolPageBySlug(slug);
+  const { pathname } = useLocation();
+  const tool = getToolPageByPath(pathname);
 
   if (!tool) {
     return <Navigate replace to="/404" />;
