@@ -222,7 +222,26 @@ VITE_SITE_IMAGE=/og-image.png
 
 ## 9. 最终生产检查
 
-运行：
+如果只想先检查生产配置是否可发布，不必等待完整前端构建：
+
+```bash
+cd web
+VITE_SITE_URL=https://your-domain.com \
+SEO_STRICT=true \
+bun run seo:preflight
+```
+
+preflight 会在构建前检查：
+
+- canonical 域名；
+- 是否仍使用原始母模板品牌/title/description；
+- Tool / Landing 是否还有 template example；
+- 首页核心工具与 standalone tool 是否发生 primary keyword 冲突；
+- OG 图片格式是否适合生产；
+- 自定义 favicon / OG 文件是否真实存在于 `web/public/`；
+- 静态资源路径是否包含 query/hash 或目录穿越。
+
+通过后再运行完整构建：
 
 ```bash
 cd web

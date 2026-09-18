@@ -122,11 +122,24 @@ strict 模式还会拒绝 `status: "example"` 的 Tool/Landing 页面；母模�
 自动生成的 SVG fallback 做测试，因此 CI 会显式设置 `SEO_ALLOW_SVG_SOCIAL_IMAGE=true`。
 真实生产站建议提供 1200×630 的 PNG/JPEG，并保持该例外为 false。
 
+可以先单独执行生产预检：
+
+```bash
+VITE_SITE_URL=https://your-domain.com SEO_STRICT=true bun run seo:preflight
+```
+
+它会在真正打包前验证站点身份、模板示例、首页关键词冲突、社交图规则，以及自定义
+favicon / OG 文件是否存在于 `web/public/`。自定义 public 资源必须使用以 `/` 开头的
+站内路径，不能带 query/hash，也不能使用 `../` 逃出 public 目录。
+
 最小生产构建只需要：
 
 ```bash
 VITE_SITE_URL=https://your-domain.com SEO_STRICT=true bun run build
 ```
+
+`bun run build` 会自动先执行同一个 `seo:preflight`，因此单独运行预检不是强制步骤，
+主要用于部署前快速定位配置错误。
 
 只有同一份代码需要按部署环境覆盖品牌时，才额外传 `VITE_SITE_NAME`、
 `VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION` 等变量。

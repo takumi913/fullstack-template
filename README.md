@@ -103,7 +103,16 @@ make lint            # 前后端代码检查
 make build           # 构建
 ```
 
-前端另有 `bun run format` 格式化（CI 会检查格式）。
+前端另有：
+
+```bash
+cd web
+bun run seo:preflight  # 构建前检查域名、品牌、示例内容、首页关键词和静态资源
+bun run build          # preflight -> SSG build -> SEO 文件生成 -> 产物验证
+bun run format         # 格式化（CI 会检查格式）
+```
+
+生产构建会先执行 `seo:preflight`。配置错误会在真正打包前失败，避免先跑完整 SSG 后才发现问题。
 
 ## 文档
 
