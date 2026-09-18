@@ -1,6 +1,7 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation, useMatches } from "react-router";
 import type { LinksFunction } from "react-router";
 import { templateSiteConfig } from "@/config/site-config";
+import { shouldHydrateDocument } from "@/runtime/client-runtime";
 import { resolveDocumentLocale } from "@/seo/document-locale";
 import { siteConfig } from "@/seo/site";
 import "./style.css";
@@ -12,7 +13,9 @@ export const links: LinksFunction = () => [
 
 export default function Root() {
   const { pathname } = useLocation();
+  const matches = useMatches();
   const locale = resolveDocumentLocale(pathname);
+  const hydrate = shouldHydrateDocument(pathname, matches.length);
 
   return (
     <html lang={locale}>
@@ -25,8 +28,12 @@ export default function Root() {
       </head>
       <body>
         <Outlet />
-        <ScrollRestoration />
-        <Scripts />
+        {hydrate ? (
+          <>
+            <ScrollRestoration />
+            <Scripts />
+          </>
+        ) : null}
       </body>
     </html>
   );
