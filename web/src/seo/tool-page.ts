@@ -17,6 +17,12 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
       {
         "@type": "ListItem",
         position: 2,
+        name: "Tools",
+        item: absoluteUrl("/tools"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
         name: tool.name,
         item: absoluteUrl(path),
       },
