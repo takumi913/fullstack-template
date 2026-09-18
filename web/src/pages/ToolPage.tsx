@@ -38,7 +38,10 @@ export default function ToolPage() {
           <ul className="mt-5 space-y-3 text-sm leading-6 text-zinc-600">
             {tool.features.map((feature) => (
               <li className="flex gap-3" key={feature}>
-                <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-zinc-400" />
+                <span
+                  aria-hidden="true"
+                  className="mt-2 size-1.5 shrink-0 rounded-full bg-zinc-400"
+                />
                 <span>{feature}</span>
               </li>
             ))}
