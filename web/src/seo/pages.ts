@@ -61,6 +61,7 @@ export const publicSeoPages = {
     h1: "隐私政策",
     intent: "legal",
     updatedAt: "2026-09-18",
+    noindex: true,
   },
   terms: {
     path: "/legal/terms",
@@ -70,6 +71,7 @@ export const publicSeoPages = {
     h1: "服务条款",
     intent: "legal",
     updatedAt: "2026-09-18",
+    noindex: true,
   },
 } satisfies Record<string, SeoPage>;
 
