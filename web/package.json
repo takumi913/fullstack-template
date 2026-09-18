@@ -9,7 +9,7 @@
     "build": "react-router build && bun run seo:generate && bun run seo:verify",
     "typecheck": "react-router typegen && tsc -b",
     "seo:generate": "bun scripts/generate-seo-files.ts",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
