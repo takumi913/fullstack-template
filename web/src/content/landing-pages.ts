@@ -86,8 +86,7 @@ export const landingPages: LandingPageDefinition[] = [
     description:
       "A concise JSON syntax guide example connected to the JSON Formatter tool and localized with hreflang.",
     h1: "JSON Syntax Guide",
-    intro:
-      "Learn the core JSON syntax rules before formatting or validating real API payloads.",
+    intro: "Learn the core JSON syntax rules before formatting or validating real API payloads.",
     sections: [
       {
         heading: "Objects use key-value pairs",
@@ -113,11 +112,9 @@ export const landingPages: LandingPageDefinition[] = [
     showInDirectory: false,
     primaryKeyword: "json 構文",
     title: "JSON 構文ガイド | Fullstack Template",
-    description:
-      "JSON Formatter と連携する、日本語版 JSON 構文ガイドのサンプルページです。",
+    description: "JSON Formatter と連携する、日本語版 JSON 構文ガイドのサンプルページです。",
     h1: "JSON 構文ガイド",
-    intro:
-      "実際の API データを整形・検証する前に、JSON の基本的な構文ルールを確認します。",
+    intro: "実際の API データを整形・検証する前に、JSON の基本的な構文ルールを確認します。",
     sections: [
       {
         heading: "オブジェクトはキーと値の組で表現する",
