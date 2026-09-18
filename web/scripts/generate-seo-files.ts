@@ -1,8 +1,10 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { routableLandingPages } from "../src/content/landing-pages";
 import { routableToolPages } from "../src/content/tool-pages";
 import { indexableSeoPages } from "../src/seo/pages";
+import { createLandingSeoPage } from "../src/seo/landing-page";
 import { createToolSeoPage } from "../src/seo/tool-page";
 import { assertSeoBuildSiteUrl } from "../src/seo/site-url";
 
@@ -21,7 +23,10 @@ function escapeXml(value: string) {
 }
 
 const toolSeoPages = routableToolPages.map(createToolSeoPage).filter((page) => !page.noindex);
-const sitemapPages = [...indexableSeoPages, ...toolSeoPages];
+const landingSeoPages = routableLandingPages
+  .map(createLandingSeoPage)
+  .filter((page) => !page.noindex);
+const sitemapPages = [...indexableSeoPages, ...toolSeoPages, ...landingSeoPages];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
