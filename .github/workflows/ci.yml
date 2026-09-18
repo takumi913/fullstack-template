@@ -112,6 +112,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
+      - name: Verify Bun toolchain alignment
+        run: |
+          PACKAGE_BUN="$(bun -e 'console.log(require("./web/package.json").packageManager.split("@")[1])')"
+          grep -Fq "oven/bun:${PACKAGE_BUN}-alpine" Dockerfile
+
       - name: Install frontend dependencies
         working-directory: web
         run: bun install --frozen-lockfile
