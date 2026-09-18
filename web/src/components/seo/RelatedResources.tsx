@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { getLandingPagesForTool } from "@/content/landing-pages";
 import type { ToolPageDefinition } from "@/content/tool-pages";
 

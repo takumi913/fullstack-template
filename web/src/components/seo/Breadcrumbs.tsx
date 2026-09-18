@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import type { ToolPageDefinition } from "@/content/tool-pages";
 
 export function Breadcrumbs({ tool }: { tool: ToolPageDefinition }) {

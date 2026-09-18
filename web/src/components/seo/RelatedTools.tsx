@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { getRelatedToolPages, toolPath, type ToolPageDefinition } from "@/content/tool-pages";
 
 export function RelatedTools({ tool }: { tool: ToolPageDefinition }) {

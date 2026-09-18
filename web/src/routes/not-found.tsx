@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { notFoundPageMeta } from "@/seo/page";
 
 export const meta = () => notFoundPageMeta("404 - Page not found");
