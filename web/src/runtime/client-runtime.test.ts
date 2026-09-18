@@ -25,6 +25,11 @@ describe("client runtime policy", () => {
     }
   });
 
+  it("does not hydrate unrelated paths that merely share a private prefix", () => {
+    expect(shouldHydrateDocument("/dashboard-anything", 3)).toBe(false);
+    expect(shouldHydrateDocument("/settings-public", 3)).toBe(false);
+  });
+
   it("keeps static SEO pages free of hydration", () => {
     for (const path of [
       "/",
