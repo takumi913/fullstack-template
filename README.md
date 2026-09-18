@@ -25,6 +25,21 @@
 - 多语言工具 URL、hreflang 与共享工具实现
 - Use Case / Comparison / Guide 数据驱动 SEO Landing Page
 
+## 从母模板创建新站
+
+复制仓库后，不需要到组件里到处搜索替换品牌。主要修改入口：
+
+```text
+web/src/config/site-config.ts      品牌、首页、导航、Hub 文案
+web/src/content/tool-pages.ts      工具页 SEO / SSG 数据
+web/src/content/landing-pages.ts   Use Case / Comparison / Guide
+web/src/content/legal-pages.ts     隐私政策与服务条款
+```
+
+完整流程见 [新站定制指南](docs/customize-template.md)。
+
+生产构建建议开启 `SEO_STRICT=true`，会阻止占位域名和母模板默认品牌直接上线。
+
 ## 快速开始
 
 ```bash
@@ -91,6 +106,7 @@ make build           # 构建
 
 ## 文档
 
+- [新站定制指南](docs/customize-template.md) — 从母模板创建一个新工具站的最短流程
 - [工具页 SEO / SSG](docs/tool-pages-seo.md) — 新增工具、多语言 URL、关键词配置、预渲染和内链规则
 - [SEO Landing Page](docs/landing-pages-seo.md) — Use Case、Comparison、Guide 与程序化 SEO 页面规则
 - [配置说明](docs/configuration.md) — 全部环境变量
