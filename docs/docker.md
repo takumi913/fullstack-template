@@ -36,7 +36,24 @@ make docker              # 等价于 docker build -t fullstack-template .
 
 ## 部署到生产环境
 
-`docker-compose.yml` 里的配置面向本地开发，直接用于生产至少需要调整三处：
+SEO 的 canonical、Open Graph URL 和 sitemap 域名会在**前端构建阶段**写入静态文件。
+因此仅在容器运行时设置 `VITE_SITE_URL` 无效，生产镜像构建时必须传入真实域名：
+
+```bash
+docker build \
+  --build-arg VITE_SITE_URL=https://tools.example.com \
+  --build-arg VITE_SITE_NAME="Example Tools" \
+  --build-arg VITE_SITE_LOCALE=en \
+  --build-arg SEO_STRICT=true \
+  -t example-tools .
+```
+
+`SEO_STRICT=true` 会拒绝缺失的站点域名和模板默认的 `https://example.com`，
+用于避免生产站带着错误 canonical 上线。
+
+`docker-compose.yml` 的本地默认值为 `http://localhost:1323`；生产环境可以通过同名环境变量覆盖 build args。
+
+`docker-compose.yml` 里的运行时配置面向本地开发，直接用于生产至少需要调整三处：
 
 ```yaml
 environment:
