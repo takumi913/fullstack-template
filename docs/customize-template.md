@@ -80,6 +80,48 @@ docs/tool-pages-seo.md
 
 只做第一步时页面仍会保持 noindex，production strict build 也会拒绝发布。
 
+### 3.1 可选：首页直接承载核心工具
+
+如果这个站只有一个最核心的搜索需求，可以让首页第一屏直接提供工具，而不是先展示营销内容。
+
+在 `site-config.ts`：
+
+```ts
+home: {
+  primaryToolSlug: "image-translator",
+  // ...
+},
+```
+
+设置后：
+
+- 首页 H1 / title / description 仍由站点 SEO 配置控制；
+- 第一屏直接渲染对应 ToolRuntime；
+- features、how-to、FAQ、Related Resources / Tools 自动复用；
+- 首页会为交互工具启用 hydration；
+- 没有配置时首页仍保持纯静态、零 hydration。
+
+如果首页和 `/tools/<slug>` 使用相同 `primaryKeyword`，不要让两个 URL 同时参与排名。
+最简单的做法是在这个工具定义上设置：
+
+```ts
+noindex: true,
+showInDirectory: false,
+```
+
+production strict build 会阻止“首页和独立工具页同时用同一个 primary keyword 且都可索引”的配置。
+
+纯免费工具站如果不需要公开登录/注册入口，还可以设置：
+
+```ts
+navigation: {
+  showAuthLinks: false,
+  // ...
+}
+```
+
+这只隐藏公开 Header 和首页 CTA，不会删除后台认证能力。
+
 ## 4. 添加 SEO 内容页
 
 编辑：

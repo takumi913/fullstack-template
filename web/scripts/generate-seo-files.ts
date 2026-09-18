@@ -31,6 +31,8 @@ assertProductionContentReady({
   allowTemplateExamples: process.env.SEO_ALLOW_TEMPLATE_EXAMPLES === "true",
   tools: toolPages,
   landings: landingPages,
+  homePrimaryToolSlug: templateSiteConfig.home.primaryToolSlug,
+  homePrimaryKeyword: resolvedSite.primaryKeyword,
 });
 
 function escapeXml(value: string) {

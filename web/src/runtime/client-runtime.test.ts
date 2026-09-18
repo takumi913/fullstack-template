@@ -6,6 +6,11 @@ describe("client runtime policy", () => {
     expect(shouldHydrateDocument("/", 1)).toBe(true);
   });
 
+  it("hydrates the homepage only when it embeds an interactive primary tool", () => {
+    expect(shouldHydrateDocument("/", 3, false)).toBe(false);
+    expect(shouldHydrateDocument("/", 3, true)).toBe(true);
+  });
+
   it("hydrates interactive tool routes", () => {
     expect(shouldHydrateDocument("/tools/json-formatter", 3)).toBe(true);
     expect(shouldHydrateDocument("/ja/tools/json-formatter", 3)).toBe(true);

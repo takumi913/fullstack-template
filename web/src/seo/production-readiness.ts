@@ -7,6 +7,8 @@ export interface ProductionReadinessOptions {
   allowTemplateExamples?: boolean;
   tools: readonly ToolPageDefinition[];
   landings: readonly LandingPageDefinition[];
+  homePrimaryToolSlug?: string | null;
+  homePrimaryKeyword?: string;
 }
 
 function toolPath(tool: ToolPageDefinition) {
@@ -22,8 +24,37 @@ export function assertProductionContentReady({
   allowTemplateExamples = false,
   tools,
   landings,
+  homePrimaryToolSlug,
+  homePrimaryKeyword,
 }: ProductionReadinessOptions) {
   if (!strict) return;
+
+  if (homePrimaryToolSlug) {
+    const primaryTool = tools.find((tool) => tool.slug === homePrimaryToolSlug);
+    if (!primaryTool) {
+      throw new Error(
+        `home.primaryToolSlug "${homePrimaryToolSlug}" does not match any tool definition`,
+      );
+    }
+    if (primaryTool.status === "draft") {
+      throw new Error(`home.primaryToolSlug "${homePrimaryToolSlug}" points to a draft tool`);
+    }
+
+    const normalizedHomeKeyword = homePrimaryKeyword?.trim().toLocaleLowerCase();
+    const normalizedToolKeyword = primaryTool.primaryKeyword.trim().toLocaleLowerCase();
+    const standaloneToolIsIndexable =
+      primaryTool.status === "published" && !primaryTool.noindex && !primaryTool.templateExample;
+
+    if (
+      normalizedHomeKeyword &&
+      standaloneToolIsIndexable &&
+      normalizedHomeKeyword === normalizedToolKeyword
+    ) {
+      throw new Error(
+        `Homepage and standalone tool "${homePrimaryToolSlug}" target the same primary keyword. Keep the homepage as the canonical intent by setting the standalone tool noindex, or use a distinct keyword.`,
+      );
+    }
+  }
 
   if (!allowTemplateExamples) {
     const examples = [

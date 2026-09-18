@@ -21,6 +21,7 @@ export const templateSiteConfig = {
     iconForeground: "#ffffff",
   },
   navigation: {
+    showAuthLinks: true as boolean,
     tools: "Tools",
     resources: "Resources",
     dashboard: "Dashboard",
@@ -31,6 +32,7 @@ export const templateSiteConfig = {
     terms: "服务条款",
   },
   home: {
+    primaryToolSlug: null as string | null,
     description:
       "认证、工作区、多租户 RBAC、SQLite/PostgreSQL 与生产部署骨架已经就位，公开页面可静态预渲染，登录后的应用继续保持 SPA。",
     primaryCta: "开始构建",

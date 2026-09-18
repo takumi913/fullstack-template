@@ -111,6 +111,23 @@ runtime: {
 - Related Resources 反向主题内链
 - 首页、Tools Hub 和页脚发现路径
 
+## 首页作为核心工具入口
+
+如果某个工具就是整个站点的核心搜索需求，可以在 `site-config.ts` 设置：
+
+```ts
+home: {
+  primaryToolSlug: "image-translator",
+}
+```
+
+首页会直接复用这个 ToolPageDefinition 的真实工具组件、features、how-to、FAQ 和相关内容。
+默认没有配置时，首页仍是静态模板介绍页，不会加载工具客户端运行时。
+
+为了避免关键词内耗，如果首页的 primary keyword 与这个工具页相同，应把独立工具 URL 设置为
+`noindex: true`（通常也建议 `showInDirectory: false`），让首页承担这个搜索意图。
+production strict build 会校验这一规则。
+
 ## 内链规则
 
 `relatedSlugs` 应只填写真正相关的工具，不要为了增加链接数量互相乱链。

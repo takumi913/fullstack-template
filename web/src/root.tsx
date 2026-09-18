@@ -23,7 +23,11 @@ export default function Root() {
   const { pathname } = useLocation();
   const matches = useMatches();
   const locale = resolveDocumentLocale(pathname);
-  const hydrate = shouldHydrateDocument(pathname, matches.length);
+  const hydrate = shouldHydrateDocument(
+    pathname,
+    matches.length,
+    Boolean(templateSiteConfig.home.primaryToolSlug),
+  );
 
   return (
     <html lang={locale}>

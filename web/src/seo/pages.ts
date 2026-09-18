@@ -1,6 +1,46 @@
 import { templateSiteConfig } from "../config/site-config";
+import { resolveHomepageTool } from "../content/homepage-tool";
 import { absoluteUrl, siteConfig } from "./site";
 import type { SeoPage } from "./page";
+
+const homePrimaryTool = resolveHomepageTool(templateSiteConfig.home.primaryToolSlug);
+
+const homeApplicationSchema = homePrimaryTool
+  ? {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: homePrimaryTool.name,
+      applicationCategory: homePrimaryTool.category,
+      operatingSystem: "Web",
+      isAccessibleForFree: homePrimaryTool.isFree,
+      url: absoluteUrl("/"),
+      description: homePrimaryTool.description,
+    }
+  : {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: siteConfig.name,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Web",
+      url: absoluteUrl("/"),
+      description: siteConfig.defaultDescription,
+    };
+
+const homeFaqSchema =
+  homePrimaryTool && homePrimaryTool.faq.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: homePrimaryTool.faq.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+          },
+        })),
+      }
+    : undefined;
 
 export const publicSeoPages = {
   home: {
@@ -19,15 +59,8 @@ export const publicSeoPages = {
         name: siteConfig.name,
         url: absoluteUrl("/"),
       },
-      {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        name: siteConfig.name,
-        applicationCategory: "DeveloperApplication",
-        operatingSystem: "Web",
-        url: absoluteUrl("/"),
-        description: siteConfig.defaultDescription,
-      },
+      homeApplicationSchema,
+      ...(homeFaqSchema ? [homeFaqSchema] : []),
     ],
   },
   tools: {

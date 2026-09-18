@@ -29,15 +29,19 @@ export function PublicHeader() {
           >
             {templateSiteConfig.navigation.resources}
           </Link>
-          <Link
-            className="rounded-md px-2.5 py-2 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
-            to="/login"
-          >
-            {templateSiteConfig.navigation.login}
-          </Link>
-          <Link className="button-primary min-h-9 px-3" to="/register">
-            {templateSiteConfig.navigation.register}
-          </Link>
+          {templateSiteConfig.navigation.showAuthLinks ? (
+            <>
+              <Link
+                className="rounded-md px-2.5 py-2 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
+                to="/login"
+              >
+                {templateSiteConfig.navigation.login}
+              </Link>
+              <Link className="button-primary min-h-9 px-3" to="/register">
+                {templateSiteConfig.navigation.register}
+              </Link>
+            </>
+          ) : null}
         </nav>
       </div>
     </header>

@@ -22,6 +22,7 @@
 - 权限矩阵与租户隔离的接口级测试，前后端均有测试
 - Public SSG + Private SPA，适合 SEO 工具站
 - Tool Page Schema 自动生成 meta、JSON-LD、sitemap 与相关工具内链
+- 可选“首页即核心工具”模式：默认静态首页，配置后第一屏直接运行主工具
 - 多语言工具 URL、hreflang 与共享工具实现
 - Use Case / Comparison / Guide 数据驱动 SEO Landing Page
 

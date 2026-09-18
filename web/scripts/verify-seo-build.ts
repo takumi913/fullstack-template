@@ -1,6 +1,8 @@
 import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { templateSiteConfig } from "../src/config/site-config";
+import { resolveHomepageTool } from "../src/content/homepage-tool";
 import {
   directoryLandingPages,
   getLandingPagesForTool,
@@ -81,7 +83,16 @@ assertIncludes(home, 'rel="canonical"', "home HTML");
 assertIncludes(home, `href="${siteConfig.url}/"`, "home canonical");
 assertIncludes(home, "application/ld+json", "home HTML");
 assertPublicHtmlDoesNotLoadPrivateApp(home, "home HTML");
-assertStaticHtmlDoesNotHydrate(home, "home HTML");
+const homePrimaryTool = resolveHomepageTool(templateSiteConfig.home.primaryToolSlug);
+if (homePrimaryTool) {
+  assertHydratedHtml(home, "home primary tool HTML");
+  assertIncludes(home, homePrimaryTool.name, "home primary tool name");
+  if (homePrimaryTool.features[0]) {
+    assertIncludes(home, homePrimaryTool.features[0], "home primary tool feature");
+  }
+} else {
+  assertStaticHtmlDoesNotHydrate(home, "home HTML");
+}
 
 const toolsHub = await readOutput("tools", "index.html");
 assertIncludes(toolsHub, publicSeoPages.tools.title, "tools hub HTML");

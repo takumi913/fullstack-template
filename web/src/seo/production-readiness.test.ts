@@ -97,6 +97,58 @@ describe("production SEO readiness", () => {
     ).toThrow(/scaffold brand/);
   });
 
+  it("rejects an unknown configured homepage tool", () => {
+    expect(() =>
+      assertProductionContentReady({
+        strict: true,
+        allowTemplateExamples: true,
+        tools: [{ ...baseTool, status: "published" }],
+        landings: [],
+        homePrimaryToolSlug: "missing-tool",
+        homePrimaryKeyword: "example tool",
+      }),
+    ).toThrow(/does not match/);
+  });
+
+  it("rejects a draft configured homepage tool", () => {
+    expect(() =>
+      assertProductionContentReady({
+        strict: true,
+        allowTemplateExamples: true,
+        tools: [{ ...baseTool, status: "draft" }],
+        landings: [],
+        homePrimaryToolSlug: "example-tool",
+        homePrimaryKeyword: "example tool",
+      }),
+    ).toThrow(/draft tool/);
+  });
+
+  it("rejects homepage keyword cannibalization from an indexable standalone tool page", () => {
+    expect(() =>
+      assertProductionContentReady({
+        strict: true,
+        allowTemplateExamples: true,
+        tools: [{ ...baseTool, status: "published" }],
+        landings: [],
+        homePrimaryToolSlug: "example-tool",
+        homePrimaryKeyword: "example tool",
+      }),
+    ).toThrow(/same primary keyword/);
+  });
+
+  it("allows the homepage to own the keyword when the standalone tool page is noindex", () => {
+    expect(() =>
+      assertProductionContentReady({
+        strict: true,
+        allowTemplateExamples: true,
+        tools: [{ ...baseTool, status: "published", noindex: true }],
+        landings: [],
+        homePrimaryToolSlug: "example-tool",
+        homePrimaryKeyword: "example tool",
+      }),
+    ).not.toThrow();
+  });
+
   it("accepts clean published content", () => {
     expect(() =>
       assertProductionContentReady({

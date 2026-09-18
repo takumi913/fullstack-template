@@ -7,11 +7,16 @@ function isToolRuntimePath(pathname: string) {
   return /^\/[A-Za-z0-9-]+\/tools\/[^/]+$/.test(pathname);
 }
 
-export function shouldHydrateDocument(pathname: string, matchCount: number) {
+export function shouldHydrateDocument(
+  pathname: string,
+  matchCount: number,
+  homeHasInteractiveTool = false,
+) {
   // React Router's SPA fallback renders only the root route at build time.
   // It must always keep the client runtime so non-prerendered auth/app URLs can hydrate.
   if (matchCount <= 1) return true;
 
+  if (pathname === "/" && homeHasInteractiveTool) return true;
   if (authPaths.has(pathname)) return true;
   if (privateAppExactPaths.has(pathname)) return true;
   if (privateAppPrefixes.some((prefix) => pathname.startsWith(prefix))) return true;
