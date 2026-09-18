@@ -1,14 +1,16 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { getRelatedToolPages, toolPath, type ToolPageDefinition } from "@/content/tool-pages";
+import { publicPageCopy } from "@/seo/ui-copy";
 
 export function RelatedTools({ tool }: { tool: ToolPageDefinition }) {
+  const copy = publicPageCopy(tool.locale);
   const relatedTools = getRelatedToolPages(tool);
   if (relatedTools.length === 0) return null;
 
   return (
     <section className="border-t pt-12">
-      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">Related tools</h2>
+      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">{copy.relatedTools}</h2>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {relatedTools.map((related) => (
           <Link
