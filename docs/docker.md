@@ -68,6 +68,22 @@ environment:
 
 完整配置项见 [`configuration.md`](configuration.md)。
 
+## CI 生产镜像烟雾测试
+
+仓库 CI 不只分别编译前端和 Go，还会在两者通过后执行完整 Docker smoke：
+
+1. 使用 strict SEO build args 构建三阶段生产镜像；
+2. 以非 root 用户启动最终 Alpine 容器；
+3. 等待 `/api/v1/health`；
+4. 验证首页和预渲染工具页返回 200；
+5. 验证随机公开 URL 返回真实 404；
+6. 验证 `/dashboard` 带 `X-Robots-Tag: noindex, nofollow`；
+7. 验证最终 `robots.txt` / `sitemap.xml` 使用镜像构建时的 canonical 域名。
+
+模板 CI 会显式传 `SEO_ALLOW_TEMPLATE_EXAMPLES=true` 和
+`SEO_ALLOW_SVG_SOCIAL_IMAGE=true`，只为了保留 demo/自动 SVG fallback 的覆盖。
+真实生产镜像不要开启这两个例外。
+
 ## 已知限制
 
 以下几点在模板中尚未处理，正式部署前建议自行加固：
