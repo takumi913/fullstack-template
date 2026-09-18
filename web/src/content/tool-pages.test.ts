@@ -101,8 +101,19 @@ describe("tool page definitions", () => {
     }
   });
 
-  it("requires published tools to be indexable unless explicitly disabled", () => {
-    for (const tool of routableToolPages.filter((item) => item.status === "published")) {
+  it("keeps scaffold examples noindex even if their status is changed to published", () => {
+    const example = routableToolPages.find((item) => item.templateExample);
+    expect(example).toBeDefined();
+
+    if (example) {
+      expect(createToolSeoPage({ ...example, status: "published" }).noindex).toBe(true);
+    }
+  });
+
+  it("requires published non-template tools to be indexable unless explicitly disabled", () => {
+    for (const tool of routableToolPages.filter(
+      (item) => item.status === "published" && !item.templateExample,
+    )) {
       expect(createToolSeoPage(tool).noindex).toBe(Boolean(tool.noindex));
     }
   });
