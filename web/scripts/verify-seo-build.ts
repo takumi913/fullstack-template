@@ -1,7 +1,9 @@
 import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { routableLandingPages } from "../src/content/landing-pages";
 import { routableToolPages, toolPath } from "../src/content/tool-pages";
+import { createLandingSeoPage } from "../src/seo/landing-page";
 import { publicSeoPages } from "../src/seo/pages";
 import { createToolSeoPage } from "../src/seo/tool-page";
 import { siteConfig } from "../src/seo/site";
@@ -104,6 +106,21 @@ assertExcludes(redirects, "/404.html                404", "Cloudflare redirects"
 const robots = await readOutput("robots.txt");
 assertIncludes(robots, `Sitemap: ${siteConfig.url}/sitemap.xml`, "robots.txt");
 
+for (const page of routableLandingPages) {
+  const html = await readOutput(...htmlOutputParts(page.path));
+  const seo = createLandingSeoPage(page);
+
+  assertIncludes(html, page.title, `${page.slug} landing HTML`);
+  assertIncludes(html, page.h1, `${page.slug} landing HTML`);
+  assertIncludes(html, 'rel="canonical"', `${page.slug} landing HTML`);
+  assertIncludes(html, "BreadcrumbList", `${page.slug} landing HTML`);
+  assertIncludes(html, "WebPage", `${page.slug} landing HTML`);
+
+  if (seo.noindex) {
+    assertIncludes(html, "noindex, nofollow", `${page.slug} landing HTML`);
+  }
+}
+
 const sitemap = await readOutput("sitemap.xml");
 assertIncludes(sitemap, `<loc>${siteConfig.url}/</loc>`, "sitemap");
 
@@ -115,12 +132,22 @@ for (const page of Object.values(publicSeoPages)) {
 
 for (const tool of routableToolPages) {
   const seo = createToolSeoPage(tool);
-  const path = toolPath(tool.slug);
+  const path = toolPath(tool);
 
   if (seo.noindex) {
     assertExcludes(sitemap, path, "sitemap");
   } else {
     assertIncludes(sitemap, path, "sitemap");
+  }
+}
+
+for (const page of routableLandingPages) {
+  const seo = createLandingSeoPage(page);
+
+  if (seo.noindex) {
+    assertExcludes(sitemap, page.path, "sitemap");
+  } else {
+    assertIncludes(sitemap, page.path, "sitemap");
   }
 }
 
