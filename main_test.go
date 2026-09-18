@@ -61,6 +61,9 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	})
 	writeStaticTestFile(t, staticDir, "index.html", "<h1>home</h1>")
 	writeStaticTestFile(t, staticDir, "tools/example/index.html", "<h1>tool</h1>")
+	writeStaticTestFile(t, staticDir, "resources/index.html", "<h1>resources</h1>")
+	writeStaticTestFile(t, staticDir, "ja/tools/example/index.html", "<h1>localized tool</h1>")
+	writeStaticTestFile(t, staticDir, "use-cases/example/index.html", "<h1>use case</h1>")
 	writeStaticTestFile(
 		t,
 		staticDir,
@@ -72,25 +75,47 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	e := echo.New()
 	setupStaticFilesFromDir(e, staticDir)
 
-	t.Run("serves prerendered page", func(t *testing.T) {
-		rec := performStaticRequest(e, "/tools/example")
-		if rec.Code != http.StatusOK {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
-		}
-		if !strings.Contains(rec.Body.String(), "tool") {
-			t.Fatalf("body = %q, want prerendered tool page", rec.Body.String())
-		}
-	})
+	for _, tt := range []struct {
+		name string
+		path string
+		want string
+	}{
+		{name: "tool", path: "/tools/example", want: "tool"},
+		{name: "resources hub", path: "/resources", want: "resources"},
+		{name: "localized tool", path: "/ja/tools/example", want: "localized tool"},
+		{name: "use case", path: "/use-cases/example", want: "use case"},
+	} {
+		t.Run("serves prerendered "+tt.name, func(t *testing.T) {
+			rec := performStaticRequest(e, tt.path)
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+			}
+			if !strings.Contains(rec.Body.String(), tt.want) {
+				t.Fatalf("body = %q, want %q", rec.Body.String(), tt.want)
+			}
+		})
+	}
 
-	t.Run("redirects trailing slash to canonical URL", func(t *testing.T) {
-		rec := performStaticRequest(e, "/tools/example/?ref=docs")
-		if rec.Code != http.StatusPermanentRedirect {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusPermanentRedirect)
-		}
-		if got := rec.Header().Get("Location"); got != "/tools/example?ref=docs" {
-			t.Fatalf("Location = %q, want %q", got, "/tools/example?ref=docs")
-		}
-	})
+	for _, tt := range []struct {
+		name string
+		from string
+		to   string
+	}{
+		{name: "tool", from: "/tools/example/?ref=docs", to: "/tools/example?ref=docs"},
+		{name: "resources", from: "/resources/", to: "/resources"},
+		{name: "localized tool", from: "/ja/tools/example/", to: "/ja/tools/example"},
+		{name: "use case", from: "/use-cases/example/", to: "/use-cases/example"},
+	} {
+		t.Run("redirects "+tt.name+" trailing slash", func(t *testing.T) {
+			rec := performStaticRequest(e, tt.from)
+			if rec.Code != http.StatusPermanentRedirect {
+				t.Fatalf("status = %d, want %d", rec.Code, http.StatusPermanentRedirect)
+			}
+			if got := rec.Header().Get("Location"); got != tt.to {
+				t.Fatalf("Location = %q, want %q", got, tt.to)
+			}
+		})
+	}
 
 	t.Run("private SPA fallback is noindex", func(t *testing.T) {
 		rec := performStaticRequest(e, "/dashboard")
