@@ -1,5 +1,24 @@
 export const placeholderSiteUrl = "https://example.com";
 
+const reservedSuffixes = [".localhost", ".test", ".example", ".invalid"];
+const reservedExampleDomains = ["example.com", "example.net", "example.org"];
+
+function isReservedSeoHostname(hostname: string) {
+  const normalized = hostname.toLowerCase();
+
+  if (normalized === "localhost" || normalized === "127.0.0.1" || normalized === "::1") {
+    return true;
+  }
+
+  if (reservedSuffixes.some((suffix) => normalized.endsWith(suffix))) {
+    return true;
+  }
+
+  return reservedExampleDomains.some(
+    (domain) => normalized === domain || normalized.endsWith(`.${domain}`),
+  );
+}
+
 export function normalizeSiteUrl(value: string) {
   const normalized = value.trim().replace(/\/$/, "");
   const url = new URL(normalized);
@@ -22,10 +41,14 @@ export function normalizeSiteUrl(value: string) {
 export function assertSeoBuildSiteUrl(rawValue: string | undefined, strict: boolean) {
   const normalized = normalizeSiteUrl(rawValue || placeholderSiteUrl);
 
-  if (strict && (!rawValue || normalized === placeholderSiteUrl)) {
-    throw new Error(
-      "SEO_STRICT=true requires VITE_SITE_URL to be set to the production site origin",
-    );
+  if (strict) {
+    const hostname = new URL(normalized).hostname;
+
+    if (!rawValue || isReservedSeoHostname(hostname)) {
+      throw new Error(
+        "SEO_STRICT=true requires VITE_SITE_URL to use a non-placeholder production hostname",
+      );
+    }
   }
 
   return normalized;
