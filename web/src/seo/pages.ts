@@ -32,6 +32,7 @@ export const publicSeoPages = {
   tools: {
     path: "/tools",
     primaryKeyword: "online tools",
+    locale: "en",
     title: "Online Tools | Fullstack Template",
     description:
       "Browse the reusable example tools included with the SEO-ready fullstack template.",
