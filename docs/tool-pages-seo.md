@@ -16,7 +16,9 @@ React Router 使用同一个 `/tools/:slug` Route Module。构建时读取工具
 ```ts
 {
   slug: "image-translator",
+  componentKey: "image-translator",
   status: "published",
+  locale: "en",
   name: "Image Translator",
   category: "AI Tool",
   primaryKeyword: "image translator",
@@ -69,13 +71,26 @@ web/src/tools/ImageTranslatorTool.tsx
 
 ## 3. 注册工具组件
 
-在 `src/tools/registry.tsx` 将 slug 与组件对应：
+在 `src/tools/registry.tsx` 将 `componentKey` 与组件对应。工具组件使用动态 import，
+因此不会把所有工具代码一次性下载：
 
 ```ts
-"image-translator": ImageTranslatorTool,
+"image-translator": lazy(async () => {
+  const module = await import("./ImageTranslatorTool");
+  return { default: module.ImageTranslatorTool };
+}),
 ```
 
-slug 必须与 `tool-pages.ts` 一致。
+一个工具实现可以服务多个 SEO 页面。比如日语、韩语图片翻译页面可以使用不同 slug，
+但共享 `componentKey: "image-translator"`。需要让交互功能读取页面差异时，将参数放在：
+
+```ts
+runtime: {
+  targetLanguage: "ja",
+}
+```
+
+工具组件可以通过 `useToolPageDefinition()` 读取当前页面定义和 runtime 参数。
 
 ## 自动获得的 SEO 能力
 
@@ -116,13 +131,33 @@ CI 会检查：
 3. 首屏是否直接提供工具，而不是先堆大段营销文案。
 4. 页面是否有真实功能和独立价值，而不是只更换关键词生成近似页面。
 5. `relatedSlugs` 是否语义相关。
-6. 设置正确的 `VITE_SITE_URL`。
+6. 在**构建阶段**设置正确的 `VITE_SITE_URL`；生产构建建议同时设置 `SEO_STRICT=true`。
 7. 将状态从 `example` / `draft` 改为 `published`。
 8. 运行 `bun run build` 并检查生成的 sitemap。
 
+## 多语言 SEO
+
+模板支持在 `SeoPage.alternates` 中声明真实存在的语言版本，并自动输出
+`<link rel="alternate" hreflang="...">`。只有当主要内容真正完成本地化后才应该声明 alternate。
+
+可以用 `createHreflangAlternates()` 生成配置：
+
+```ts
+alternates: createHreflangAlternates(
+  [
+    { locale: "en", path: "/en/tools/image-translator" },
+    { locale: "ja", path: "/ja/tools/image-translator" },
+  ],
+  "/tools/image-translator",
+)
+```
+
+每个语言版本都应该包含自己和其它版本，并保持双向对应；`x-default` 用于没有匹配语言时的兜底页面。
+模板只采用 HTML hreflang，不在 sitemap 再复制一套相同声明，减少两套配置漂移。
+
 ## 批量 / 程序化 SEO
 
-不要直接用 AI 批量生成数千个近似页面。
+`componentKey` 允许多个关键词页面复用同一个真实工具实现，但不要直接用 AI 批量生成数千个近似页面。
 
 优先把页面看成结构化数据：
 
