@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { templateSiteConfig } from "@/config/site-config";
 import { directoryLandingPages } from "@/content/landing-pages";
 import { publicSeoPages } from "@/seo/pages";
 
@@ -13,13 +14,14 @@ export default function ResourcesPage() {
   return (
     <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
       <header className="max-w-3xl">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">Resources</p>
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
+          {templateSiteConfig.hubs.resources.eyebrow}
+        </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
           {publicSeoPages.resources.h1}
         </h1>
         <p className="mt-4 text-base leading-7 text-zinc-600">
-          Use cases, comparisons, and guides live here so informational pages remain connected to
-          the tools they support.
+          {templateSiteConfig.hubs.resources.description}
         </p>
       </header>
 
