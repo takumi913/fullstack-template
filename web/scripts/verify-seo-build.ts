@@ -13,6 +13,11 @@ async function readOutput(...parts: string[]) {
   return readFile(join(clientDir, ...parts), "utf8");
 }
 
+function htmlOutputParts(pathname: string) {
+  const segments = pathname.split("/").filter(Boolean);
+  return [...segments, "index.html"];
+}
+
 async function assertOutputMissing(...parts: string[]) {
   const path = join(clientDir, ...parts);
   try {
@@ -47,7 +52,7 @@ assertIncludes(toolsHub, "noindex, nofollow", "tools hub HTML");
 assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
 
 for (const tool of routableToolPages) {
-  const html = await readOutput("tools", tool.slug, "index.html");
+  const html = await readOutput(...htmlOutputParts(toolPath(tool)));
   const seo = createToolSeoPage(tool);
 
   assertIncludes(html, tool.title, `${tool.slug} HTML`);
@@ -64,6 +69,15 @@ for (const tool of routableToolPages) {
   if (seo.noindex) {
     assertIncludes(html, "noindex, nofollow", `${tool.slug} HTML`);
   }
+
+  for (const alternate of tool.alternates || []) {
+    assertIncludes(html, `hreflang="${alternate.hreflang}"`, `${tool.slug} hreflang`);
+    assertIncludes(
+      html,
+      `href="${siteConfig.url}${alternate.path}"`,
+      `${tool.slug} alternate URL`,
+    );
+  }
 }
 
 const jsonFormatterHtml = await readOutput("tools", "json-formatter", "index.html");
@@ -71,6 +85,10 @@ assertIncludes(jsonFormatterHtml, "JSON input", "json formatter prerender");
 
 const wordCounterHtml = await readOutput("tools", "word-counter", "index.html");
 assertIncludes(wordCounterHtml, "word-counter-input", "word counter prerender");
+
+const japaneseJsonFormatterHtml = await readOutput("ja", "tools", "json-formatter", "index.html");
+assertIncludes(japaneseJsonFormatterHtml, 'lang="ja"', "Japanese JSON formatter language");
+assertIncludes(japaneseJsonFormatterHtml, "JSON 整形ツール", "Japanese JSON formatter content");
 
 const notFound = await readOutput("404.html");
 assertIncludes(notFound, "404 - Page not found", "404 HTML");
