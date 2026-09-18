@@ -1,13 +1,6 @@
 import TenantMembersPage from "@/pages/TenantMembersPage";
-import { ProtectedRoute } from "@/router/RouteGuards";
-import { privatePageMeta } from "@/seo/page";
+import { privatePageTitleMeta } from "@/seo/page";
 
-export const meta = () => privatePageMeta;
+export const meta = () => privatePageTitleMeta("Workspace members");
 
-export default function TenantMembersRoute() {
-  return (
-    <ProtectedRoute>
-      <TenantMembersPage />
-    </ProtectedRoute>
-  );
-}
+export default TenantMembersPage;
