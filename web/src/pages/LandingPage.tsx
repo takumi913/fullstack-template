@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Link, Navigate, useLocation } from "react-router";
+import { LanguageSwitcher } from "@/components/seo/LanguageSwitcher";
 import { getLandingPageByPath } from "@/content/landing-pages";
 import { getToolPageBySlug, toolPath } from "@/content/tool-pages";
 
@@ -36,6 +37,7 @@ export default function LandingPage() {
           </li>
         </ol>
       </nav>
+      <LanguageSwitcher alternates={page.alternates} currentPath={pathname} />
 
       <header className="mt-8 max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
