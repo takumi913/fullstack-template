@@ -17,6 +17,12 @@ export function createLandingSeoPage(page: LandingPageDefinition): SeoPage {
       {
         "@type": "ListItem",
         position: 2,
+        name: "Resources",
+        item: absoluteUrl("/resources"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
         name: page.h1,
         item: absoluteUrl(page.path),
       },
