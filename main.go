@@ -169,10 +169,13 @@ func staticPagePath(staticDir, urlPath string) (string, bool) {
 	return "", false
 }
 
-// setupStaticFiles 设置静态文件服务.
+// setupStaticFiles 设置生产静态文件服务.
 func setupStaticFiles(e *echo.Echo) {
-	staticDir := "static"
+	setupStaticFilesFromDir(e, "static")
+}
 
+// setupStaticFilesFromDir 将静态目录参数化，便于对 SSG、SPA fallback 与 404 行为做 HTTP 测试。
+func setupStaticFilesFromDir(e *echo.Echo, staticDir string) {
 	if _, err := os.Stat(staticDir); os.IsNotExist(err) {
 		slog.Warn("静态文件目录不存在，跳过静态文件服务", "dir", staticDir)
 		return
