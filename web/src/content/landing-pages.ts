@@ -129,7 +129,7 @@ export const landingPages: LandingPageDefinition[] = [
       },
     ],
     faq: [],
-    relatedToolSlugs: ["json-formatter"],
+    relatedToolSlugs: ["json-formatter-ja"],
     updatedAt: "2026-09-18",
     noindex: true,
   },
