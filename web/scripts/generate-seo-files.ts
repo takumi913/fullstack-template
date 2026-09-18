@@ -10,6 +10,7 @@ import { createToolSeoPage } from "../src/seo/tool-page";
 import { assertProductionContentReady } from "../src/seo/production-readiness";
 import { assertSeoBuildSiteIdentity } from "../src/seo/site-identity";
 import { assertSeoBuildSiteUrl } from "../src/seo/site-url";
+import { createSitemapXml } from "../src/seo/sitemap";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const outputDir = join(scriptDir, "..", "dist", "client");
