@@ -10,6 +10,9 @@ export default [
     route("use-cases/:slug", "./routes/use-case.tsx"),
     route("compare/:slug", "./routes/comparison.tsx"),
     route("guides/:slug", "./routes/guide.tsx"),
+    route(":locale/use-cases/:slug", "./routes/localized-use-case.tsx"),
+    route(":locale/compare/:slug", "./routes/localized-comparison.tsx"),
+    route(":locale/guides/:slug", "./routes/localized-guide.tsx"),
     route("404", "./routes/not-found.tsx"),
 
     route("legal/privacy-policy", "./routes/privacy.tsx"),
