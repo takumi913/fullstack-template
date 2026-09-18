@@ -114,10 +114,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      - name: Verify Bun toolchain alignment
+      - name: Verify build toolchain alignment
         run: |
           PACKAGE_BUN="$(bun -e 'console.log(require("./web/package.json").packageManager.split("@")[1])')"
+          GO_VERSION="$(awk '/^go / { print $2; exit }' go.mod)"
           grep -Fq "oven/bun:${PACKAGE_BUN}-alpine" Dockerfile
+          grep -Fq "golang:${GO_VERSION}-alpine" Dockerfile
 
       - name: Install frontend dependencies
         working-directory: web
