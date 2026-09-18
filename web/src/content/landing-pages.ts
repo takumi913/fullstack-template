@@ -21,6 +21,7 @@ export interface LandingPageDefinition {
   primaryKeyword: string;
   locale?: string;
   alternates?: SeoAlternate[];
+  showInDirectory?: boolean;
   title: string;
   description: string;
   h1: string;
@@ -99,10 +100,18 @@ export const landingPages: LandingPageDefinition[] = [
 
 export const routableLandingPages = landingPages.filter((page) => page.status !== "draft");
 
+export const directoryLandingPages = routableLandingPages.filter(
+  (page) => page.showInDirectory !== false,
+);
+
 export const landingPrerenderPaths = routableLandingPages.map((page) => page.path);
 
 export function getLandingPageByPath(pathname: string | undefined) {
   if (!pathname) return undefined;
   const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
   return routableLandingPages.find((page) => page.path === normalized);
+}
+
+export function getLandingPagesForTool(toolSlug: string) {
+  return routableLandingPages.filter((page) => page.relatedToolSlugs.includes(toolSlug));
 }
