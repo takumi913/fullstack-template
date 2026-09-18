@@ -1,5 +1,5 @@
 import type { MetaDescriptor } from "react-router";
-import type { SeoAlternate } from "./localization";
+import { toOpenGraphLocale, type SeoAlternate } from "./localization";
 import { absoluteUrl, siteConfig } from "./site";
 
 export type SeoIntent = "tool" | "informational" | "comparison" | "commercial" | "legal";
@@ -39,7 +39,7 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
     { tagName: "link", rel: "canonical", href: canonical },
     { property: "og:type", content: "website" },
     { property: "og:site_name", content: siteConfig.name },
-    { property: "og:locale", content: locale },
+    { property: "og:locale", content: toOpenGraphLocale(locale) },
     { property: "og:title", content: page.title },
     { property: "og:description", content: page.description },
     { property: "og:url", content: canonical },
@@ -61,7 +61,7 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
     if (alternate.hreflang !== "x-default" && alternate.hreflang !== locale) {
       meta.push({
         property: "og:locale:alternate",
-        content: alternate.hreflang,
+        content: toOpenGraphLocale(alternate.hreflang),
       });
     }
   }
