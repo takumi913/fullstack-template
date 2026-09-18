@@ -43,10 +43,12 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
     { property: "og:description", content: page.description },
     { property: "og:url", content: canonical },
     { property: "og:image", content: image },
+    { property: "og:image:alt", content: page.title },
     { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: page.title },
     { name: "twitter:description", content: page.description },
     { name: "twitter:image", content: image },
+    { name: "twitter:image:alt", content: page.title },
   ];
 
   for (const alternate of page.alternates || []) {
