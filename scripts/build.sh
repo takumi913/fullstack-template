@@ -33,7 +33,7 @@ echo "✅ 前端构建完成"
 echo "📦 复制前端静态文件到后端..."
 cd "$PROJECT_ROOT"
 mkdir -p static
-cp -r web/dist/* static/
+cp -r web/dist/client/* static/
 
 echo "✅ 静态文件复制完成"
 

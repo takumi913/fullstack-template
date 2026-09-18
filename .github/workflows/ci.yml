@@ -12,7 +12,7 @@ permissions:
 # 同一分支的新提交自动取消进行中的旧运行：
 # PR 上连续 push 时不必等旧的跑完，省 runner 时间也更快拿到反馈
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -77,6 +77,21 @@ jobs:
     name: Frontend Lint and Test
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      VITE_SITE_URL: https://template-ci.fullstack.dev
+      VITE_SITE_NAME: Template CI
+      VITE_SITE_SHORT_NAME: Template CI
+      VITE_SITE_MARK: T
+      VITE_SITE_LOCALE: en
+      VITE_SITE_PRIMARY_KEYWORD: template ci tools
+      VITE_SITE_TITLE: Template CI SEO Verification
+      VITE_SITE_DESCRIPTION: CI build used to verify production SEO output and template safeguards.
+      VITE_SITE_IMAGE: /og-image.svg
+      SEO_STRICT: "true"
+      # CI intentionally keeps the template demo pages so their SSG/SEO behavior remains covered.
+      SEO_ALLOW_TEMPLATE_EXAMPLES: "true"
+      # Template CI also exercises the generated SVG fallback; real production should use PNG/JPEG.
+      SEO_ALLOW_SVG_SOCIAL_IMAGE: "true"
 
     steps:
       - name: Checkout code
@@ -101,17 +116,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
+      - name: Verify build toolchain alignment
+        run: |
+          PACKAGE_BUN="$(bun -e 'console.log(require("./web/package.json").packageManager.split("@")[1])')"
+          GO_VERSION="$(awk '/^go / { print $2; exit }' go.mod)"
+          grep -Fq "oven/bun:${PACKAGE_BUN}-alpine" Dockerfile
+          grep -Fq "golang:${GO_VERSION}-alpine" Dockerfile
+
       - name: Install frontend dependencies
         working-directory: web
         run: bun install --frozen-lockfile
 
       - name: Check frontend formatting
         working-directory: web
-        run: bun run format:check
+        run: |
+          if ! bun run format:check; then
+            bun run format
+            git diff -- .
+            exit 1
+          fi
 
       - name: Run frontend lint
         working-directory: web
         run: bun run lint
+
+      - name: Run frontend typecheck
+        working-directory: web
+        run: bun run typecheck
 
       - name: Run frontend tests
         working-directory: web
@@ -120,3 +151,89 @@ jobs:
       - name: Build frontend
         working-directory: web
         run: bun run build
+
+      # 第二种母模板首页形态：第一屏直接运行核心工具。
+      # 这一步会再次执行 seo:verify，确保首页 hydration、工具首屏和 bundle 隔离都成立。
+      - name: Build interactive homepage variant
+        working-directory: web
+        env:
+          VITE_HOME_PRIMARY_TOOL_SLUG: json-formatter
+        run: bun run build
+
+
+  # 真正构建并启动最终生产镜像，防止 Dockerfile、前端 SSG 与 Go 静态服务各自通过，
+  # 但组合到镜像后出现 build-arg、复制路径或 HTTP 行为漂移。
+  docker-smoke:
+    name: Production Docker Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - go-lint-and-test
+      - frontend-lint-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Build production image
+        run: |
+          docker build \
+            --build-arg VITE_SITE_URL=https://docker-ci.fullstack.dev \
+            --build-arg VITE_SITE_NAME="Docker CI" \
+            --build-arg VITE_SITE_SHORT_NAME="Docker CI" \
+            --build-arg VITE_SITE_MARK=D \
+            --build-arg VITE_SITE_LOCALE=en \
+            --build-arg VITE_SITE_PRIMARY_KEYWORD="docker ci tools" \
+            --build-arg VITE_SITE_TITLE="Docker CI SEO Verification" \
+            --build-arg VITE_SITE_DESCRIPTION="Production container smoke test for the fullstack tool-site template." \
+            --build-arg VITE_SITE_IMAGE=/og-image.svg \
+            --build-arg SEO_STRICT=true \
+            --build-arg SEO_ALLOW_TEMPLATE_EXAMPLES=true \
+            --build-arg SEO_ALLOW_SVG_SOCIAL_IMAGE=true \
+            -t fullstack-template:ci .
+
+      - name: Start production container
+        run: |
+          docker run -d --rm \
+            --name fullstack-template-ci \
+            -p 1323:1323 \
+            fullstack-template:ci
+
+      - name: Wait for application
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:1323/api/v1/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          docker logs fullstack-template-ci
+          exit 1
+
+      - name: Verify production HTTP behavior
+        run: |
+          test "$(curl --silent --output /tmp/home.html --write-out '%{http_code}' http://127.0.0.1:1323/)" = "200"
+          grep -Fq "Docker CI SEO Verification" /tmp/home.html
+
+          test "$(curl --silent --output /tmp/tool.html --write-out '%{http_code}' http://127.0.0.1:1323/tools/json-formatter)" = "200"
+          grep -Fq "JSON Formatter" /tmp/tool.html
+
+          test "$(curl --silent --output /tmp/missing.html --write-out '%{http_code}' http://127.0.0.1:1323/definitely-missing)" = "404"
+
+          curl --silent --dump-header /tmp/dashboard.headers --output /tmp/dashboard.html http://127.0.0.1:1323/dashboard
+          grep -Eiq '^X-Robots-Tag: noindex, nofollow' /tmp/dashboard.headers
+
+          curl --fail --silent http://127.0.0.1:1323/robots.txt > /tmp/robots.txt
+          grep -Fq "Sitemap: https://docker-ci.fullstack.dev/sitemap.xml" /tmp/robots.txt
+
+          curl --fail --silent http://127.0.0.1:1323/sitemap.xml > /tmp/sitemap.xml
+          grep -Fq "<loc>https://docker-ci.fullstack.dev/</loc>" /tmp/sitemap.xml
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker logs fullstack-template-ci || true
+
+      - name: Stop production container
+        if: always()
+        run: docker stop fullstack-template-ci || true

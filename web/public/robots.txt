@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mdzz.uk/sitemap.xml
+# Production builds replace this file with the canonical sitemap URL.

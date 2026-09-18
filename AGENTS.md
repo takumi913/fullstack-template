@@ -50,7 +50,7 @@
 
 ### 后端 (Backend)
 
-- **语言**: Go 1.25+（以 go.mod 的 go 指令为准）
+- **语言**: Go 1.26（以 `go.mod` 的 `go` 指令为唯一版本来源）
 - **Web 框架**: Echo v5（注意 handler 签名是 `*echo.Context` 指针，与 v4 不同）
 - **数据访问**: database/sql + sqlc（由 SQL 生成类型安全代码，无 ORM）
 - **数据库**: SQLite 与 PostgreSQL 双方言（`db/query/`、`db/migrations/` 各维护一套）
@@ -66,12 +66,12 @@
 - **构建工具**: Vite
 - **CSS**: TailwindCSS v4+
 - **状态管理**: Zustand (支持持久化)
-- **路由**: React Router DOM v7+
+- **路由**: React Router Framework Mode v7.18+（统一从 `react-router` 导入，不使用 `react-router-dom`）
 - **UI 组件**: 页面使用 `style.css` 中的 `.panel`/`.button-primary`/`.field` 等类；如需成品组件，用 `bunx shadcn@latest add <组件>` 按需引入
 - **表单处理**: 原生受控组件 + `useAsyncAction`（未引入表单库），业务校验以后端 service 层为准
 - **图标**: lucide-react（已在用，不要再引入第二个图标库）
 - **HTTP 客户端**: Axios
-- **国际化**: 暂未引入，文案直接写在组件中
+- **国际化**: UI 暂未引入 i18n 库；SEO 页面已支持显式 locale、本地化 URL 与 hreflang
 - **主题切换**: 暂未引入
 - **通知组件**: 暂未引入，错误以表单内联红字展示
 - **包管理器**: Bun
@@ -136,9 +136,15 @@
     │   ├── assets/        # 前端资源
     │   ├── components/    # 可复用组件
     │   ├── lib/           # 工具函数
-    │   ├── pages/         # 页面级组件
-    │   ├── router/        # 路由配置
-    │   ├── store/         # Zustand store
+    │   ├── config/        # 站点配置与脚手架 sentinel
+    │   ├── content/       # Tool / Landing / Legal SEO 内容数据
+    │   ├── pages/         # 页面级 UI 组件
+    │   ├── routes/        # React Router Framework route modules
+    │   ├── router/        # 认证守卫等路由辅助逻辑
+    │   ├── seo/           # meta、hreflang、sitemap、发布门禁
+    │   ├── store/         # Zustand store（只服务私有 App 依赖）
+    │   ├── tools/         # 工具实现与 lazy registry
+    │   ├── routes.ts      # Framework Mode 路由表
     │   └── style.css      # 全局样式和主题配置
     ├── components.json    # shadcn 配置（供 bunx shadcn add 按需引入组件）
     ├── package.json       # 前端依赖
@@ -310,7 +316,7 @@ slog.Error("数据库连接失败", "err", err)
 #### 5.1.1 组件分类和组织
 
 - **页面组件** (`pages/`): 路由对应的页面级组件
-- **布局组件** (`components/layout/`): 页面骨架，如 `Layout`、`Header`、`Footer`
+- **布局组件** (`components/layout/`): 页面骨架，当前按 `PublicLayout` / `AuthLayout` / `AppLayout` 分离，Header 也分 Public/App
 - **复用组件** (`components/`): 跨页面复用的组件，`components/ui/` 留给 shadcn 按需引入的成品组件
 
 组件先写在使用它的页面里，出现第二个使用者时再提取到 `components/`。
@@ -325,7 +331,7 @@ slog.Error("数据库连接失败", "err", err)
 #### 5.1.3 命名与导出
 
 - 组件文件名用 PascalCase，与组件同名：`LoginPage.tsx`、`Header.tsx`
-- 具名导出，不用默认导出；对外暴露的目录用 `index.ts` 汇总
+- 普通组件优先具名导出；React Router route module 按 Framework Mode 约定使用默认 route component 导出。对外暴露的普通组件目录可用 `index.ts` 汇总
 - Props 接口命名为 `<组件名>Props`，与组件放在同一文件
 - 对外可定制样式的组件接收 `className`，用 `cn()` 与内部样式合并
 
@@ -377,14 +383,22 @@ const { user, loading } = useUserStore((state) => ({
 const userStore = useUserStore(); // 会导致不必要的重渲染
 ```
 
-### 5.3 路由管理规范 (React Router DOM)
+### 5.3 路由管理规范 (React Router Framework Mode)
 
-路由集中配置在 `src/router/index.tsx`，守卫组件在 `src/router/RouteGuards.tsx`：
+项目使用 React Router Framework Mode，而不是旧的 Data Mode / `createBrowserRouter`。
 
-- **ProtectedRoute**：需要登录的页面，未登录重定向到 `/login`
-- **PublicRoute**：登录/注册页，已登录重定向到已认证首页
-- 守卫只读 `authStore` 的认证状态，不自己发请求
-- 新增页面时在 `router/index.tsx` 注册，并按需要套用对应守卫；不要在页面组件内部自己做跳转判断
+- 路由表集中在 `src/routes.ts`，页面 route module 放在 `src/routes/`
+- React Router 应统一从 `react-router` 导入；不要重新引入 `react-router-dom`
+- `react-router.config.ts` 负责 Framework Mode、SSG prerender 与 future flags
+- 公开 SEO 页面放在 `PublicLayout` 下，必须保持与认证 store/API 依赖隔离
+- `/login`、`/register` 放在 `AuthLayout` 下，由 layout 统一套 `PublicRoute`
+- `/dashboard`、`/settings/*`、`/tenant/*` 放在 `AppLayout` 下，由 layout 统一套 `ProtectedRoute`
+- 不要在每个后台 route module 里重复包 `ProtectedRoute` / `PublicRoute`
+- 新增公开 SEO URL 时，同时更新对应 content schema；prerender/sitemap 应由数据源自动推导，不要维护第二份手写 URL 清单
+- Tool / Landing 的 canonical、hreflang、meta、JSON-LD 统一从 `src/seo/` 生成
+- 未知公开 URL 必须保持真实 HTTP 404，不能恢复成全站 SPA 200 fallback
+
+Framework Mode 会自动进行 route-level code splitting。不要为了路由拆包再手写 `React.lazy`；只有工具实现这类页面内大型交互模块，才通过 `src/tools/registry.tsx` 做 lazy import。
 
 ### 5.4 样式开发规范 (TailwindCSS)
 
@@ -503,7 +517,7 @@ const onSubmit = async () => {
 先测量再优化。没有实测到卡顿之前，不要预先加 `React.memo`/`useMemo`/`useCallback`——
 它们本身有成本，且会掩盖真正的性能问题。
 
-- **路由级代码分割**：页面组件用 `React.lazy` 分割，这是唯一默认就该做的优化
+- **路由级代码分割**：Framework Mode 自动拆分 route module，不手写 `React.lazy`。工具实现等大型页面内交互模块可在 `src/tools/registry.tsx` 按需 lazy import
 - **列表渲染**：`key` 用稳定的业务 id，不要用数组下标
 - **其余优化**：定位到具体瓶颈后再针对性处理，并在注释里说明测量结论
 
@@ -530,7 +544,7 @@ export interface CreateUserRequest {
 
 ## 6. 国际化 (i18n) 规范 🌍
 
-项目当前未引入国际化方案，界面文案直接以中文写在组件中。
+项目当前未引入 UI i18n 运行时，通用界面文案仍直接来自组件/站点配置；但 SEO 内容层已经支持独立 locale、显式本地化 path、可见语言切换与 reciprocal hreflang。两者不要混为一谈。
 
 若确实需要多语言，再安装 `i18next` 与 `react-i18next`，并遵循：
 
@@ -547,7 +561,7 @@ export interface CreateUserRequest {
 
 #### 7.1.1 后端开发工具
 
-- **Go**: 版本以 `go.mod` 的 go 指令为准（当前 1.25.8）
+- **Go**: 版本以 `go.mod` 的 go 指令为准（当前 1.26.0）
 - **Air**: 热重载工具，`make tools` 安装
 - **golangci-lint**: 代码检查，版本必须与 CI 一致，`make tools` 安装
 - **Docker**: 容器化部署
