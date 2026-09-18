@@ -210,9 +210,10 @@ func setupStaticFilesFromDir(e *echo.Echo, staticDir string) {
 		}
 
 		if filePath, ok := staticPagePath(staticDir, path); ok {
-			if filepath.Ext(filePath) == ".html" {
-				c.Response().Header().Set("Cache-Control", "no-cache")
-			}
+			// 除 /assets/* 外的静态文件都不是内容哈希文件。HTML、robots、
+			// sitemap、manifest、favicon、OG 图等更新后必须及时重新验证，
+			// 统一使用 no-cache，避免浏览器/代理长期持有旧品牌或旧 SEO 数据。
+			c.Response().Header().Set("Cache-Control", "no-cache")
 			return c.File(filePath)
 		}
 
