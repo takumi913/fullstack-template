@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { createHreflangAlternates } from "./localization";
+import { createHreflangAlternates, isValidHreflang } from "./localization";
 
-describe("createHreflangAlternates", () => {
+describe("hreflang helpers", () => {
+  it("accepts valid locale tags and x-default", () => {
+    for (const value of ["en", "ja", "en-US", "zh-Hans", "x-default"]) {
+      expect(isValidHreflang(value), value).toBe(true);
+    }
+  });
+
+  it("rejects malformed locale tags", () => {
+    for (const value of ["en_US", "en--US", "", "not a locale!"]) {
+      expect(isValidHreflang(value), value).toBe(false);
+    }
+  });
+
   it("includes every locale and an optional x-default", () => {
     expect(
       createHreflangAlternates(
