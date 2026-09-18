@@ -14,7 +14,7 @@ export function RelatedTools({ tool }: { tool: ToolPageDefinition }) {
           <Link
             className="group rounded-xl border p-5 transition hover:border-zinc-400"
             key={related.slug}
-            to={toolPath(related.slug)}
+            to={toolPath(related)}
           >
             <div className="flex items-center justify-between gap-4">
               <div>
