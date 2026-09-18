@@ -68,7 +68,7 @@ assertIncludes(resourcesHub, publicSeoPages.resources.title, "resources hub HTML
 assertIncludes(resourcesHub, "noindex, follow", "resources hub HTML");
 
 for (const page of Object.values(publicSeoPages)) {
-  if (!page.noindex) continue;
+  if (!("noindex" in page) || !page.noindex) continue;
   const html = await readOutput(...htmlOutputParts(page.path));
   assertIncludes(html, "noindex, follow", `${page.path} public noindex HTML`);
 }
