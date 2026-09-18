@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { routableToolPages, toolPages, toolPath } from "./tool-pages";
 import { createToolSeoPage } from "../seo/tool-page";
+import { toolComponents } from "../tools/registry";
 
 describe("tool page definitions", () => {
   it("uses unique slugs and paths", () => {
@@ -19,6 +20,12 @@ describe("tool page definitions", () => {
         expect(knownSlugs.has(relatedSlug), `${tool.slug} -> ${relatedSlug}`).toBe(true);
         expect(relatedSlug).not.toBe(tool.slug);
       }
+    }
+  });
+
+  it("registers a React implementation for every routable tool", () => {
+    for (const tool of routableToolPages) {
+      expect(toolComponents[tool.slug], tool.slug).toBeDefined();
     }
   });
 
