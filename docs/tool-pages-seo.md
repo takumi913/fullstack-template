@@ -50,7 +50,7 @@ React Router 使用同一个 `/tools/:slug` Route Module。构建时读取工具
 状态说明：
 
 - `draft`：不生成公开路由，也不预渲染。
-- `example`：会生成 SSG 页面，但自动 `noindex`，适合模板示例和开发预览。
+- `example`：会生成 SSG 页面，但自动 `noindex`，适合模板示例和开发预览。公开 noindex 页面仍保持 `follow`。
 - `published`：默认允许索引并进入 sitemap。
 
 如果暂时不希望已发布页面被搜索引擎收录，可以显式设置：
@@ -108,7 +108,8 @@ runtime: {
 - FAQPage JSON-LD（存在 FAQ 时）
 - sitemap 收录（仅 indexable 页面）
 - Related Tools 内链
-- 首页和页脚发现路径
+- Related Resources 反向主题内链
+- 首页、Tools Hub 和页脚发现路径
 
 ## 内链规则
 
