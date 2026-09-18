@@ -11,11 +11,12 @@ import type { LinksFunction } from "react-router";
 import { templateSiteConfig } from "@/config/site-config";
 import { shouldHydrateDocument } from "@/runtime/client-runtime";
 import { resolveDocumentLocale } from "@/seo/document-locale";
+import { publicAssetMimeType } from "@/seo/public-asset";
 import { siteConfig } from "@/seo/site";
 import "./style.css";
 
 export const links: LinksFunction = () => [
-  { rel: "icon", href: siteConfig.favicon, type: "image/svg+xml" },
+  { rel: "icon", href: siteConfig.favicon, type: publicAssetMimeType(siteConfig.favicon) },
   { rel: "manifest", href: "/manifest.webmanifest" },
 ];
 
