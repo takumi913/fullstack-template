@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { routableToolPages } from "../src/content/tool-pages";
@@ -58,6 +58,9 @@ await Promise.all([
   writeFile(join(outputDir, "404.html"), notFound),
   writeFile(spaFallbackPath, protectedSpaFallback),
 ]);
+
+// /404 只用于生成统一的 React 404 文档，最终不能保留为可返回 200 的静态页面。
+await rm(join(outputDir, "404"), { recursive: true, force: true });
 
 if (!process.env.VITE_SITE_URL) {
   console.warn("SEO warning: VITE_SITE_URL is not set; using https://example.com.");
