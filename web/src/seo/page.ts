@@ -73,3 +73,7 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
 }
 
 export const privatePageMeta: MetaDescriptor[] = [{ name: "robots", content: "noindex, nofollow" }];
+
+export function notFoundPageMeta(label = "Page not found"): MetaDescriptor[] {
+  return [{ title: `${label} | ${siteConfig.name}` }, ...privatePageMeta];
+}
