@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { routableToolPages, toolPath } from "@/content/tool-pages";
+import { directoryToolPages, toolPath } from "@/content/tool-pages";
 
 export const Footer = () => (
   <footer className="border-t bg-white">
@@ -9,8 +9,8 @@ export const Footer = () => (
         <Link className="hover:text-zinc-950" to="/tools">
           Tools
         </Link>
-        {routableToolPages.map((tool) => (
-          <Link className="hover:text-zinc-950" key={tool.slug} to={toolPath(tool.slug)}>
+        {directoryToolPages.map((tool) => (
+          <Link className="hover:text-zinc-950" key={tool.slug} to={toolPath(tool)}>
             {tool.name}
           </Link>
         ))}
