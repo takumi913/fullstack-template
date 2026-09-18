@@ -12,6 +12,12 @@ export const templateSiteConfig = {
       "基于 Go、React、sqlc、PostgreSQL/SQLite 与多租户 RBAC 的 SaaS 全栈母模板。",
     defaultImage: "/og-image.svg",
   },
+  appearance: {
+    themeColor: "#ffffff",
+    backgroundColor: "#ffffff",
+    iconBackground: "#18181b",
+    iconForeground: "#ffffff",
+  },
   navigation: {
     tools: "Tools",
     resources: "Resources",
