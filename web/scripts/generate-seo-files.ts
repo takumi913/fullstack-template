@@ -1,45 +1,18 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveSiteConfig } from "../src/config/resolve-site-config";
 import { templateSiteConfig } from "../src/config/site-config";
-import { landingPages, routableLandingPages } from "../src/content/landing-pages";
-import { routableToolPages, toolPages } from "../src/content/tool-pages";
+import { routableLandingPages } from "../src/content/landing-pages";
+import { routableToolPages } from "../src/content/tool-pages";
 import { indexableSeoPages } from "../src/seo/pages";
 import { createLandingSeoPage } from "../src/seo/landing-page";
 import { createToolSeoPage } from "../src/seo/tool-page";
-import { assertProductionContentReady } from "../src/seo/production-readiness";
-import { assertSeoBuildSiteIdentity } from "../src/seo/site-identity";
-import { assertProductionSocialImage } from "../src/seo/social-image";
-import { assertSeoBuildSiteUrl } from "../src/seo/site-url";
 import { createSitemapXml } from "../src/seo/sitemap";
+import { runSeoPreflight } from "../src/seo/preflight";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const outputDir = join(scriptDir, "..", "dist", "client");
-const strictSeo = process.env.SEO_STRICT === "true";
-const siteUrl = assertSeoBuildSiteUrl(process.env.VITE_SITE_URL, strictSeo);
-const resolvedSite = resolveSiteConfig(process.env);
-assertSeoBuildSiteIdentity(
-  {
-    name: resolvedSite.name,
-    title: resolvedSite.defaultTitle,
-    description: resolvedSite.defaultDescription,
-  },
-  strictSeo,
-);
-assertProductionContentReady({
-  strict: strictSeo,
-  allowTemplateExamples: process.env.SEO_ALLOW_TEMPLATE_EXAMPLES === "true",
-  tools: toolPages,
-  landings: landingPages,
-  homePrimaryToolSlug: resolvedSite.homePrimaryToolSlug,
-  homePrimaryKeyword: resolvedSite.primaryKeyword,
-});
-assertProductionSocialImage({
-  strict: strictSeo,
-  allowSvgSocialImage: process.env.SEO_ALLOW_SVG_SOCIAL_IMAGE === "true",
-  imagePath: resolvedSite.defaultImage,
-});
+const { siteUrl, resolvedSite } = runSeoPreflight(process.env);
 
 function escapeXml(value: string) {
   return value
