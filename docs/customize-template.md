@@ -197,13 +197,15 @@ VITE_SITE_IMAGE=/og-image.svg
 自动生成一张不会泄漏母模板旧品牌的 OG SVG。品牌值默认来自 `site-config.ts`，
 只有存在对应 `VITE_SITE_*` 时才使用部署覆盖。
 
-有正式视觉设计时，直接改成：
+真实生产站应改成 raster 分享图，例如：
 
 ```env
 VITE_SITE_IMAGE=/og-image.png
 ```
 
-并把对应文件放入 `web/public/`。
+并把对应文件放入 `web/public/`。建议使用 1200×630 的 PNG/JPEG。
+`SEO_STRICT=true` 默认会拒绝 SVG OG 图片，因为主流社交抓取器对 SVG 支持并不稳定。
+`SEO_ALLOW_SVG_SOCIAL_IMAGE=true` 只用于母模板 CI 验证自动生成的 SVG fallback。
 
 ## 8. 删除不需要的示例
 

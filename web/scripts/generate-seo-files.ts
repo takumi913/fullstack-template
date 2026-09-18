@@ -10,6 +10,7 @@ import { createLandingSeoPage } from "../src/seo/landing-page";
 import { createToolSeoPage } from "../src/seo/tool-page";
 import { assertProductionContentReady } from "../src/seo/production-readiness";
 import { assertSeoBuildSiteIdentity } from "../src/seo/site-identity";
+import { assertProductionSocialImage } from "../src/seo/social-image";
 import { assertSeoBuildSiteUrl } from "../src/seo/site-url";
 import { createSitemapXml } from "../src/seo/sitemap";
 
@@ -33,6 +34,11 @@ assertProductionContentReady({
   landings: landingPages,
   homePrimaryToolSlug: resolvedSite.homePrimaryToolSlug,
   homePrimaryKeyword: resolvedSite.primaryKeyword,
+});
+assertProductionSocialImage({
+  strict: strictSeo,
+  allowSvgSocialImage: process.env.SEO_ALLOW_SVG_SOCIAL_IMAGE === "true",
+  imagePath: resolvedSite.defaultImage,
 });
 
 function escapeXml(value: string) {

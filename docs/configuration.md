@@ -86,6 +86,9 @@ SEO_STRICT=true
 
 # 只用于母模板仓库自己的 CI/测试；真实生产站不要开启。
 SEO_ALLOW_TEMPLATE_EXAMPLES=false
+
+# 只用于验证母模板自动生成 SVG OG fallback；真实生产站不要开启。
+SEO_ALLOW_SVG_SOCIAL_IMAGE=false
 ```
 
 `VITE_SITE_URL` 必须是纯 origin：
@@ -114,6 +117,10 @@ strict 最终校验的是“解析后的站点身份”，并与不可编辑的 
 
 strict 模式还会拒绝 `status: "example"` 的 Tool/Landing 页面；母模板自己的 CI 通过
 `SEO_ALLOW_TEMPLATE_EXAMPLES=true` 保留示例覆盖，真实生产站不要开启这个例外。
+
+另外，strict 模式默认要求社交分享图使用本地 `.png/.jpg/.jpeg` 资源。模板自身仍用
+自动生成的 SVG fallback 做测试，因此 CI 会显式设置 `SEO_ALLOW_SVG_SOCIAL_IMAGE=true`。
+真实生产站建议提供 1200×630 的 PNG/JPEG，并保持该例外为 false。
 
 最小生产构建只需要：
 

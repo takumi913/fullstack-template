@@ -90,6 +90,8 @@ jobs:
       SEO_STRICT: "true"
       # CI intentionally keeps the template demo pages so their SSG/SEO behavior remains covered.
       SEO_ALLOW_TEMPLATE_EXAMPLES: "true"
+      # Template CI also exercises the generated SVG fallback; real production should use PNG/JPEG.
+      SEO_ALLOW_SVG_SOCIAL_IMAGE: "true"
 
     steps:
       - name: Checkout code
