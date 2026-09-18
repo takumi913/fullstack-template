@@ -3,6 +3,7 @@ export const templateSiteConfig = {
     name: "Fullstack Template",
     shortName: "Fullstack",
     mark: "F",
+    favicon: "/favicon.svg",
   },
   seo: {
     locale: "zh-CN",
