@@ -2,7 +2,13 @@
 # 公开 SEO 页面由 React Router 预渲染为真实 HTML，静态文件优先匹配。
 # canonical URL 统一不带尾斜杠；只有应用内路由使用 SPA fallback。
 
+/tools/                 /tools                  301
 /tools/:slug/           /tools/:slug            301
+/:locale/tools/:slug/   /:locale/tools/:slug    301
+/resources/             /resources              301
+/use-cases/:slug/       /use-cases/:slug        301
+/compare/:slug/         /compare/:slug          301
+/guides/:slug/          /guides/:slug           301
 /legal/privacy-policy/  /legal/privacy-policy   301
 /legal/terms/           /legal/terms            301
 /login/                 /login                  301
