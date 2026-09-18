@@ -49,9 +49,7 @@ export default function ToolPage() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
-            How to use it
-          </h2>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">How to use it</h2>
           <ol className="mt-5 space-y-4 text-sm leading-6 text-zinc-600">
             {tool.howToSteps.map((step, index) => (
               <li className="flex gap-3" key={step}>
