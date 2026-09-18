@@ -12,7 +12,7 @@ permissions:
 # 同一分支的新提交自动取消进行中的旧运行：
 # PR 上连续 push 时不必等旧的跑完，省 runner 时间也更快拿到反馈
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
