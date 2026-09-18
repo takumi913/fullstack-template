@@ -49,7 +49,11 @@ web/src/content/landing-pages.ts
 
 - `draft`：不生成公开页面。
 - `example`：生成 SSG 页面，但自动 noindex。
-- `published`：默认可索引并进入 sitemap。
+- `published`：真实内容的发布状态。
+- `templateExample: true`：母模板 demo 的独立保护标记；即使状态误改为 published 仍然 noindex。
+
+把示例内容改造成真实页面时，需要同时使用 `status: "published"` 并删除
+`templateExample: true`，production strict build 才会允许正式索引。
 
 ## 自动获得
 
