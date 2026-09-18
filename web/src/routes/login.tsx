@@ -1,4 +1,5 @@
 import LoginPage from "@/pages/LoginPage";
+import { PublicRoute } from "@/router/RouteGuards";
 import { privatePageMeta } from "@/seo/page";
 
 export const meta = () => [
@@ -6,4 +7,10 @@ export const meta = () => [
   ...privatePageMeta,
 ];
 
-export default LoginPage;
+export default function LoginRoute() {
+  return (
+    <PublicRoute>
+      <LoginPage />
+    </PublicRoute>
+  );
+}
