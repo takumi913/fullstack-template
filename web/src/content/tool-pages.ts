@@ -1,3 +1,5 @@
+import type { SeoAlternate } from "../seo/localization";
+
 export type ToolPageStatus = "draft" | "example" | "published";
 
 export interface ToolFaqItem {
@@ -13,6 +15,7 @@ export interface ToolPageDefinition {
   category: string;
   primaryKeyword: string;
   locale?: string;
+  alternates?: SeoAlternate[];
   title: string;
   description: string;
   h1: string;
