@@ -30,15 +30,11 @@ describe("site URL validation", () => {
       expect(() => assertSeoBuildSiteUrl(url, true), url).toThrow();
     }
 
-    expect(assertSeoBuildSiteUrl("https://tools.acme.dev", true)).toBe(
-      "https://tools.acme.dev",
-    );
+    expect(assertSeoBuildSiteUrl("https://tools.acme.dev", true)).toBe("https://tools.acme.dev");
   });
 
   it("still allows placeholder and local URLs outside strict production mode", () => {
-    expect(assertSeoBuildSiteUrl("http://localhost:5173", false)).toBe(
-      "http://localhost:5173",
-    );
+    expect(assertSeoBuildSiteUrl("http://localhost:5173", false)).toBe("http://localhost:5173");
     expect(assertSeoBuildSiteUrl(placeholderSiteUrl, false)).toBe(placeholderSiteUrl);
   });
 });
