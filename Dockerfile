@@ -55,7 +55,7 @@ RUN addgroup -g 1000 app && adduser -D -u 1000 -G app app \
 # 二进制与静态文件保持 root 属主（app 用户只读、可执行），无需 chmod：
 # COPY 会保留构建阶段的可执行权限位
 COPY --from=backend-builder /app/server /app/server
-COPY --from=frontend-builder /app/dist /app/static
+COPY --from=frontend-builder /app/dist/client /app/static
 
 USER app
 
