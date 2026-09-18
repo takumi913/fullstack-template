@@ -53,6 +53,13 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
       hrefLang: alternate.hreflang,
       href: absoluteUrl(alternate.path),
     });
+
+    if (alternate.hreflang !== "x-default" && alternate.hreflang !== locale) {
+      meta.push({
+        property: "og:locale:alternate",
+        content: alternate.hreflang,
+      });
+    }
   }
 
   if (page.schema) {
