@@ -29,14 +29,12 @@ export function assertProductionContentReady({
     const examples = [
       ...tools
         .filter(
-          (tool) =>
-            tool.status === "example" || (tool.templateExample && tool.status !== "draft"),
+          (tool) => tool.status === "example" || (tool.templateExample && tool.status !== "draft"),
         )
         .map((tool) => toolPath(tool)),
       ...landings
         .filter(
-          (page) =>
-            page.status === "example" || (page.templateExample && page.status !== "draft"),
+          (page) => page.status === "example" || (page.templateExample && page.status !== "draft"),
         )
         .map((page) => page.path),
     ];
