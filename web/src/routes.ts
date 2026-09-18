@@ -8,6 +8,7 @@ export default [
     route(":locale/tools/:slug", "./routes/localized-tool.tsx"),
     route("use-cases/:slug", "./routes/use-case.tsx"),
     route("compare/:slug", "./routes/comparison.tsx"),
+    route("guides/:slug", "./routes/guide.tsx"),
     route("404", "./routes/not-found.tsx"),
 
     route("legal/privacy-policy", "./routes/privacy.tsx"),
