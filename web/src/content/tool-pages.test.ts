@@ -20,9 +20,7 @@ describe("tool page definitions", () => {
       expect(path.endsWith("/"), tool.slug).toBe(false);
       expect(path.includes("?"), tool.slug).toBe(false);
       expect(path.includes("#"), tool.slug).toBe(false);
-      expect(/^\/(?:[A-Za-z0-9-]+\/)?tools\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(path), path).toBe(
-        true,
-      );
+      expect(/^\/(?:[A-Za-z0-9-]+\/)?tools\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(path), path).toBe(true);
     }
   });
 
@@ -58,8 +56,7 @@ describe("tool page definitions", () => {
       expect(new Set(hreflangs).size, `${tool.slug} hreflang uniqueness`).toBe(hreflangs.length);
       expect(
         tool.alternates.some(
-          (alternate) =>
-            alternate.hreflang === tool.locale && alternate.path === toolPath(tool),
+          (alternate) => alternate.hreflang === tool.locale && alternate.path === toolPath(tool),
         ),
         `${tool.slug} self hreflang`,
       ).toBe(true);
@@ -75,8 +72,7 @@ describe("tool page definitions", () => {
         expect(target?.locale).toBe(alternate.hreflang);
         expect(
           target?.alternates?.some(
-            (backlink) =>
-              backlink.hreflang === tool.locale && backlink.path === toolPath(tool),
+            (backlink) => backlink.hreflang === tool.locale && backlink.path === toolPath(tool),
           ),
           `${alternate.path} -> ${toolPath(tool)}`,
         ).toBe(true);
