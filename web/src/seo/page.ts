@@ -1,12 +1,7 @@
 import type { MetaDescriptor } from "react-router";
 import { absoluteUrl, siteConfig } from "./site";
 
-export type SeoIntent =
-  | "tool"
-  | "informational"
-  | "comparison"
-  | "commercial"
-  | "legal";
+export type SeoIntent = "tool" | "informational" | "comparison" | "commercial" | "legal";
 
 type JsonLd = Record<string, unknown> | Array<Record<string, unknown>>;
 
@@ -53,6 +48,4 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
   return meta;
 }
 
-export const privatePageMeta: MetaDescriptor[] = [
-  { name: "robots", content: "noindex, nofollow" },
-];
+export const privatePageMeta: MetaDescriptor[] = [{ name: "robots", content: "noindex, nofollow" }];
