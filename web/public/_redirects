@@ -1,11 +1,20 @@
 # Cloudflare Pages 路由规则
 # 公开 SEO 页面由 React Router 预渲染为真实 HTML，静态文件优先匹配。
-# 只有应用内路由使用 SPA fallback，未知 URL 返回真正的 404。
+# canonical URL 统一不带尾斜杠；只有应用内路由使用 SPA fallback。
 
-/login                 /__spa-fallback.html  200
-/register              /__spa-fallback.html  200
-/dashboard             /__spa-fallback.html  200
-/settings/*            /__spa-fallback.html  200
-/tenant/*              /__spa-fallback.html  200
+/tools/:slug/           /tools/:slug            301
+/legal/privacy-policy/  /legal/privacy-policy   301
+/legal/terms/           /legal/terms            301
+/login/                 /login                  301
+/register/              /register               301
+/dashboard/             /dashboard              301
+/settings/:path*/       /settings/:path          301
+/tenant/:path*/         /tenant/:path            301
 
-/*                     /404.html             404
+/login                  /__spa-fallback.html     200
+/register               /__spa-fallback.html     200
+/dashboard              /__spa-fallback.html     200
+/settings/*             /__spa-fallback.html     200
+/tenant/*               /__spa-fallback.html     200
+
+/*                      /404.html                404
