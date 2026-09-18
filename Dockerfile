@@ -5,11 +5,11 @@ FROM --platform=$BUILDPLATFORM oven/bun:1.4.2-alpine AS frontend-builder
 
 WORKDIR /app
 
-# 复制前端依赖清单（锁文件保证构建可重现）
+# 复制前端依赖清单
 COPY web/package.json web/bun.lock ./
 
 # 安装前端依赖
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # 复制前端源码并构建
 COPY web/ ./
