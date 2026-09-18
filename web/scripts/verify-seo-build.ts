@@ -256,11 +256,7 @@ for (const page of routableLandingPages) {
     );
 
     if (alternate.hreflang !== "x-default" && alternate.path !== page.path) {
-      assertIncludes(
-        html,
-        `href="${alternate.path}"`,
-        `${page.slug} visible language link`,
-      );
+      assertIncludes(html, `href="${alternate.path}"`, `${page.slug} visible language link`);
     }
   }
 }
