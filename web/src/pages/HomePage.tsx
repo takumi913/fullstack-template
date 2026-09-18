@@ -13,11 +13,12 @@ export default function HomePage() {
     <div className="bg-white">
       <section className="shell border-x px-6 py-24 sm:px-12 sm:py-32">
         <div className="max-w-3xl">
-          <h1 className="max-w-2xl text-5xl font-semibold leading-[1.06] tracking-[-0.045em] text-zinc-950 sm:text-7xl">
-            基础设施
+          <h1 className="max-w-3xl text-5xl font-semibold leading-[1.06] tracking-[-0.045em] text-zinc-950 sm:text-7xl">
+            Go + React 多租户 SaaS 全栈模板
           </h1>
-          <p className="mt-7 max-w-xl text-base leading-7 text-zinc-600">
-            一个克制的多租户全栈起点。认证、权限和数据库结构已经就位，剩下的空间留给你的产品。
+          <p className="mt-7 max-w-2xl text-base leading-7 text-zinc-600">
+            认证、工作区、多租户 RBAC、SQLite/PostgreSQL 与生产部署骨架已经就位，
+            公开页面可静态预渲染，登录后的应用继续保持 SPA。
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link to="/register" className="button-primary">
@@ -28,6 +29,12 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className="shell border-x border-t px-6 py-10 sm:px-12">
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
+          构建 SaaS 所需的基础能力
+        </h2>
       </section>
 
       <section className="shell border-x border-t">
@@ -50,7 +57,7 @@ export default function HomePage() {
       <section className="shell border-x border-t px-6 py-20 sm:px-12">
         <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
           <h2 className="max-w-md text-3xl font-semibold tracking-[-0.035em]">
-            保持简单，保持可扩展。
+            公开页面做 SEO，产品后台保持简单。
           </h2>
           <Link to="/register" className="text-sm font-medium text-zinc-700 hover:text-zinc-950">
             创建第一个工作区 →
