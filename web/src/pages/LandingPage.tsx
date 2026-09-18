@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation } from "react-router";
 import { LanguageSwitcher } from "@/components/seo/LanguageSwitcher";
 import { getLandingPageByPath } from "@/content/landing-pages";
 import { getToolPageBySlug, toolPath } from "@/content/tool-pages";
+import { publicPageCopy } from "@/seo/ui-copy";
 
 export default function LandingPage() {
   const { pathname } = useLocation();
@@ -12,23 +13,24 @@ export default function LandingPage() {
     return <Navigate replace to="/404" />;
   }
 
+  const copy = publicPageCopy(page.locale);
   const relatedTools = page.relatedToolSlugs
     .map((slug) => getToolPageBySlug(slug))
     .filter((tool) => tool !== undefined);
 
   return (
     <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
-      <nav aria-label="Breadcrumb" className="text-sm text-zinc-500">
+      <nav aria-label={copy.breadcrumb} className="text-sm text-zinc-500">
         <ol className="flex items-center gap-2">
           <li>
             <Link className="hover:text-zinc-950" to="/">
-              Home
+              {copy.home}
             </Link>
           </li>
           <li aria-hidden="true">/</li>
           <li>
             <Link className="hover:text-zinc-950" to="/resources">
-              Resources
+              {copy.resources}
             </Link>
           </li>
           <li aria-hidden="true">/</li>
@@ -37,11 +39,11 @@ export default function LandingPage() {
           </li>
         </ol>
       </nav>
-      <LanguageSwitcher alternates={page.alternates} currentPath={pathname} />
+      <LanguageSwitcher alternates={page.alternates} currentPath={pathname} locale={page.locale} />
 
       <header className="mt-8 max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
-          {page.kind.replace("-", " ")}
+          {copy.kinds[page.kind]}
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
           {page.h1}
@@ -62,7 +64,7 @@ export default function LandingPage() {
 
       {relatedTools.length > 0 && (
         <section className="mt-14 border-t pt-10">
-          <h2 className="text-xl font-semibold text-zinc-950">Related tools</h2>
+          <h2 className="text-xl font-semibold text-zinc-950">{copy.relatedTools}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {relatedTools.map((tool) => (
               <Link
@@ -88,7 +90,7 @@ export default function LandingPage() {
 
       {page.faq.length > 0 && (
         <section className="mt-14 border-t pt-10">
-          <h2 className="text-xl font-semibold text-zinc-950">Frequently asked questions</h2>
+          <h2 className="text-xl font-semibold text-zinc-950">{copy.faq}</h2>
           <div className="mt-5 divide-y border-y">
             {page.faq.map((item) => (
               <details className="py-5" key={item.question}>
