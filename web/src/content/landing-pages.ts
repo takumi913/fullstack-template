@@ -33,6 +33,12 @@ export interface LandingPageDefinition {
   noindex?: boolean;
 }
 
+const jsonSyntaxAlternates: SeoAlternate[] = [
+  { hreflang: "en", path: "/guides/json-syntax" },
+  { hreflang: "ja", path: "/ja/guides/json-syntax" },
+  { hreflang: "x-default", path: "/guides/json-syntax" },
+];
+
 export const landingPages: LandingPageDefinition[] = [
   {
     slug: "json-api-debugging",
@@ -64,6 +70,65 @@ export const landingPages: LandingPageDefinition[] = [
           "No. The use-case page should answer a different search intent and explain a workflow, while the tool page should focus on completing the task immediately.",
       },
     ],
+    relatedToolSlugs: ["json-formatter"],
+    updatedAt: "2026-09-18",
+    noindex: true,
+  },
+  {
+    slug: "json-syntax",
+    kind: "guide",
+    status: "example",
+    path: "/guides/json-syntax",
+    locale: "en",
+    alternates: jsonSyntaxAlternates,
+    primaryKeyword: "json syntax",
+    title: "JSON Syntax Guide | Fullstack Template",
+    description:
+      "A concise JSON syntax guide example connected to the JSON Formatter tool and localized with hreflang.",
+    h1: "JSON Syntax Guide",
+    intro:
+      "Learn the core JSON syntax rules before formatting or validating real API payloads.",
+    sections: [
+      {
+        heading: "Objects use key-value pairs",
+        body: "JSON objects are wrapped in curly braces and use double-quoted keys followed by a colon and a value.",
+      },
+      {
+        heading: "Arrays preserve ordered values",
+        body: "JSON arrays are wrapped in square brackets and can contain strings, numbers, booleans, null, objects, or other arrays.",
+      },
+    ],
+    faq: [],
+    relatedToolSlugs: ["json-formatter"],
+    updatedAt: "2026-09-18",
+    noindex: true,
+  },
+  {
+    slug: "json-syntax-ja",
+    kind: "guide",
+    status: "example",
+    path: "/ja/guides/json-syntax",
+    locale: "ja",
+    alternates: jsonSyntaxAlternates,
+    showInDirectory: false,
+    primaryKeyword: "json 構文",
+    title: "JSON 構文ガイド | Fullstack Template",
+    description:
+      "JSON Formatter と連携する、日本語版 JSON 構文ガイドのサンプルページです。",
+    h1: "JSON 構文ガイド",
+    intro:
+      "実際の API データを整形・検証する前に、JSON の基本的な構文ルールを確認します。",
+    sections: [
+      {
+        heading: "オブジェクトはキーと値の組で表現する",
+        body: "JSON オブジェクトは波括弧で囲み、ダブルクォートで囲んだキー、コロン、値の順で記述します。",
+      },
+      {
+        heading: "配列は順序を持つ値を表現する",
+        body: "JSON 配列は角括弧で囲み、文字列、数値、真偽値、null、オブジェクト、配列などを格納できます。",
+      },
+    ],
+    faq: [],
     relatedToolSlugs: ["json-formatter"],
     updatedAt: "2026-09-18",
     noindex: true,
