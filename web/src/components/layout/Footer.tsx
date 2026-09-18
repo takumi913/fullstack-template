@@ -1,17 +1,23 @@
 import { Link } from "react-router-dom";
+import { routableToolPages, toolPath } from "@/content/tool-pages";
 
 export const Footer = () => (
   <footer className="border-t bg-white">
-    <div className="shell flex flex-col gap-3 py-7 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
+    <div className="shell flex flex-col gap-5 py-7 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
       <span>Fullstack Template</span>
-      <div className="flex gap-5">
+      <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2">
+        {routableToolPages.map((tool) => (
+          <Link className="hover:text-zinc-950" key={tool.slug} to={toolPath(tool.slug)}>
+            {tool.name}
+          </Link>
+        ))}
         <Link className="hover:text-zinc-950" to="/legal/privacy-policy">
           隐私政策
         </Link>
         <Link className="hover:text-zinc-950" to="/legal/terms">
           服务条款
         </Link>
-      </div>
+      </nav>
     </div>
   </footer>
 );
