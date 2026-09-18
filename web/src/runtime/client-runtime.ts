@@ -1,4 +1,5 @@
-const privateAppPrefixes = ["/dashboard", "/settings/", "/tenant/"] as const;
+const privateAppExactPaths = new Set(["/dashboard"]);
+const privateAppPrefixes = ["/settings/", "/tenant/"] as const;
 const authPaths = new Set(["/login", "/register"]);
 
 function isToolRuntimePath(pathname: string) {
@@ -12,9 +13,8 @@ export function shouldHydrateDocument(pathname: string, matchCount: number) {
   if (matchCount <= 1) return true;
 
   if (authPaths.has(pathname)) return true;
-  if (privateAppPrefixes.some((prefix) => pathname === prefix.slice(0, -1) || pathname.startsWith(prefix))) {
-    return true;
-  }
+  if (privateAppExactPaths.has(pathname)) return true;
+  if (privateAppPrefixes.some((prefix) => pathname.startsWith(prefix))) return true;
 
   return isToolRuntimePath(pathname);
 }
