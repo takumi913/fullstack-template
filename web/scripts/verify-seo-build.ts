@@ -62,6 +62,13 @@ assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
 const resourcesHub = await readOutput("resources", "index.html");
 assertIncludes(resourcesHub, publicSeoPages.resources.title, "resources hub HTML");
 assertIncludes(resourcesHub, "noindex, follow", "resources hub HTML");
+
+for (const page of Object.values(publicSeoPages)) {
+  if (!page.noindex) continue;
+  const html = await readOutput(...htmlOutputParts(page.path));
+  assertIncludes(html, "noindex, follow", `${page.path} public noindex HTML`);
+}
+
 for (const page of directoryLandingPages) {
   assertIncludes(resourcesHub, `href="${page.path}"`, `resources hub -> ${page.path}`);
 }
