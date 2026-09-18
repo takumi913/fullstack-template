@@ -1,10 +1,16 @@
-import type { ComponentType } from "react";
-import { JsonFormatterTool } from "./JsonFormatterTool";
-import { WordCounterTool } from "./WordCounterTool";
+import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from "react";
 
-export const toolComponents: Record<string, ComponentType> = {
-  "json-formatter": JsonFormatterTool,
-  "word-counter": WordCounterTool,
+type ToolComponent = LazyExoticComponent<ComponentType>;
+
+export const toolComponents: Record<string, ToolComponent> = {
+  "json-formatter": lazy(async () => {
+    const module = await import("./JsonFormatterTool");
+    return { default: module.JsonFormatterTool };
+  }),
+  "word-counter": lazy(async () => {
+    const module = await import("./WordCounterTool");
+    return { default: module.WordCounterTool };
+  }),
 };
 
 export function ToolRuntime({ slug }: { slug: string }) {
@@ -18,5 +24,15 @@ export function ToolRuntime({ slug }: { slug: string }) {
     );
   }
 
-  return <Component />;
+  return (
+    <Suspense
+      fallback={
+        <div className="rounded-xl border bg-zinc-50 p-8 text-sm text-zinc-500">
+          Loading tool…
+        </div>
+      }
+    >
+      <Component />
+    </Suspense>
+  );
 }
