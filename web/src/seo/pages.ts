@@ -29,6 +29,16 @@ export const publicSeoPages = {
       },
     ],
   },
+  tools: {
+    path: "/tools",
+    primaryKeyword: "online tools",
+    title: "Online Tools | Fullstack Template",
+    description: "Browse the reusable example tools included with the SEO-ready fullstack template.",
+    h1: "Online Tools",
+    intent: "commercial",
+    updatedAt: "2026-09-18",
+    noindex: true,
+  },
   privacy: {
     path: "/legal/privacy-policy",
     primaryKeyword: "privacy policy",
