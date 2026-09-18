@@ -50,7 +50,15 @@ func TestTrailingSlashRedirectTarget(t *testing.T) {
 }
 
 func TestStaticRoutingSEOBehavior(t *testing.T) {
-	staticDir := t.TempDir()
+	staticDir, err := os.MkdirTemp(".", ".static-test-*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.RemoveAll(staticDir); err != nil {
+			t.Errorf("remove temp static dir: %v", err)
+		}
+	})
 	writeStaticTestFile(t, staticDir, "index.html", "<h1>home</h1>")
 	writeStaticTestFile(t, staticDir, "tools/example/index.html", "<h1>tool</h1>")
 	writeStaticTestFile(
