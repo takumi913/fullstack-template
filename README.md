@@ -22,6 +22,8 @@
 - 权限矩阵与租户隔离的接口级测试，前后端均有测试
 - Public SSG + Private SPA，适合 SEO 工具站
 - Tool Page Schema 自动生成 meta、JSON-LD、sitemap 与相关工具内链
+- 多语言工具 URL、hreflang 与共享工具实现
+- Use Case / Comparison / Guide 数据驱动 SEO Landing Page
 
 ## 快速开始
 
@@ -89,7 +91,8 @@ make build           # 构建
 
 ## 文档
 
-- [工具页 SEO / SSG](docs/tool-pages-seo.md) — 新增工具、关键词配置、预渲染和内链规则
+- [工具页 SEO / SSG](docs/tool-pages-seo.md) — 新增工具、多语言 URL、关键词配置、预渲染和内链规则
+- [SEO Landing Page](docs/landing-pages-seo.md) — Use Case、Comparison、Guide 与程序化 SEO 页面规则
 - [配置说明](docs/configuration.md) — 全部环境变量
 - [Docker 部署](docs/docker.md) — 镜像构建、生产配置与已知限制
 - [Go 代码检查](docs/golangci-lint.md) — golangci-lint 版本要求与用法
