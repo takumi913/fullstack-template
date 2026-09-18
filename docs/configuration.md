@@ -122,20 +122,28 @@ VITE_SITE_URL=https://your-domain.com SEO_STRICT=true bun run build
 只有同一份代码需要按部署环境覆盖品牌时，才额外传 `VITE_SITE_NAME`、
 `VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION` 等变量。
 
-Docker 构建时通过 build args 注入：
+如果品牌已经写入 `site-config.ts`，Docker 最小生产构建只需要：
 
 ```bash
 docker build \
   --build-arg VITE_SITE_URL=https://your-domain.com \
-  --build-arg VITE_SITE_NAME="Your Product" \
-  --build-arg VITE_SITE_SHORT_NAME="Your Product" \
-  --build-arg VITE_SITE_MARK=Y \
-  --build-arg VITE_SITE_FAVICON=/favicon.svg \
-  --build-arg VITE_SITE_LOCALE=en \
-  --build-arg VITE_SITE_PRIMARY_KEYWORD="your primary keyword" \
-  --build-arg VITE_SITE_TITLE="Your SEO Title" \
-  --build-arg VITE_SITE_DESCRIPTION="Your product description" \
-  --build-arg VITE_SITE_IMAGE=/og-image.png \
   --build-arg SEO_STRICT=true \
   .
 ```
+
+Dockerfile 中的品牌类 build args 默认为空，会自动回退到 `site-config.ts`。
+只有同一份源码需要按部署环境覆盖品牌时，才额外传：
+
+```bash
+--build-arg VITE_SITE_NAME="Your Product"
+--build-arg VITE_SITE_SHORT_NAME="Your Product"
+--build-arg VITE_SITE_MARK=Y
+--build-arg VITE_SITE_FAVICON=/brand-icon.svg
+--build-arg VITE_SITE_LOCALE=en
+--build-arg VITE_SITE_PRIMARY_KEYWORD="your primary keyword"
+--build-arg VITE_SITE_TITLE="Your SEO Title"
+--build-arg VITE_SITE_DESCRIPTION="Your product description"
+--build-arg VITE_SITE_IMAGE=/og-image.png
+```
+
+`SEO_ALLOW_TEMPLATE_EXAMPLES=true` 仅用于母模板自身 CI/测试，不要在真实生产镜像中开启。
