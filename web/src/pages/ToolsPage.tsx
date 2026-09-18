@@ -12,7 +12,8 @@ export default function ToolsPage() {
           {publicSeoPages.tools.h1}
         </h1>
         <p className="mt-4 text-base leading-7 text-zinc-600">
-          这里集中展示公开工具页。母模板中的示例工具默认 noindex，替换成真实产品后再发布。
+          Browse the public tool pages included with the template. Example tools stay noindex until
+          you replace them with real product functionality and publish them.
         </p>
       </header>
 
