@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { templateSiteConfig } from "@/config/site-config";
 import { directoryToolPages, toolPath } from "@/content/tool-pages";
 import { publicSeoPages } from "@/seo/pages";
 
@@ -7,13 +8,14 @@ export default function ToolsPage() {
   return (
     <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
       <header className="max-w-3xl">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">Tools</p>
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
+          {templateSiteConfig.hubs.tools.eyebrow}
+        </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
           {publicSeoPages.tools.h1}
         </h1>
         <p className="mt-4 text-base leading-7 text-zinc-600">
-          Browse the public tool pages included with the template. Example tools stay noindex until
-          you replace them with real product functionality and publish them.
+          {templateSiteConfig.hubs.tools.description}
         </p>
       </header>
 
