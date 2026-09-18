@@ -4,10 +4,12 @@ import { fileURLToPath } from "node:url";
 import { routableToolPages } from "../src/content/tool-pages";
 import { indexableSeoPages } from "../src/seo/pages";
 import { createToolSeoPage } from "../src/seo/tool-page";
+import { assertSeoBuildSiteUrl } from "../src/seo/site-url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const outputDir = join(scriptDir, "..", "dist", "client");
-const siteUrl = (process.env.VITE_SITE_URL || "https://example.com").replace(/\/$/, "");
+const strictSeo = process.env.SEO_STRICT === "true";
+const siteUrl = assertSeoBuildSiteUrl(process.env.VITE_SITE_URL, strictSeo);
 
 function escapeXml(value: string) {
   return value
@@ -65,5 +67,9 @@ await Promise.all([
   writeFile(join(outputDir, "robots.txt"), robots),
   writeFile(join(outputDir, "404.html"), notFound),
 ]);
+
+if (!process.env.VITE_SITE_URL) {
+  console.warn("SEO warning: VITE_SITE_URL is not set; using https://example.com.");
+}
 
 console.log(`SEO files generated for ${sitemapPages.length} indexable pages.`);
