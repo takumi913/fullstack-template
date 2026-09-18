@@ -8,6 +8,8 @@ export type SeoIntent =
   | "commercial"
   | "legal";
 
+type JsonLd = Record<string, unknown> | Array<Record<string, unknown>>;
+
 export interface SeoPage {
   path: string;
   primaryKeyword: string;
@@ -19,6 +21,7 @@ export interface SeoPage {
   noindex?: boolean;
   updatedAt?: string;
   relatedPages?: string[];
+  schema?: JsonLd;
 }
 
 export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
@@ -26,7 +29,7 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
   const image = absoluteUrl(page.image || siteConfig.defaultImage);
   const robots = page.noindex ? "noindex, nofollow" : "index, follow";
 
-  return [
+  const meta: MetaDescriptor[] = [
     { title: page.title },
     { name: "description", content: page.description },
     { name: "robots", content: robots },
@@ -42,6 +45,12 @@ export function createSeoMeta(page: SeoPage): MetaDescriptor[] {
     { name: "twitter:description", content: page.description },
     { name: "twitter:image", content: image },
   ];
+
+  if (page.schema) {
+    meta.push({ "script:ld+json": page.schema });
+  }
+
+  return meta;
 }
 
 export const privatePageMeta: MetaDescriptor[] = [
