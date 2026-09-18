@@ -25,7 +25,7 @@ describe("tool page definitions", () => {
 
   it("registers a React implementation for every routable tool", () => {
     for (const tool of routableToolPages) {
-      expect(toolComponents[tool.slug], tool.slug).toBeDefined();
+      expect(toolComponents[tool.componentKey], `${tool.slug} -> ${tool.componentKey}`).toBeDefined();
     }
   });
 
