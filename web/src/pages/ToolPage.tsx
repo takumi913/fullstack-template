@@ -16,7 +16,7 @@ export default function ToolPage() {
   return (
     <main className="shell border-x px-6 py-10 sm:px-12 sm:py-14">
       <Breadcrumbs tool={tool} />
-      <LanguageSwitcher alternates={tool.alternates} currentPath={pathname} />
+      <LanguageSwitcher alternates={tool.alternates} currentPath={pathname} locale={tool.locale} />
 
       <header className="mt-8 max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
