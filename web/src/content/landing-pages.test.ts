@@ -19,14 +19,66 @@ describe("landing page definitions", () => {
       expect(page.path.includes("?"), page.slug).toBe(false);
       expect(page.path.includes("#"), page.slug).toBe(false);
 
+      const localizedPrefix = page.locale ? `/${page.locale}` : "";
       if (page.kind === "use-case") {
-        expect(page.path.startsWith("/use-cases/"), page.path).toBe(true);
+        expect(
+          page.path === `${localizedPrefix}/use-cases/${page.slug.replace(/-[a-z]{2}$/i, "")}` ||
+            page.path.startsWith(`${localizedPrefix}/use-cases/`),
+          page.path,
+        ).toBe(true);
       }
       if (page.kind === "comparison") {
-        expect(page.path.startsWith("/compare/"), page.path).toBe(true);
+        expect(page.path.startsWith(`${localizedPrefix}/compare/`), page.path).toBe(true);
       }
       if (page.kind === "guide") {
-        expect(page.path.startsWith("/guides/"), page.path).toBe(true);
+        expect(page.path.startsWith(`${localizedPrefix}/guides/`), page.path).toBe(true);
+      }
+    }
+  });
+
+  it("keeps localized URL prefixes aligned with locale metadata", () => {
+    for (const page of routableLandingPages) {
+      const localizedMatch = page.path.match(/^\/([^/]+)\/(?:use-cases|compare|guides)\//);
+
+      if (localizedMatch) {
+        expect(page.locale, `${page.slug} locale`).toBe(localizedMatch[1]);
+      }
+    }
+  });
+
+  it("keeps hreflang sets self-referencing and reciprocal", () => {
+    const pagesByPath = new Map(routableLandingPages.map((page) => [page.path, page]));
+
+    for (const page of routableLandingPages) {
+      if (!page.alternates?.length) continue;
+
+      expect(page.locale, `${page.slug} locale`).toBeTruthy();
+
+      const hreflangs = page.alternates.map((alternate) => alternate.hreflang);
+      expect(new Set(hreflangs).size, `${page.slug} hreflang uniqueness`).toBe(hreflangs.length);
+      expect(
+        page.alternates.some(
+          (alternate) => alternate.hreflang === page.locale && alternate.path === page.path,
+        ),
+        `${page.slug} self hreflang`,
+      ).toBe(true);
+
+      for (const alternate of page.alternates) {
+        const target = pagesByPath.get(alternate.path);
+
+        if (alternate.hreflang === "x-default") {
+          expect(target, `${page.slug} x-default -> ${alternate.path}`).toBeDefined();
+          continue;
+        }
+
+        expect(target, `${page.slug} -> ${alternate.path}`).toBeDefined();
+        expect(target?.locale).toBe(alternate.hreflang);
+        expect(
+          target?.alternates?.some(
+            (backlink) => backlink.hreflang === page.locale && backlink.path === page.path,
+          ),
+          `${alternate.path} -> ${page.path}`,
+        ).toBe(true);
       }
     }
   });
