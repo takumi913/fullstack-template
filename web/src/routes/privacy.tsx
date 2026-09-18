@@ -1,15 +1,7 @@
 import PrivacyPage from "@/pages/PrivacyPage";
-import { createSeoMeta, type SeoPage } from "@/seo/page";
+import { createSeoMeta } from "@/seo/page";
+import { publicSeoPages } from "@/seo/pages";
 
-export const seo: SeoPage = {
-  path: "/legal/privacy-policy",
-  primaryKeyword: "privacy policy",
-  title: "隐私政策 | Fullstack Template",
-  description: "Fullstack Template 的隐私政策与数据处理说明。",
-  h1: "隐私政策",
-  intent: "legal",
-};
-
-export const meta = () => createSeoMeta(seo);
+export const meta = () => createSeoMeta(publicSeoPages.privacy);
 
 export default PrivacyPage;
