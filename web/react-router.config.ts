@@ -5,5 +5,5 @@ export default {
   appDirectory: "src",
   buildDirectory: "dist",
   ssr: false,
-  prerender: ["/", "/legal/privacy-policy", "/legal/terms", ...toolPrerenderPaths],
+  prerender: ["/", "/tools", "/legal/privacy-policy", "/legal/terms", ...toolPrerenderPaths],
 } satisfies Config;
