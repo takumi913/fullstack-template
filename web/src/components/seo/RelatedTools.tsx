@@ -10,7 +10,9 @@ export function RelatedTools({ tool }: { tool: ToolPageDefinition }) {
 
   return (
     <section className="border-t pt-12">
-      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">{copy.relatedTools}</h2>
+      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
+        {copy.relatedTools}
+      </h2>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {relatedTools.map((related) => (
           <Link
