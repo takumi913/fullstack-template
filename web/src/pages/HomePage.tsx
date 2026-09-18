@@ -1,5 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import { publicSeoPages } from "@/seo/pages";
 
 const capabilities = [
   ["Authentication", "邮箱密码认证、数据库 Session 与安全 Cookie。"],
@@ -14,7 +15,7 @@ export default function HomePage() {
       <section className="shell border-x px-6 py-24 sm:px-12 sm:py-32">
         <div className="max-w-3xl">
           <h1 className="max-w-3xl text-5xl font-semibold leading-[1.06] tracking-[-0.045em] text-zinc-950 sm:text-7xl">
-            Go + React 多租户 SaaS 全栈模板
+            {publicSeoPages.home.h1}
           </h1>
           <p className="mt-7 max-w-2xl text-base leading-7 text-zinc-600">
             认证、工作区、多租户 RBAC、SQLite/PostgreSQL 与生产部署骨架已经就位，
