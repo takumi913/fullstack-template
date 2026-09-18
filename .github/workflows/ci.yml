@@ -110,7 +110,12 @@ jobs:
 
       - name: Check frontend formatting
         working-directory: web
-        run: bun run format:check
+        run: |
+          if ! bun run format:check; then
+            bun run format
+            git diff -- .
+            exit 1
+          fi
 
       - name: Run frontend lint
         working-directory: web
