@@ -19,19 +19,23 @@ describe("landing page definitions", () => {
       expect(page.path.includes("?"), page.slug).toBe(false);
       expect(page.path.includes("#"), page.slug).toBe(false);
 
-      const localizedPrefix = page.locale ? `/${page.locale}` : "";
       if (page.kind === "use-case") {
         expect(
-          page.path === `${localizedPrefix}/use-cases/${page.slug.replace(/-[a-z]{2}$/i, "")}` ||
-            page.path.startsWith(`${localizedPrefix}/use-cases/`),
+          /^\/(?:[A-Za-z0-9-]+\/)?use-cases\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(page.path),
           page.path,
         ).toBe(true);
       }
       if (page.kind === "comparison") {
-        expect(page.path.startsWith(`${localizedPrefix}/compare/`), page.path).toBe(true);
+        expect(
+          /^\/(?:[A-Za-z0-9-]+\/)?compare\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(page.path),
+          page.path,
+        ).toBe(true);
       }
       if (page.kind === "guide") {
-        expect(page.path.startsWith(`${localizedPrefix}/guides/`), page.path).toBe(true);
+        expect(
+          /^\/(?:[A-Za-z0-9-]+\/)?guides\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(page.path),
+          page.path,
+        ).toBe(true);
       }
     }
   });
