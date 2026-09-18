@@ -88,6 +88,8 @@ jobs:
       VITE_SITE_DESCRIPTION: CI build used to verify production SEO output and template safeguards.
       VITE_SITE_IMAGE: /og-image.svg
       SEO_STRICT: "true"
+      # CI intentionally keeps the template demo pages so their SSG/SEO behavior remains covered.
+      SEO_ALLOW_TEMPLATE_EXAMPLES: "true"
 
     steps:
       - name: Checkout code

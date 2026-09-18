@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { templateSiteConfig } from "../config/site-config";
+import { scaffoldSentinels } from "../config/scaffold-sentinels";
 import { assertSeoBuildSiteIdentity } from "./site-identity";
 
 const customIdentity = {
@@ -22,7 +22,7 @@ describe("site identity validation", () => {
       assertSeoBuildSiteIdentity(
         {
           ...customIdentity,
-          name: templateSiteConfig.brand.name,
+          name: scaffoldSentinels.name,
         },
         true,
       ),
@@ -34,7 +34,7 @@ describe("site identity validation", () => {
       assertSeoBuildSiteIdentity(
         {
           ...customIdentity,
-          title: templateSiteConfig.seo.defaultTitle,
+          title: scaffoldSentinels.title,
         },
         true,
       ),
@@ -46,7 +46,7 @@ describe("site identity validation", () => {
       assertSeoBuildSiteIdentity(
         {
           ...customIdentity,
-          description: templateSiteConfig.seo.defaultDescription,
+          description: scaffoldSentinels.description,
         },
         true,
       ),

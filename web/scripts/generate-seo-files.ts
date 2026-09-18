@@ -2,11 +2,12 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { templateSiteConfig } from "../src/config/site-config";
-import { routableLandingPages } from "../src/content/landing-pages";
-import { routableToolPages } from "../src/content/tool-pages";
+import { landingPages, routableLandingPages } from "../src/content/landing-pages";
+import { routableToolPages, toolPages } from "../src/content/tool-pages";
 import { indexableSeoPages } from "../src/seo/pages";
 import { createLandingSeoPage } from "../src/seo/landing-page";
 import { createToolSeoPage } from "../src/seo/tool-page";
+import { assertProductionContentReady } from "../src/seo/production-readiness";
 import { assertSeoBuildSiteIdentity } from "../src/seo/site-identity";
 import { assertSeoBuildSiteUrl } from "../src/seo/site-url";
 
@@ -22,6 +23,12 @@ assertSeoBuildSiteIdentity(
   },
   strictSeo,
 );
+assertProductionContentReady({
+  strict: strictSeo,
+  allowTemplateExamples: process.env.SEO_ALLOW_TEMPLATE_EXAMPLES === "true",
+  tools: toolPages,
+  landings: landingPages,
+});
 
 function escapeXml(value: string) {
   return value

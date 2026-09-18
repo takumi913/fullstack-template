@@ -1,6 +1,8 @@
+import { scaffoldSentinels } from "./scaffold-sentinels";
+
 export const templateSiteConfig = {
   brand: {
-    name: "Fullstack Template",
+    name: scaffoldSentinels.name,
     shortName: "Fullstack",
     mark: "F",
     favicon: "/favicon.svg",
@@ -8,9 +10,8 @@ export const templateSiteConfig = {
   seo: {
     locale: "zh-CN",
     primaryKeyword: "go react saas template",
-    defaultTitle: "Go + React 多租户 SaaS 全栈模板",
-    defaultDescription:
-      "基于 Go、React、sqlc、PostgreSQL/SQLite 与多租户 RBAC 的 SaaS 全栈母模板。",
+    defaultTitle: scaffoldSentinels.title,
+    defaultDescription: scaffoldSentinels.description,
     defaultImage: "/og-image.svg",
   },
   appearance: {

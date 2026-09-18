@@ -45,11 +45,16 @@ strict 模式会阻止：
 
 - localhost / 保留测试域名
 - example.com / .test / .example / .invalid
-- 默认母模板品牌
-- 默认母模板 title
-- 默认母模板 description
+- 原始母模板品牌
+- 原始母模板 title
+- 原始母模板 description
+- 仍处于 `status: "example"` 的 Tool / Landing 页面
+- 已发布页面中残留的原始 `Fullstack Template` 品牌
 
-这样可以避免复制模板后忘记改品牌就部署。
+这样可以避免复制模板后忘记改品牌或清理 demo 就部署。
+
+这些“原始模板值”保存在 `web/src/config/scaffold-sentinels.ts`，用于发布保护，不要修改。
+你的真实品牌仍然只需要改 `site-config.ts`，并在生产构建中提供对应的 `VITE_SITE_*`。
 
 ## 3. 添加真实工具
 

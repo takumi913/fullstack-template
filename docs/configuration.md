@@ -78,8 +78,12 @@ VITE_SITE_DESCRIPTION=Describe the primary user value here.
 VITE_SITE_IMAGE=/og-image.svg
 
 # 生产 CI / Docker 构建建议开启。
-# 开启后会校验 canonical 域名，并阻止默认母模板品牌/title/description 被直接上线。
+# 开启后会校验 canonical 域名，并阻止原始母模板品牌/title/description
+# 与 status=example 的模板示例内容被直接上线。
 SEO_STRICT=true
+
+# 只用于母模板仓库自己的 CI/测试；真实生产站不要开启。
+SEO_ALLOW_TEMPLATE_EXAMPLES=false
 ```
 
 `VITE_SITE_URL` 必须是纯 origin：
@@ -100,7 +104,11 @@ https://example.com?a=1    ❌
 
 本地开发可以不设置 `SEO_STRICT`。开启 strict 后，除了生产域名外，还必须显式提供
 `VITE_SITE_NAME`、`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION`，且不能继续使用
-`site-config.ts` 中的母模板默认值。
+仓库内置的原始脚手架身份值。这个比较使用不可编辑的 `scaffold-sentinels.ts`，
+因此你可以正常把 `site-config.ts` 改成自己的品牌，再用相同品牌的 `VITE_SITE_*` 做生产构建。
+
+strict 模式还会拒绝 `status: "example"` 的 Tool/Landing 页面；母模板自己的 CI 通过
+`SEO_ALLOW_TEMPLATE_EXAMPLES=true` 保留示例覆盖，真实生产站不要开启这个例外。
 
 生产 CI、Docker/BuildKit 或发布流水线建议显式设置：
 

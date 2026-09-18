@@ -1,4 +1,4 @@
-import { templateSiteConfig } from "../config/site-config";
+import { scaffoldSentinels } from "../config/scaffold-sentinels";
 
 export interface SeoSiteIdentityInput {
   name?: string;
@@ -17,19 +17,19 @@ export function assertSeoBuildSiteIdentity(input: SeoSiteIdentityInput, strict: 
   const title = normalized(input.title);
   const description = normalized(input.description);
 
-  if (!name || name === templateSiteConfig.brand.name) {
+  if (!name || name === scaffoldSentinels.name) {
     throw new Error(
       "SEO_STRICT=true requires VITE_SITE_NAME to be explicitly customized from the template default",
     );
   }
 
-  if (!title || title === templateSiteConfig.seo.defaultTitle) {
+  if (!title || title === scaffoldSentinels.title) {
     throw new Error(
       "SEO_STRICT=true requires VITE_SITE_TITLE to be explicitly customized from the template default",
     );
   }
 
-  if (!description || description === templateSiteConfig.seo.defaultDescription) {
+  if (!description || description === scaffoldSentinels.description) {
     throw new Error(
       "SEO_STRICT=true requires VITE_SITE_DESCRIPTION to be explicitly customized from the template default",
     );
