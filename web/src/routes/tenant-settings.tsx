@@ -1,13 +1,6 @@
 import TenantSettingsPage from "@/pages/TenantSettingsPage";
-import { ProtectedRoute } from "@/router/RouteGuards";
-import { privatePageMeta } from "@/seo/page";
+import { privatePageTitleMeta } from "@/seo/page";
 
-export const meta = () => privatePageMeta;
+export const meta = () => privatePageTitleMeta("Workspace settings");
 
-export default function TenantSettingsRoute() {
-  return (
-    <ProtectedRoute>
-      <TenantSettingsPage />
-    </ProtectedRoute>
-  );
-}
+export default TenantSettingsPage;
