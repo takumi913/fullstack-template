@@ -56,7 +56,7 @@ assertIncludes(home, "application/ld+json", "home HTML");
 
 const toolsHub = await readOutput("tools", "index.html");
 assertIncludes(toolsHub, publicSeoPages.tools.title, "tools hub HTML");
-assertIncludes(toolsHub, "noindex, nofollow", "tools hub HTML");
+assertIncludes(toolsHub, "noindex, follow", "tools hub HTML");
 assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
 
 for (const tool of routableToolPages) {
@@ -75,7 +75,7 @@ for (const tool of routableToolPages) {
   );
 
   if (seo.noindex) {
-    assertIncludes(html, "noindex, nofollow", `${tool.slug} HTML`);
+    assertIncludes(html, "noindex, follow", `${tool.slug} HTML`);
   }
 
   for (const alternate of tool.alternates || []) {
@@ -123,7 +123,7 @@ for (const page of routableLandingPages) {
   assertIncludes(html, "WebPage", `${page.slug} landing HTML`);
 
   if (seo.noindex) {
-    assertIncludes(html, "noindex, nofollow", `${page.slug} landing HTML`);
+    assertIncludes(html, "noindex, follow", `${page.slug} landing HTML`);
   }
 }
 
