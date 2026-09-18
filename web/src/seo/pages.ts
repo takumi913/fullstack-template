@@ -1,3 +1,4 @@
+import { absoluteUrl, siteConfig } from "./site";
 import type { SeoPage } from "./page";
 
 export const publicSeoPages = {
@@ -11,6 +12,23 @@ export const publicSeoPages = {
     intent: "commercial",
     updatedAt: "2026-09-18",
     relatedPages: ["/legal/privacy-policy", "/legal/terms"],
+    schema: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: siteConfig.name,
+        url: absoluteUrl("/"),
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: siteConfig.name,
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Web",
+        url: absoluteUrl("/"),
+        description: siteConfig.defaultDescription,
+      },
+    ],
   },
   privacy: {
     path: "/legal/privacy-policy",
