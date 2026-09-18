@@ -68,7 +68,13 @@ TRUST_PROXY=false
 ```env
 VITE_SITE_URL=https://example.com
 VITE_SITE_NAME=Example
+VITE_SITE_SHORT_NAME=Example
+VITE_SITE_MARK=E
 VITE_SITE_LOCALE=zh-CN
+VITE_SITE_PRIMARY_KEYWORD=example online tool
+VITE_SITE_TITLE=Example Online Tool
+VITE_SITE_DESCRIPTION=Describe the primary user value here.
+VITE_SITE_IMAGE=/og-image.svg
 
 # 生产 CI / Docker 构建建议开启。
 # 开启后，如果 VITE_SITE_URL 缺失或仍是 https://example.com，构建会直接失败。
@@ -87,6 +93,10 @@ https://example.com?a=1    ❌
 它会作为 canonical、Open Graph URL、JSON-LD、sitemap 和 robots.txt 的域名来源。
 因此生产环境不要依赖默认值 `https://example.com`。
 
+品牌与长文案的默认值集中在 `web/src/config/site-config.ts`。复制模板创建新站时，
+优先修改这个文件以及 `web/src/content/` 下的页面数据；`VITE_SITE_*` 变量用于部署时覆盖
+品牌名、标题、描述、主关键词、OG 图片等构建期值。
+
 本地开发可以不设置 `SEO_STRICT`；生产 CI、Docker/BuildKit 或发布流水线建议显式设置：
 
 ```bash
@@ -99,7 +109,13 @@ Docker 构建时通过 build args 注入：
 docker build \
   --build-arg VITE_SITE_URL=https://your-domain.com \
   --build-arg VITE_SITE_NAME="Your Product" \
+  --build-arg VITE_SITE_SHORT_NAME="Your Product" \
+  --build-arg VITE_SITE_MARK=Y \
   --build-arg VITE_SITE_LOCALE=en \
+  --build-arg VITE_SITE_PRIMARY_KEYWORD="your primary keyword" \
+  --build-arg VITE_SITE_TITLE="Your SEO Title" \
+  --build-arg VITE_SITE_DESCRIPTION="Your product description" \
+  --build-arg VITE_SITE_IMAGE=/og-image.png \
   --build-arg SEO_STRICT=true \
   .
 ```
