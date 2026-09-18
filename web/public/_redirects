@@ -1,6 +1,11 @@
-# Cloudflare Pages 重定向配置
-# 静态文件（ads.txt, llms.txt 等）会自动优先匹配，无需额外配置
-# 以下规则仅处理 SPA 路由 fallback
+# Cloudflare Pages 路由规则
+# 公开 SEO 页面由 React Router 预渲染为真实 HTML，静态文件优先匹配。
+# 只有应用内路由使用 SPA fallback，未知 URL 返回真正的 404。
 
-# SPA fallback - 所有未匹配的路径返回 index.html
-/*    /index.html   200
+/login                 /__spa-fallback.html  200
+/register              /__spa-fallback.html  200
+/dashboard             /__spa-fallback.html  200
+/settings/*            /__spa-fallback.html  200
+/tenant/*              /__spa-fallback.html  200
+
+/*                     /404.html             404
