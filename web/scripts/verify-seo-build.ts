@@ -148,11 +148,7 @@ for (const tool of routableToolPages) {
   );
   if (toolLanguageVersions.length > 1) {
     const copy = publicPageCopy(tool.locale);
-    assertIncludes(
-      html,
-      `aria-label="${copy.languageVersions}"`,
-      `${tool.slug} language switcher`,
-    );
+    assertIncludes(html, `aria-label="${copy.languageVersions}"`, `${tool.slug} language switcher`);
   }
 
   for (const alternate of tool.alternates || []) {
@@ -185,7 +181,11 @@ assertIncludes(
 );
 assertIncludes(japaneseJsonFormatterHtml, "使い方", "Japanese JSON formatter how-to heading");
 assertIncludes(japaneseJsonFormatterHtml, "よくある質問", "Japanese JSON formatter FAQ heading");
-assertIncludes(japaneseJsonFormatterHtml, "関連リソース", "Japanese JSON formatter resources heading");
+assertIncludes(
+  japaneseJsonFormatterHtml,
+  "関連リソース",
+  "Japanese JSON formatter resources heading",
+);
 
 const japaneseJsonGuideHtml = await readOutput("ja", "guides", "json-syntax", "index.html");
 assertIncludes(japaneseJsonGuideHtml, 'lang="ja"', "Japanese JSON guide language");
@@ -269,11 +269,7 @@ for (const page of routableLandingPages) {
   );
   if (landingLanguageVersions.length > 1) {
     const copy = publicPageCopy(page.locale);
-    assertIncludes(
-      html,
-      `aria-label="${copy.languageVersions}"`,
-      `${page.slug} language switcher`,
-    );
+    assertIncludes(html, `aria-label="${copy.languageVersions}"`, `${page.slug} language switcher`);
   }
 
   for (const alternate of page.alternates || []) {
