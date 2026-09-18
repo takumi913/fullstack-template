@@ -1,7 +1,7 @@
 import { access, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { routableLandingPages } from "../src/content/landing-pages";
+import { directoryLandingPages, getLandingPagesForTool, routableLandingPages } from "../src/content/landing-pages";
 import { routableToolPages, toolPath } from "../src/content/tool-pages";
 import { createLandingSeoPage } from "../src/seo/landing-page";
 import { publicSeoPages } from "../src/seo/pages";
@@ -59,6 +59,13 @@ assertIncludes(toolsHub, publicSeoPages.tools.title, "tools hub HTML");
 assertIncludes(toolsHub, "noindex, follow", "tools hub HTML");
 assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
 
+const resourcesHub = await readOutput("resources", "index.html");
+assertIncludes(resourcesHub, publicSeoPages.resources.title, "resources hub HTML");
+assertIncludes(resourcesHub, "noindex, follow", "resources hub HTML");
+for (const page of directoryLandingPages) {
+  assertIncludes(resourcesHub, `href="${page.path}"`, `resources hub -> ${page.path}`);
+}
+
 for (const tool of routableToolPages) {
   const html = await readOutput(...htmlOutputParts(toolPath(tool)));
   const seo = createToolSeoPage(tool);
@@ -76,6 +83,10 @@ for (const tool of routableToolPages) {
 
   if (seo.noindex) {
     assertIncludes(html, "noindex, follow", `${tool.slug} HTML`);
+  }
+
+  for (const resource of getLandingPagesForTool(tool.slug)) {
+    assertIncludes(html, `href="${resource.path}"`, `${tool.slug} -> ${resource.path}`);
   }
 
   for (const alternate of tool.alternates || []) {
