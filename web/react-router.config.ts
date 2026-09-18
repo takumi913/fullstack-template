@@ -1,4 +1,5 @@
 import type { Config } from "@react-router/dev/config";
+import { landingPrerenderPaths } from "./src/content/landing-pages";
 import { toolPrerenderPaths } from "./src/content/tool-pages";
 
 export default {
@@ -12,5 +13,6 @@ export default {
     "/legal/privacy-policy",
     "/legal/terms",
     ...toolPrerenderPaths,
+    ...landingPrerenderPaths,
   ],
 } satisfies Config;
