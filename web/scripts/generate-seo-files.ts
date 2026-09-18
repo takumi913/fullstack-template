@@ -6,12 +6,21 @@ import { routableToolPages } from "../src/content/tool-pages";
 import { indexableSeoPages } from "../src/seo/pages";
 import { createLandingSeoPage } from "../src/seo/landing-page";
 import { createToolSeoPage } from "../src/seo/tool-page";
+import { assertSeoBuildSiteIdentity } from "../src/seo/site-identity";
 import { assertSeoBuildSiteUrl } from "../src/seo/site-url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const outputDir = join(scriptDir, "..", "dist", "client");
 const strictSeo = process.env.SEO_STRICT === "true";
 const siteUrl = assertSeoBuildSiteUrl(process.env.VITE_SITE_URL, strictSeo);
+assertSeoBuildSiteIdentity(
+  {
+    name: process.env.VITE_SITE_NAME,
+    title: process.env.VITE_SITE_TITLE,
+    description: process.env.VITE_SITE_DESCRIPTION,
+  },
+  strictSeo,
+);
 
 function escapeXml(value: string) {
   return value
