@@ -17,6 +17,7 @@ export interface LandingPageDefinition {
   slug: string;
   kind: LandingPageKind;
   status: LandingPageStatus;
+  templateExample?: boolean;
   path: string;
   primaryKeyword: string;
   locale?: string;
@@ -44,6 +45,7 @@ export const landingPages: LandingPageDefinition[] = [
     slug: "json-api-debugging",
     kind: "use-case",
     status: "example",
+    templateExample: true,
     path: "/use-cases/json-api-debugging",
     locale: "en",
     primaryKeyword: "json api debugging",
@@ -78,6 +80,7 @@ export const landingPages: LandingPageDefinition[] = [
     slug: "json-syntax",
     kind: "guide",
     status: "example",
+    templateExample: true,
     path: "/guides/json-syntax",
     locale: "en",
     alternates: jsonSyntaxAlternates,
@@ -106,6 +109,7 @@ export const landingPages: LandingPageDefinition[] = [
     slug: "json-syntax-ja",
     kind: "guide",
     status: "example",
+    templateExample: true,
     path: "/ja/guides/json-syntax",
     locale: "ja",
     alternates: jsonSyntaxAlternates,
@@ -134,6 +138,7 @@ export const landingPages: LandingPageDefinition[] = [
     slug: "json-formatter-vs-validator",
     kind: "comparison",
     status: "example",
+    templateExample: true,
     path: "/compare/json-formatter-vs-validator",
     locale: "en",
     primaryKeyword: "json formatter vs json validator",
