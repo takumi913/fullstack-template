@@ -1,8 +1,6 @@
-import { resolve, sep } from "node:path";
-
 export const generatedPublicAssets = new Set(["/favicon.svg", "/og-image.svg"]);
 
-export function resolvePublicAssetPath(publicDir: string, assetPath: string) {
+export function normalizePublicAssetPath(assetPath: string) {
   const normalized = assetPath.trim();
 
   if (!normalized.startsWith("/")) {
@@ -13,13 +11,11 @@ export function resolvePublicAssetPath(publicDir: string, assetPath: string) {
     throw new Error(`Public asset path must not include query/hash: ${assetPath}`);
   }
 
-  const relative = normalized.replace(/^\/+/, "");
-  const root = resolve(publicDir);
-  const fullPath = resolve(root, relative);
+  const segments = normalized.split("/").filter(Boolean);
 
-  if (fullPath !== root && !fullPath.startsWith(root + sep)) {
-    throw new Error(`Public asset path escapes web/public: ${assetPath}`);
+  if (segments.some((segment) => segment === "." || segment === "..")) {
+    throw new Error(`Public asset path must stay inside web/public: ${assetPath}`);
   }
 
-  return fullPath;
+  return segments.join("/");
 }

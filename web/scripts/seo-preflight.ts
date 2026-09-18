@@ -2,7 +2,7 @@ import { access } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runSeoPreflight } from "../src/seo/preflight";
-import { generatedPublicAssets, resolvePublicAssetPath } from "../src/seo/public-asset";
+import { generatedPublicAssets, normalizePublicAssetPath } from "../src/seo/public-asset";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(scriptDir, "..", "public");
@@ -11,7 +11,8 @@ const { strict, siteUrl, resolvedSite } = runSeoPreflight(process.env);
 async function assertConfiguredAssetExists(assetPath: string, label: string) {
   if (generatedPublicAssets.has(assetPath)) return;
 
-  const filePath = resolvePublicAssetPath(publicDir, assetPath);
+  const relativePath = normalizePublicAssetPath(assetPath);
+  const filePath = join(publicDir, relativePath);
 
   try {
     await access(filePath);
