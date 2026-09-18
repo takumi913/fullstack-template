@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_SITE_NAME?: string;
   readonly VITE_SITE_SHORT_NAME?: string;
   readonly VITE_SITE_MARK?: string;
+  readonly VITE_SITE_FAVICON?: string;
   readonly VITE_SITE_LOCALE?: string;
   readonly VITE_SITE_PRIMARY_KEYWORD?: string;
   readonly VITE_SITE_TITLE?: string;
