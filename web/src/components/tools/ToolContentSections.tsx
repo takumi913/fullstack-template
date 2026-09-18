@@ -1,13 +1,16 @@
 import type { ToolPageDefinition } from "@/content/tool-pages";
 import { RelatedResources } from "@/components/seo/RelatedResources";
 import { RelatedTools } from "@/components/seo/RelatedTools";
+import { publicPageCopy } from "@/seo/ui-copy";
 
 function FeaturesAndHowTo({ tool }: { tool: ToolPageDefinition }) {
+  const copy = publicPageCopy(tool.locale);
+
   return (
     <>
       <div>
         <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
-          What this tool does
+          {copy.whatThisToolDoes}
         </h2>
         <ul className="mt-5 space-y-3 text-sm leading-6 text-zinc-600">
           {tool.features.map((feature) => (
@@ -23,7 +26,7 @@ function FeaturesAndHowTo({ tool }: { tool: ToolPageDefinition }) {
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">How to use it</h2>
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">{copy.howToUse}</h2>
         <ol className="mt-5 space-y-4 text-sm leading-6 text-zinc-600">
           {tool.howToSteps.map((step, index) => (
             <li className="flex gap-3" key={step}>
@@ -40,12 +43,13 @@ function FeaturesAndHowTo({ tool }: { tool: ToolPageDefinition }) {
 }
 
 function FaqContent({ tool }: { tool: ToolPageDefinition }) {
+  const copy = publicPageCopy(tool.locale);
   if (tool.faq.length === 0) return null;
 
   return (
     <>
       <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
-        Frequently asked questions
+        {copy.faq}
       </h2>
       <div className="mt-6 divide-y border-y">
         {tool.faq.map((item) => (
