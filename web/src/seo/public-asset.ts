@@ -19,3 +19,15 @@ export function normalizePublicAssetPath(assetPath: string) {
 
   return segments.join("/");
 }
+
+export function publicAssetMimeType(assetPath: string) {
+  const normalized = assetPath.trim().toLocaleLowerCase();
+
+  if (normalized.endsWith(".svg")) return "image/svg+xml";
+  if (normalized.endsWith(".png")) return "image/png";
+  if (normalized.endsWith(".ico")) return "image/x-icon";
+  if (normalized.endsWith(".jpg") || normalized.endsWith(".jpeg")) return "image/jpeg";
+  if (normalized.endsWith(".webp")) return "image/webp";
+
+  return undefined;
+}
