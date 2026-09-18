@@ -6,7 +6,7 @@
   "packageManager": "bun@1.3.14",
   "scripts": {
     "dev": "react-router dev",
-    "build": "react-router build && bun run seo:generate",
+    "build": "react-router build && bun run seo:generate && bun run seo:verify",
     "typecheck": "react-router typegen && tsc -b",
     "seo:generate": "bun scripts/generate-seo-files.ts",
     "lint": "eslint .",
@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "seo:verify": "bun scripts/verify-seo-build.ts"
   },
   "dependencies": {
     "@react-router/node": "7.18.3",
