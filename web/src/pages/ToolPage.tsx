@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { RelatedResources } from "@/components/seo/RelatedResources";
 import { RelatedTools } from "@/components/seo/RelatedTools";
 import { getToolPageByPath } from "@/content/tool-pages";
 import { ToolRuntime } from "@/tools/registry";
@@ -81,7 +82,8 @@ export default function ToolPage() {
         </section>
       )}
 
-      <div className="mt-14">
+      <div className="mt-14 space-y-14">
+        <RelatedResources tool={tool} />
         <RelatedTools tool={tool} />
       </div>
     </main>
