@@ -63,6 +63,14 @@ function assertPublicHtmlDoesNotLoadPrivateApp(html: string, label: string) {
   }
 }
 
+function assertStaticHtmlDoesNotHydrate(html: string, label: string) {
+  assertExcludes(html, "entry.client-", `${label} client runtime`);
+}
+
+function assertHydratedHtml(html: string, label: string) {
+  assertIncludes(html, "entry.client-", `${label} client runtime`);
+}
+
 const home = await readOutput("index.html");
 assertIncludes(home, publicSeoPages.home.title, "home HTML");
 assertIncludes(home, `href="${siteConfig.favicon}"`, "home favicon");
@@ -71,17 +79,20 @@ assertIncludes(home, 'rel="canonical"', "home HTML");
 assertIncludes(home, `href="${siteConfig.url}/"`, "home canonical");
 assertIncludes(home, "application/ld+json", "home HTML");
 assertPublicHtmlDoesNotLoadPrivateApp(home, "home HTML");
+assertStaticHtmlDoesNotHydrate(home, "home HTML");
 
 const toolsHub = await readOutput("tools", "index.html");
 assertIncludes(toolsHub, publicSeoPages.tools.title, "tools hub HTML");
 assertIncludes(toolsHub, "noindex, follow", "tools hub HTML");
 assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
 assertPublicHtmlDoesNotLoadPrivateApp(toolsHub, "tools hub HTML");
+assertStaticHtmlDoesNotHydrate(toolsHub, "tools hub HTML");
 
 const resourcesHub = await readOutput("resources", "index.html");
 assertIncludes(resourcesHub, publicSeoPages.resources.title, "resources hub HTML");
 assertIncludes(resourcesHub, "noindex, follow", "resources hub HTML");
 assertPublicHtmlDoesNotLoadPrivateApp(resourcesHub, "resources hub HTML");
+assertStaticHtmlDoesNotHydrate(resourcesHub, "resources hub HTML");
 
 for (const page of Object.values(publicSeoPages)) {
   if (!("noindex" in page) || !page.noindex) continue;
@@ -98,6 +109,7 @@ for (const tool of routableToolPages) {
   const seo = createToolSeoPage(tool);
 
   assertPublicHtmlDoesNotLoadPrivateApp(html, `${tool.slug} HTML`);
+  assertHydratedHtml(html, `${tool.slug} HTML`);
   assertIncludes(html, tool.title, `${tool.slug} HTML`);
   assertIncludes(html, tool.h1, `${tool.slug} HTML`);
   assertIncludes(html, 'rel="canonical"', `${tool.slug} HTML`);
@@ -144,10 +156,12 @@ assertIncludes(japaneseJsonGuideHtml, "JSON 構文ガイド", "Japanese JSON gui
 const notFound = await readOutput("404.html");
 assertIncludes(notFound, "404 - Page not found", "404 HTML");
 assertIncludes(notFound, "noindex, nofollow", "404 HTML");
+assertStaticHtmlDoesNotHydrate(notFound, "404 HTML");
 await assertOutputMissing("404", "index.html");
 
 const spaFallback = await readOutput("__spa-fallback.html");
 assertIncludes(spaFallback, "noindex, nofollow", "SPA fallback HTML");
+assertHydratedHtml(spaFallback, "SPA fallback HTML");
 
 const redirects = await readOutput("_redirects");
 assertExcludes(redirects, "/404.html                404", "Cloudflare redirects");
@@ -199,6 +213,7 @@ for (const page of routableLandingPages) {
   const seo = createLandingSeoPage(page);
 
   assertPublicHtmlDoesNotLoadPrivateApp(html, `${page.slug} landing HTML`);
+  assertStaticHtmlDoesNotHydrate(html, `${page.slug} landing HTML`);
   assertIncludes(html, page.title, `${page.slug} landing HTML`);
   assertIncludes(html, page.h1, `${page.slug} landing HTML`);
   assertIncludes(html, 'rel="canonical"', `${page.slug} landing HTML`);
