@@ -24,6 +24,18 @@ export function createHreflangAlternates(
   return alternates;
 }
 
+export function isValidHreflang(value: string) {
+  if (value === "x-default") return true;
+  if (value.includes("_")) return false;
+
+  try {
+    new Intl.Locale(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function toOpenGraphLocale(locale: string) {
   try {
     const expanded = new Intl.Locale(locale).maximize();
