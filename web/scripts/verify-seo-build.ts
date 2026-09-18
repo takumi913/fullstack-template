@@ -130,6 +130,13 @@ for (const tool of routableToolPages) {
     assertIncludes(html, `href="${resource.path}"`, `${tool.slug} -> ${resource.path}`);
   }
 
+  const toolLanguageVersions = (tool.alternates || []).filter(
+    (alternate) => alternate.hreflang !== "x-default",
+  );
+  if (toolLanguageVersions.length > 1) {
+    assertIncludes(html, 'aria-label="Language versions"', `${tool.slug} language switcher`);
+  }
+
   for (const alternate of tool.alternates || []) {
     assertMatches(
       html,
@@ -137,6 +144,10 @@ for (const tool of routableToolPages) {
       `${tool.slug} hreflang`,
     );
     assertIncludes(html, `href="${siteConfig.url}${alternate.path}"`, `${tool.slug} alternate URL`);
+
+    if (alternate.hreflang !== "x-default" && alternate.path !== toolPath(tool)) {
+      assertIncludes(html, `href="${alternate.path}"`, `${tool.slug} visible language link`);
+    }
   }
 }
 
@@ -225,6 +236,13 @@ for (const page of routableLandingPages) {
     assertIncludes(html, "noindex, follow", `${page.slug} landing HTML`);
   }
 
+  const landingLanguageVersions = (page.alternates || []).filter(
+    (alternate) => alternate.hreflang !== "x-default",
+  );
+  if (landingLanguageVersions.length > 1) {
+    assertIncludes(html, 'aria-label="Language versions"', `${page.slug} language switcher`);
+  }
+
   for (const alternate of page.alternates || []) {
     assertMatches(
       html,
@@ -236,6 +254,14 @@ for (const page of routableLandingPages) {
       `href="${siteConfig.url}${alternate.path}"`,
       `${page.slug} landing alternate URL`,
     );
+
+    if (alternate.hreflang !== "x-default" && alternate.path !== page.path) {
+      assertIncludes(
+        html,
+        `href="${alternate.path}"`,
+        `${page.slug} visible language link`,
+      );
+    }
   }
 }
 
