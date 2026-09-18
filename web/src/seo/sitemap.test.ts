@@ -69,11 +69,7 @@ describe("createSitemapXml", () => {
     standalone.updatedAt = "2026-09-19";
 
     expect(
-      createSitemapXml(
-        "https://tools.example.dev",
-        [standalone],
-        new Date("2026-09-19T12:00:00Z"),
-      ),
+      createSitemapXml("https://tools.example.dev", [standalone], new Date("2026-09-19T12:00:00Z")),
     ).toContain("<lastmod>2026-09-19</lastmod>");
   });
 

@@ -30,11 +30,7 @@ function assertValidLastmod(value: string, path: string, now: Date) {
   }
 }
 
-export function createSitemapXml(
-  siteUrl: string,
-  pages: readonly SeoPage[],
-  now = new Date(),
-) {
+export function createSitemapXml(siteUrl: string, pages: readonly SeoPage[], now = new Date()) {
   const sitemapPaths = new Set(pages.map((page) => page.path));
 
   for (const page of pages) {
