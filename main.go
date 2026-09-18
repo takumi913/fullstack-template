@@ -139,6 +139,20 @@ func spaFallbackPath(path string) bool {
 	return strings.HasPrefix(path, "/settings/") || strings.HasPrefix(path, "/tenant/")
 }
 
+// trailingSlashRedirectTarget 将非根路径统一为无尾斜杠 URL。
+// canonical URL 也采用无尾斜杠，避免同一静态页存在两套可抓取地址。
+func trailingSlashRedirectTarget(path, rawQuery string) (string, bool) {
+	if path == "/" || !strings.HasSuffix(path, "/") {
+		return "", false
+	}
+
+	target := strings.TrimSuffix(path, "/")
+	if rawQuery != "" {
+		target += "?" + rawQuery
+	}
+	return target, true
+}
+
 // staticPagePath 解析静态文件和预渲染目录。
 // React Router 会把 /legal/terms 输出为 static/legal/terms/index.html。
 func staticPagePath(staticDir, urlPath string) (string, bool) {
@@ -183,6 +197,13 @@ func setupStaticFiles(e *echo.Echo) {
 		if path == "/" {
 			c.Response().Header().Set("Cache-Control", "no-cache")
 			return c.File(filepath.Join(staticDir, "index.html"))
+		}
+
+		if target, ok := trailingSlashRedirectTarget(path, c.Request().URL.RawQuery); ok {
+			canonicalPath := strings.TrimSuffix(path, "/")
+			if _, staticPage := staticPagePath(staticDir, canonicalPath); staticPage || spaFallbackPath(canonicalPath) {
+				return c.Redirect(http.StatusPermanentRedirect, target)
+			}
 		}
 
 		if filePath, ok := staticPagePath(staticDir, path); ok {
