@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { routableToolPages, toolPath } from "../src/content/tool-pages";
 import { publicSeoPages } from "../src/seo/pages";
 import { createToolSeoPage } from "../src/seo/tool-page";
+import { siteConfig } from "../src/seo/site";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const clientDir = join(scriptDir, "..", "dist", "client");
@@ -27,11 +28,13 @@ function assertExcludes(content: string, unexpected: string, label: string) {
 const home = await readOutput("index.html");
 assertIncludes(home, publicSeoPages.home.title, "home HTML");
 assertIncludes(home, 'rel="canonical"', "home HTML");
+assertIncludes(home, `href="${siteConfig.url}/"`, "home canonical");
 assertIncludes(home, "application/ld+json", "home HTML");
 
 const toolsHub = await readOutput("tools", "index.html");
 assertIncludes(toolsHub, publicSeoPages.tools.title, "tools hub HTML");
 assertIncludes(toolsHub, "noindex, nofollow", "tools hub HTML");
+assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
 
 for (const tool of routableToolPages) {
   const html = await readOutput("tools", tool.slug, "index.html");
@@ -42,6 +45,7 @@ for (const tool of routableToolPages) {
   assertIncludes(html, 'rel="canonical"', `${tool.slug} HTML`);
   assertIncludes(html, "BreadcrumbList", `${tool.slug} HTML`);
   assertIncludes(html, "WebApplication", `${tool.slug} HTML`);
+  assertIncludes(html, `lang="${tool.locale || "zh-CN"}"`, `${tool.slug} document language`);
 
   if (seo.noindex) {
     assertIncludes(html, "noindex, nofollow", `${tool.slug} HTML`);
