@@ -33,11 +33,48 @@ function escapeXml(value: string) {
 }
 
 const siteName = process.env.VITE_SITE_NAME || templateSiteConfig.brand.name;
+const siteShortName = process.env.VITE_SITE_SHORT_NAME || templateSiteConfig.brand.shortName;
 const siteTitle = process.env.VITE_SITE_TITLE || templateSiteConfig.seo.defaultTitle;
 const siteDescription =
   process.env.VITE_SITE_DESCRIPTION || templateSiteConfig.seo.defaultDescription;
 const siteMark = process.env.VITE_SITE_MARK || templateSiteConfig.brand.mark;
 const siteImage = process.env.VITE_SITE_IMAGE || templateSiteConfig.seo.defaultImage;
+const siteFavicon = process.env.VITE_SITE_FAVICON || templateSiteConfig.brand.favicon;
+
+function generateDefaultFavicon() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="${templateSiteConfig.appearance.iconBackground}"/>
+  <text x="32" y="42" font-family="system-ui, sans-serif" font-size="30" font-weight="700" fill="${templateSiteConfig.appearance.iconForeground}" text-anchor="middle">${escapeXml(siteMark.slice(0, 2))}</text>
+</svg>
+`;
+}
+
+function faviconMimeType(path: string) {
+  if (path.endsWith(".svg")) return "image/svg+xml";
+  if (path.endsWith(".png")) return "image/png";
+  if (path.endsWith(".ico")) return "image/x-icon";
+  return "image/*";
+}
+
+const manifest = JSON.stringify(
+  {
+    name: siteName,
+    short_name: siteShortName,
+    start_url: "/",
+    display: "standalone",
+    background_color: templateSiteConfig.appearance.backgroundColor,
+    theme_color: templateSiteConfig.appearance.themeColor,
+    icons: [
+      {
+        src: siteFavicon,
+        sizes: siteFavicon.endsWith(".svg") ? "any" : "512x512",
+        type: faviconMimeType(siteFavicon),
+      },
+    ],
+  },
+  null,
+  2,
+);
 
 function generateDefaultOgImage() {
   return `<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,12 +128,17 @@ const protectedSpaFallback = /<meta[^>]+name=["']robots["'][^>]*>/i.test(spaFall
 const generatedFiles = [
   writeFile(join(outputDir, "sitemap.xml"), sitemap),
   writeFile(join(outputDir, "robots.txt"), robots),
+  writeFile(join(outputDir, "manifest.webmanifest"), manifest + "\n"),
   writeFile(join(outputDir, "404.html"), notFound),
   writeFile(spaFallbackPath, protectedSpaFallback),
 ];
 
 if (siteImage === "/og-image.svg") {
   generatedFiles.push(writeFile(join(outputDir, "og-image.svg"), generateDefaultOgImage()));
+}
+
+if (siteFavicon === "/favicon.svg") {
+  generatedFiles.push(writeFile(join(outputDir, "favicon.svg"), generateDefaultFavicon()));
 }
 
 await Promise.all(generatedFiles);
