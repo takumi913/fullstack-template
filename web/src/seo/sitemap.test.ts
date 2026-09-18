@@ -43,6 +43,40 @@ describe("createSitemapXml", () => {
     ).toThrow(/must be indexable and included/);
   });
 
+  it("rejects malformed, impossible, and future lastmod values", () => {
+    const standalone = page("/guides/standalone", "en");
+    standalone.alternates = undefined;
+
+    standalone.updatedAt = "09/18/2026";
+    expect(() =>
+      createSitemapXml("https://tools.example.dev", [standalone], new Date("2026-09-19T00:00:00Z")),
+    ).toThrow(/YYYY-MM-DD/);
+
+    standalone.updatedAt = "2026-02-30";
+    expect(() =>
+      createSitemapXml("https://tools.example.dev", [standalone], new Date("2026-09-19T00:00:00Z")),
+    ).toThrow(/valid calendar date/);
+
+    standalone.updatedAt = "2026-09-20";
+    expect(() =>
+      createSitemapXml("https://tools.example.dev", [standalone], new Date("2026-09-19T23:59:59Z")),
+    ).toThrow(/cannot be in the future/);
+  });
+
+  it("accepts today's date as a valid lastmod", () => {
+    const standalone = page("/guides/standalone", "en");
+    standalone.alternates = undefined;
+    standalone.updatedAt = "2026-09-19";
+
+    expect(
+      createSitemapXml(
+        "https://tools.example.dev",
+        [standalone],
+        new Date("2026-09-19T12:00:00Z"),
+      ),
+    ).toContain("<lastmod>2026-09-19</lastmod>");
+  });
+
   it("does not add the xhtml namespace when no page has alternates", () => {
     const standalone = page("/guides/standalone", "en");
     standalone.alternates = undefined;

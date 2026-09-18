@@ -41,7 +41,7 @@ web/src/content/landing-pages.ts
   ],
   faq: [],
   relatedToolSlugs: ["image-translator"],
-  updatedAt: "2026-09-18",
+  updatedAt: "2026-09-18", // YYYY-MM-DD；只在内容发生实质更新时修改
 }
 ```
 
@@ -159,3 +159,9 @@ Tool Page
 6. example 页面确认 noindex。
 7. published 页面确认进入 sitemap。
 8. 运行 `bun run build`，让 `seo:verify` 检查最终 HTML。
+
+
+## updatedAt / sitemap lastmod
+
+Landing Page 的 `updatedAt` 使用严格 `YYYY-MM-DD`。它代表内容的真实实质更新时间，
+不是部署日期。构建会拒绝无效日期和未来日期，避免程序化 SEO 批量产生误导的 sitemap lastmod。

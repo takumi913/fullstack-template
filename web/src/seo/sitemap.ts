@@ -9,8 +9,39 @@ function escapeXml(value: string) {
     .replace(/'/g, "&apos;");
 }
 
-export function createSitemapXml(siteUrl: string, pages: readonly SeoPage[]) {
+function assertValidLastmod(value: string, path: string, now: Date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw new Error(`Sitemap lastmod must use YYYY-MM-DD: ${path} -> ${value}`);
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    throw new Error(`Sitemap lastmod is not a valid calendar date: ${path} -> ${value}`);
+  }
+
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  if (parsed > today) {
+    throw new Error(`Sitemap lastmod cannot be in the future: ${path} -> ${value}`);
+  }
+}
+
+export function createSitemapXml(
+  siteUrl: string,
+  pages: readonly SeoPage[],
+  now = new Date(),
+) {
   const sitemapPaths = new Set(pages.map((page) => page.path));
+
+  for (const page of pages) {
+    if (page.updatedAt) {
+      assertValidLastmod(page.updatedAt, page.path, now);
+    }
+  }
   const hasAlternates = pages.some((page) => (page.alternates?.length || 0) > 0);
 
   for (const page of pages) {

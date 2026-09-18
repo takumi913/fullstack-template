@@ -42,7 +42,7 @@ React Router 使用同一个 `/tools/:slug` Route Module。构建时读取工具
     },
   ],
   relatedSlugs: ["ocr-tool"],
-  updatedAt: "2026-09-18",
+  updatedAt: "2026-09-18", // YYYY-MM-DD；只在内容发生实质更新时修改
   isFree: true,
 }
 ```
@@ -210,3 +210,13 @@ sitemap / GSC
 ```
 
 只有在每个页面确实满足不同需求时，才应该扩大页面规模。
+
+
+## updatedAt / sitemap lastmod
+
+`updatedAt` 使用严格的 `YYYY-MM-DD`，并会写入 sitemap 的 `<lastmod>`。
+
+- 只在页面内容发生实质变化时更新；
+- 不要在每次 build 时自动写当前日期；
+- 不允许未来日期；
+- 非法日期会让 production build 直接失败。
