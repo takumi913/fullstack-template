@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      VITE_SITE_URL: https://template.example
+      VITE_SITE_URL: https://template-ci.fullstack.dev
       SEO_STRICT: "true"
 
     steps:
