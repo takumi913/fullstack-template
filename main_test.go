@@ -71,6 +71,7 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		`<!doctype html><meta name="robots" content="noindex, nofollow"><div id="root"></div>`,
 	)
 	writeStaticTestFile(t, staticDir, "404.html", "<h1>not found</h1>")
+	writeStaticTestFile(t, staticDir, "assets/app.js", "console.log('ok')")
 
 	e := echo.New()
 	setupStaticFilesFromDir(e, staticDir)
@@ -117,6 +118,23 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		})
 	}
 
+	t.Run("prerendered HTML is not cached aggressively", func(t *testing.T) {
+		rec := performStaticRequest(e, "/tools/example")
+		if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
+			t.Fatalf("Cache-Control = %q, want %q", got, "no-cache")
+		}
+	})
+
+	t.Run("fingerprinted assets use immutable caching", func(t *testing.T) {
+		rec := performStaticRequest(e, "/assets/app.js")
+		if rec.Code != http.StatusOK {
+			t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+		}
+		if got := rec.Header().Get("Cache-Control"); got != "public, max-age=31536000, immutable" {
+			t.Fatalf("Cache-Control = %q", got)
+		}
+	})
+
 	t.Run("private SPA fallback is noindex", func(t *testing.T) {
 		rec := performStaticRequest(e, "/dashboard")
 		if rec.Code != http.StatusOK {
@@ -134,6 +152,22 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		}
 		if !strings.Contains(rec.Body.String(), "not found") {
 			t.Fatalf("body = %q, want custom 404 page", rec.Body.String())
+		}
+		if got := rec.Header().Get("X-Robots-Tag"); got != "noindex, nofollow" {
+			t.Fatalf("X-Robots-Tag = %q", got)
+		}
+		if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
+			t.Fatalf("Cache-Control = %q, want %q", got, "no-cache")
+		}
+	})
+
+	t.Run("API paths never fall back to static HTML", func(t *testing.T) {
+		rec := performStaticRequest(e, "/api/definitely-missing")
+		if rec.Code != http.StatusNotFound {
+			t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
+		}
+		if strings.Contains(rec.Body.String(), "<h1>") {
+			t.Fatalf("body = %q, API request unexpectedly received HTML", rec.Body.String())
 		}
 	})
 }
