@@ -72,6 +72,10 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	)
 	writeStaticTestFile(t, staticDir, "404.html", "<h1>not found</h1>")
 	writeStaticTestFile(t, staticDir, "assets/app.js", "console.log('ok')")
+	writeStaticTestFile(t, staticDir, "robots.txt", "User-agent: *")
+	writeStaticTestFile(t, staticDir, "sitemap.xml", "<urlset></urlset>")
+	writeStaticTestFile(t, staticDir, "manifest.webmanifest", "{}")
+	writeStaticTestFile(t, staticDir, "favicon.svg", "<svg></svg>")
 
 	e := echo.New()
 	setupStaticFilesFromDir(e, staticDir)
@@ -122,6 +126,18 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		rec := performStaticRequest(e, "/tools/example")
 		if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
 			t.Fatalf("Cache-Control = %q, want %q", got, "no-cache")
+		}
+	})
+
+	t.Run("unhashed public assets require revalidation", func(t *testing.T) {
+		for _, path := range []string{"/robots.txt", "/sitemap.xml", "/manifest.webmanifest", "/favicon.svg"} {
+			rec := performStaticRequest(e, path)
+			if rec.Code != http.StatusOK {
+				t.Fatalf("%s status = %d, want %d", path, rec.Code, http.StatusOK)
+			}
+			if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
+				t.Fatalf("%s Cache-Control = %q, want %q", path, got, "no-cache")
+			}
 		}
 	})
 
