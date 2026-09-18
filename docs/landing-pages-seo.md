@@ -66,6 +66,62 @@ Landing Page 会自动获得：
 - sitemap 管理
 - Related Tools 内链
 - build-time SEO verification
+- `/resources` Hub 自动发现
+- Tool Page ↔ Landing Page 双向主题内链
+
+## 多语言 Landing Page
+
+Landing Page 与 Tool Page 使用同一套 `locale + alternates` 机制。
+
+默认语言可以不带语言前缀：
+
+```text
+/guides/json-syntax
+```
+
+本地化版本使用显式 path：
+
+```text
+/ja/guides/json-syntax
+/ja/use-cases/example
+/ja/compare/example-a-vs-b
+```
+
+例如：
+
+```ts
+{
+  slug: "json-syntax-ja",
+  kind: "guide",
+  path: "/ja/guides/json-syntax",
+  locale: "ja",
+  alternates: [
+    { hreflang: "en", path: "/guides/json-syntax" },
+    { hreflang: "ja", path: "/ja/guides/json-syntax" },
+    { hreflang: "x-default", path: "/guides/json-syntax" },
+  ],
+  showInDirectory: false,
+  // ...
+}
+```
+
+CI 会检查 hreflang 自引用、双向对应、目标路径存在，以及 URL 语言前缀与 locale 一致。
+
+## Resources Hub 与主题簇
+
+所有未设置 `showInDirectory: false` 的 routable Landing Page 会出现在 `/resources`。
+
+Landing Page 通过 `relatedToolSlugs` 链接到相关工具；Tool Page 会自动反向找出引用自己的 Landing Page，因此形成：
+
+```text
+/resources
+   ↓
+Guide / Use Case / Comparison
+   ↔
+Tool Page
+```
+
+公开示例和 Hub 默认可以设置 `noindex`，模板会输出 `noindex, follow`，避免索引示例内容，同时保留站内链接的抓取能力。
 
 ## Tool Page 和 Landing Page 不要互相复制
 
