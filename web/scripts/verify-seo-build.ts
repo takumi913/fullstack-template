@@ -55,7 +55,11 @@ for (const tool of routableToolPages) {
   assertIncludes(html, 'rel="canonical"', `${tool.slug} HTML`);
   assertIncludes(html, "BreadcrumbList", `${tool.slug} HTML`);
   assertIncludes(html, "WebApplication", `${tool.slug} HTML`);
-  assertIncludes(html, `lang="${tool.locale || siteConfig.locale}"`, `${tool.slug} document language`);
+  assertIncludes(
+    html,
+    `lang="${tool.locale || siteConfig.locale}"`,
+    `${tool.slug} document language`,
+  );
 
   if (seo.noindex) {
     assertIncludes(html, "noindex, nofollow", `${tool.slug} HTML`);
