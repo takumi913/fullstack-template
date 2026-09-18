@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { privatePageMeta } from "@/seo/page";
+import { notFoundPageMeta } from "@/seo/page";
 
-export const meta = () => [{ title: "404 - Page not found" }, ...privatePageMeta];
+export const meta = () => notFoundPageMeta("404 - Page not found");
 
 export default function NotFoundRoute() {
   return (
