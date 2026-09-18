@@ -77,7 +77,7 @@ VITE_SITE_DESCRIPTION=Describe the primary user value here.
 VITE_SITE_IMAGE=/og-image.svg
 
 # 生产 CI / Docker 构建建议开启。
-# 开启后，如果 VITE_SITE_URL 缺失或仍是 https://example.com，构建会直接失败。
+# 开启后会校验 canonical 域名，并阻止默认母模板品牌/title/description 被直接上线。
 SEO_STRICT=true
 ```
 
@@ -97,7 +97,11 @@ https://example.com?a=1    ❌
 优先修改这个文件以及 `web/src/content/` 下的页面数据；`VITE_SITE_*` 变量用于部署时覆盖
 品牌名、标题、描述、主关键词、OG 图片等构建期值。
 
-本地开发可以不设置 `SEO_STRICT`；生产 CI、Docker/BuildKit 或发布流水线建议显式设置：
+本地开发可以不设置 `SEO_STRICT`。开启 strict 后，除了生产域名外，还必须显式提供
+`VITE_SITE_NAME`、`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION`，且不能继续使用
+`site-config.ts` 中的母模板默认值。
+
+生产 CI、Docker/BuildKit 或发布流水线建议显式设置：
 
 ```bash
 VITE_SITE_URL=https://your-domain.com SEO_STRICT=true bun run build
