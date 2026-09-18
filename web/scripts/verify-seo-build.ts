@@ -11,6 +11,7 @@ import { routableToolPages, toolPath } from "../src/content/tool-pages";
 import { createLandingSeoPage } from "../src/seo/landing-page";
 import { publicSeoPages } from "../src/seo/pages";
 import { createToolSeoPage } from "../src/seo/tool-page";
+import { publicPageCopy } from "../src/seo/ui-copy";
 import { siteConfig } from "../src/seo/site";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -146,7 +147,12 @@ for (const tool of routableToolPages) {
     (alternate) => alternate.hreflang !== "x-default",
   );
   if (toolLanguageVersions.length > 1) {
-    assertIncludes(html, 'aria-label="Language versions"', `${tool.slug} language switcher`);
+    const copy = publicPageCopy(tool.locale);
+    assertIncludes(
+      html,
+      `aria-label="${copy.languageVersions}"`,
+      `${tool.slug} language switcher`,
+    );
   }
 
   for (const alternate of tool.alternates || []) {
@@ -172,10 +178,20 @@ assertIncludes(wordCounterHtml, "word-counter-input", "word counter prerender");
 const japaneseJsonFormatterHtml = await readOutput("ja", "tools", "json-formatter", "index.html");
 assertIncludes(japaneseJsonFormatterHtml, 'lang="ja"', "Japanese JSON formatter language");
 assertIncludes(japaneseJsonFormatterHtml, "JSON 整形ツール", "Japanese JSON formatter content");
+assertIncludes(
+  japaneseJsonFormatterHtml,
+  "このツールでできること",
+  "Japanese JSON formatter feature heading",
+);
+assertIncludes(japaneseJsonFormatterHtml, "使い方", "Japanese JSON formatter how-to heading");
+assertIncludes(japaneseJsonFormatterHtml, "よくある質問", "Japanese JSON formatter FAQ heading");
+assertIncludes(japaneseJsonFormatterHtml, "関連リソース", "Japanese JSON formatter resources heading");
 
 const japaneseJsonGuideHtml = await readOutput("ja", "guides", "json-syntax", "index.html");
 assertIncludes(japaneseJsonGuideHtml, 'lang="ja"', "Japanese JSON guide language");
 assertIncludes(japaneseJsonGuideHtml, "JSON 構文ガイド", "Japanese JSON guide content");
+assertIncludes(japaneseJsonGuideHtml, "ホーム", "Japanese JSON guide breadcrumb");
+assertIncludes(japaneseJsonGuideHtml, "リソース", "Japanese JSON guide resource label");
 
 const notFound = await readOutput("404.html");
 assertIncludes(notFound, "404 - Page not found", "404 HTML");
@@ -252,7 +268,12 @@ for (const page of routableLandingPages) {
     (alternate) => alternate.hreflang !== "x-default",
   );
   if (landingLanguageVersions.length > 1) {
-    assertIncludes(html, 'aria-label="Language versions"', `${page.slug} language switcher`);
+    const copy = publicPageCopy(page.locale);
+    assertIncludes(
+      html,
+      `aria-label="${copy.languageVersions}"`,
+      `${page.slug} language switcher`,
+    );
   }
 
   for (const alternate of page.alternates || []) {
