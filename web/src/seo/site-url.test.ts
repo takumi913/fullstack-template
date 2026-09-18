@@ -12,11 +12,33 @@ describe("site URL validation", () => {
     );
   });
 
-  it("requires a real URL in strict mode", () => {
+  it("requires a production-style hostname in strict mode", () => {
     expect(() => assertSeoBuildSiteUrl(undefined, true)).toThrow();
     expect(() => assertSeoBuildSiteUrl(placeholderSiteUrl, true)).toThrow();
-    expect(assertSeoBuildSiteUrl("https://tools.example.org", true)).toBe(
+
+    for (const url of [
+      "http://localhost:5173",
+      "https://preview.localhost",
+      "https://template.example",
+      "https://project.test",
+      "https://project.invalid",
+      "https://tools.example.com",
+      "https://tools.example.net",
       "https://tools.example.org",
+      "http://127.0.0.1:5173",
+    ]) {
+      expect(() => assertSeoBuildSiteUrl(url, true), url).toThrow();
+    }
+
+    expect(assertSeoBuildSiteUrl("https://tools.acme.dev", true)).toBe(
+      "https://tools.acme.dev",
     );
+  });
+
+  it("still allows placeholder and local URLs outside strict production mode", () => {
+    expect(assertSeoBuildSiteUrl("http://localhost:5173", false)).toBe(
+      "http://localhost:5173",
+    );
+    expect(assertSeoBuildSiteUrl(placeholderSiteUrl, false)).toBe(placeholderSiteUrl);
   });
 });
