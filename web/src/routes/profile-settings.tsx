@@ -5,5 +5,9 @@ import { privatePageMeta } from "@/seo/page";
 export const meta = () => privatePageMeta;
 
 export default function ProfileSettingsRoute() {
-  return <ProtectedRoute><ProfileSettingsPage /></ProtectedRoute>;
+  return (
+    <ProtectedRoute>
+      <ProfileSettingsPage />
+    </ProtectedRoute>
+  );
 }
