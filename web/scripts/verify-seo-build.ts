@@ -98,6 +98,7 @@ for (const page of Object.values(publicSeoPages)) {
   if (!("noindex" in page) || !page.noindex) continue;
   const html = await readOutput(...htmlOutputParts(page.path));
   assertIncludes(html, "noindex, follow", `${page.path} public noindex HTML`);
+  assertStaticHtmlDoesNotHydrate(html, `${page.path} public noindex HTML`);
 }
 
 for (const page of directoryLandingPages) {
