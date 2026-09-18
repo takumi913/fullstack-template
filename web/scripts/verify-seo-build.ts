@@ -62,6 +62,9 @@ const notFound = await readOutput("404.html");
 assertIncludes(notFound, "404 - Page not found", "404 HTML");
 assertIncludes(notFound, "noindex, nofollow", "404 HTML");
 
+const spaFallback = await readOutput("__spa-fallback.html");
+assertIncludes(spaFallback, "noindex, nofollow", "SPA fallback HTML");
+
 const sitemap = await readOutput("sitemap.xml");
 
 for (const page of Object.values(publicSeoPages)) {
