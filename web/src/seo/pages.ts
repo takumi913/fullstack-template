@@ -51,5 +51,5 @@ export const publicSeoPages = {
 } satisfies Record<string, SeoPage>;
 
 export const indexableSeoPages = Object.values(publicSeoPages).filter(
-  (page) => !page.noindex,
+  (page) => !("noindex" in page) || !page.noindex,
 );
