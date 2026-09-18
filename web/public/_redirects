@@ -19,4 +19,4 @@
 /settings/*             /__spa-fallback.html     200
 /tenant/*               /__spa-fallback.html     200
 
-/*                      /404.html                404
+# 未匹配路径不写 fallback 规则：Cloudflare Pages 会自动使用顶层 404.html 并返回 404。
