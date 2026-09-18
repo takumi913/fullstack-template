@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 import { templateSiteConfig } from "@/config/site-config";
-import { directoryToolPages, toolPath } from "@/content/tool-pages";
 import { siteConfig } from "@/seo/site";
 
 export const Footer = () => (
@@ -14,11 +13,6 @@ export const Footer = () => (
         <Link className="hover:text-zinc-950" to="/resources">
           {templateSiteConfig.navigation.resources}
         </Link>
-        {directoryToolPages.map((tool) => (
-          <Link className="hover:text-zinc-950" key={tool.slug} to={toolPath(tool)}>
-            {tool.name}
-          </Link>
-        ))}
         <Link className="hover:text-zinc-950" to="/legal/privacy-policy">
           {templateSiteConfig.navigation.privacy}
         </Link>
