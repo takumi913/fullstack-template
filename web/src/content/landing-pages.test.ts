@@ -25,6 +25,9 @@ describe("landing page definitions", () => {
       if (page.kind === "comparison") {
         expect(page.path.startsWith("/compare/"), page.path).toBe(true);
       }
+      if (page.kind === "guide") {
+        expect(page.path.startsWith("/guides/"), page.path).toBe(true);
+      }
     }
   });
 
