@@ -12,6 +12,20 @@ describe("tool page definitions", () => {
     expect(new Set(paths).size).toBe(paths.length);
   });
 
+  it("uses clean canonical URL paths", () => {
+    for (const tool of routableToolPages) {
+      const path = toolPath(tool);
+
+      expect(path.startsWith("/"), tool.slug).toBe(true);
+      expect(path.endsWith("/"), tool.slug).toBe(false);
+      expect(path.includes("?"), tool.slug).toBe(false);
+      expect(path.includes("#"), tool.slug).toBe(false);
+      expect(/^\/(?:[A-Za-z0-9-]+\/)?tools\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(path), path).toBe(
+        true,
+      );
+    }
+  });
+
   it("only references existing related tools", () => {
     const knownSlugs = new Set(toolPages.map((tool) => tool.slug));
 
@@ -51,9 +65,12 @@ describe("tool page definitions", () => {
       ).toBe(true);
 
       for (const alternate of tool.alternates) {
-        if (alternate.hreflang === "x-default") continue;
-
         const target = pagesByPath.get(alternate.path);
+
+        if (alternate.hreflang === "x-default") {
+          expect(target, `${tool.slug} x-default -> ${alternate.path}`).toBeDefined();
+          continue;
+        }
         expect(target, `${tool.slug} -> ${alternate.path}`).toBeDefined();
         expect(target?.locale).toBe(alternate.hreflang);
         expect(
