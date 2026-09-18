@@ -11,18 +11,21 @@ COPY web/package.json web/bun.lock ./
 # 安装前端依赖
 RUN bun install --frozen-lockfile
 
-# SEO 元数据在构建期写入静态 HTML；生产构建应通过 --build-arg 覆盖这些值
-ARG VITE_SITE_URL=https://example.com
-ARG VITE_SITE_NAME="Fullstack Template"
-ARG VITE_SITE_SHORT_NAME=Fullstack
-ARG VITE_SITE_MARK=F
-ARG VITE_SITE_FAVICON=/favicon.svg
-ARG VITE_SITE_LOCALE=zh-CN
-ARG VITE_SITE_PRIMARY_KEYWORD="go react saas template"
-ARG VITE_SITE_TITLE="Go + React 多租户 SaaS 全栈模板"
-ARG VITE_SITE_DESCRIPTION="基于 Go、React、sqlc、PostgreSQL/SQLite 与多租户 RBAC 的 SaaS 全栈母模板。"
-ARG VITE_SITE_IMAGE=/og-image.svg
+# SEO 元数据在构建期写入静态 HTML。
+# 品牌类 ARG 默认留空：resolveSiteConfig() 会回退到 web/src/config/site-config.ts，
+# 只有同一份代码需要按部署环境覆盖品牌时才传这些 build args。
+ARG VITE_SITE_URL
+ARG VITE_SITE_NAME
+ARG VITE_SITE_SHORT_NAME
+ARG VITE_SITE_MARK
+ARG VITE_SITE_FAVICON
+ARG VITE_SITE_LOCALE
+ARG VITE_SITE_PRIMARY_KEYWORD
+ARG VITE_SITE_TITLE
+ARG VITE_SITE_DESCRIPTION
+ARG VITE_SITE_IMAGE
 ARG SEO_STRICT=false
+ARG SEO_ALLOW_TEMPLATE_EXAMPLES=false
 ENV VITE_SITE_URL=$VITE_SITE_URL \
     VITE_SITE_NAME=$VITE_SITE_NAME \
     VITE_SITE_SHORT_NAME=$VITE_SITE_SHORT_NAME \
@@ -33,7 +36,8 @@ ENV VITE_SITE_URL=$VITE_SITE_URL \
     VITE_SITE_TITLE=$VITE_SITE_TITLE \
     VITE_SITE_DESCRIPTION=$VITE_SITE_DESCRIPTION \
     VITE_SITE_IMAGE=$VITE_SITE_IMAGE \
-    SEO_STRICT=$SEO_STRICT
+    SEO_STRICT=$SEO_STRICT \
+    SEO_ALLOW_TEMPLATE_EXAMPLES=$SEO_ALLOW_TEMPLATE_EXAMPLES
 
 # 复制前端源码并构建
 COPY web/ ./
@@ -41,7 +45,7 @@ RUN bun run build
 
 # 第二阶段：后端构建阶段
 # 同样固定在宿主架构上运行，通过 GOOS/GOARCH 交叉编译出目标架构的二进制
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS backend-builder
+FROM --platform=$BUILDPLATFORM golang:1.26.0-alpine AS backend-builder
 
 WORKDIR /app
 
