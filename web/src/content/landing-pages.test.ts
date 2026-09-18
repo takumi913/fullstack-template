@@ -114,8 +114,19 @@ describe("landing page definitions", () => {
     }
   });
 
-  it("keeps published landing pages indexable unless explicitly disabled", () => {
-    for (const page of routableLandingPages.filter((item) => item.status === "published")) {
+  it("keeps scaffold examples noindex even if their status is changed to published", () => {
+    const example = routableLandingPages.find((item) => item.templateExample);
+    expect(example).toBeDefined();
+
+    if (example) {
+      expect(createLandingSeoPage({ ...example, status: "published" }).noindex).toBe(true);
+    }
+  });
+
+  it("keeps published non-template landing pages indexable unless explicitly disabled", () => {
+    for (const page of routableLandingPages.filter(
+      (item) => item.status === "published" && !item.templateExample,
+    )) {
       expect(createLandingSeoPage(page).noindex).toBe(Boolean(page.noindex));
     }
   });
