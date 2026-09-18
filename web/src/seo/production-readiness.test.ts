@@ -59,6 +59,16 @@ describe("production SEO readiness", () => {
     ).toThrow(/template example content/);
   });
 
+  it("rejects a scaffold example even if its status is accidentally changed to published", () => {
+    expect(() =>
+      assertProductionContentReady({
+        strict: true,
+        tools: [{ ...baseTool, status: "published", templateExample: true }],
+        landings: [],
+      }),
+    ).toThrow(/template example content/);
+  });
+
   it("allows examples only when explicitly enabled for template testing", () => {
     expect(() =>
       assertProductionContentReady({
