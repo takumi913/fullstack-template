@@ -1,13 +1,6 @@
 import LoginPage from "@/pages/LoginPage";
-import { PublicRoute } from "@/router/RouteGuards";
-import { privatePageMeta } from "@/seo/page";
+import { privatePageTitleMeta } from "@/seo/page";
 
-export const meta = () => [{ title: "登录 | Fullstack Template" }, ...privatePageMeta];
+export const meta = () => privatePageTitleMeta("登录");
 
-export default function LoginRoute() {
-  return (
-    <PublicRoute>
-      <LoginPage />
-    </PublicRoute>
-  );
-}
+export default LoginPage;
