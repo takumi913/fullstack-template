@@ -45,10 +45,18 @@ Sitemap: ${siteUrl}/sitemap.xml
 
 await mkdir(outputDir, { recursive: true });
 const notFound = await readFile(join(outputDir, "404", "index.html"), "utf8");
+const spaFallbackPath = join(outputDir, "__spa-fallback.html");
+const spaFallback = await readFile(spaFallbackPath, "utf8");
+const noindexMeta = '<meta name="robots" content="noindex, nofollow">';
+const protectedSpaFallback = /<meta[^>]+name=["']robots["'][^>]*>/i.test(spaFallback)
+  ? spaFallback.replace(/<meta[^>]+name=["']robots["'][^>]*>/i, noindexMeta)
+  : spaFallback.replace("</head>", `${noindexMeta}</head>`);
+
 await Promise.all([
   writeFile(join(outputDir, "sitemap.xml"), sitemap),
   writeFile(join(outputDir, "robots.txt"), robots),
   writeFile(join(outputDir, "404.html"), notFound),
+  writeFile(spaFallbackPath, protectedSpaFallback),
 ]);
 
 if (!process.env.VITE_SITE_URL) {
