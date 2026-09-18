@@ -23,3 +23,17 @@ export function createHreflangAlternates(
 
   return alternates;
 }
+
+
+export function toOpenGraphLocale(locale: string) {
+  try {
+    const expanded = new Intl.Locale(locale).maximize();
+    if (expanded.region) {
+      return `${expanded.language}_${expanded.region}`;
+    }
+  } catch {
+    // Fall through to a conservative separator normalization.
+  }
+
+  return locale.replaceAll("-", "_");
+}
