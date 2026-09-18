@@ -145,7 +145,7 @@ CI 会检查：
 ```ts
 alternates: createHreflangAlternates(
   [
-    { locale: "en", path: "/en/tools/image-translator" },
+    { locale: "en", path: "/tools/image-translator" },
     { locale: "ja", path: "/ja/tools/image-translator" },
   ],
   "/tools/image-translator",
