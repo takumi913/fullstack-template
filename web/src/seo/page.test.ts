@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createSeoMeta, type SeoPage } from "./page";
-import { absoluteUrl } from "./site";
+import { createSeoMeta, notFoundPageMeta, type SeoPage } from "./page";
+import { absoluteUrl, siteConfig } from "./site";
 
 const basePage: SeoPage = {
   path: "/example",
@@ -12,6 +12,12 @@ const basePage: SeoPage = {
 };
 
 describe("createSeoMeta", () => {
+  it("uses the configured site brand for not-found titles", () => {
+    expect(notFoundPageMeta("Tool not found")).toContainEqual({
+      title: `Tool not found | ${siteConfig.name}`,
+    });
+  });
+
   it("keeps public noindex pages crawlable", () => {
     const meta = createSeoMeta({ ...basePage, noindex: true });
 
