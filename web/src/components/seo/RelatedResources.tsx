@@ -11,7 +11,9 @@ export function RelatedResources({ tool }: { tool: ToolPageDefinition }) {
 
   return (
     <section className="border-t pt-12">
-      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">{copy.relatedResources}</h2>
+      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
+        {copy.relatedResources}
+      </h2>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {resources.map((resource) => (
           <Link
