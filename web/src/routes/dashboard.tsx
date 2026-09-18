@@ -5,5 +5,9 @@ import { privatePageMeta } from "@/seo/page";
 export const meta = () => privatePageMeta;
 
 export default function DashboardRoute() {
-  return <ProtectedRoute><DashboardPage /></ProtectedRoute>;
+  return (
+    <ProtectedRoute>
+      <DashboardPage />
+    </ProtectedRoute>
+  );
 }
