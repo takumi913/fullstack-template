@@ -3,7 +3,7 @@ import { absoluteUrl, siteConfig } from "./site";
 import type { SeoPage } from "./page";
 
 export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
-  const path = toolPath(tool.slug);
+  const path = toolPath(tool);
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -67,7 +67,7 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
     alternates: tool.alternates,
     updatedAt: tool.updatedAt,
     noindex: tool.noindex || tool.status !== "published",
-    relatedPages: tool.relatedSlugs.map(toolPath),
+    relatedPages: tool.relatedSlugs.map((slug) => toolPath(slug)),
     schema: [applicationSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])],
     image: siteConfig.defaultImage,
   };
