@@ -4,7 +4,10 @@
 
 /tools/                 /tools                  301
 /tools/:slug/           /tools/:slug            301
-/:locale/tools/:slug/   /:locale/tools/:slug    301
+/:locale/tools/:slug/       /:locale/tools/:slug        301
+/:locale/use-cases/:slug/   /:locale/use-cases/:slug    301
+/:locale/compare/:slug/     /:locale/compare/:slug      301
+/:locale/guides/:slug/      /:locale/guides/:slug       301
 /resources/             /resources              301
 /use-cases/:slug/       /use-cases/:slug        301
 /compare/:slug/         /compare/:slug          301
