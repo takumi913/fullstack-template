@@ -29,6 +29,41 @@ describe("tool page definitions", () => {
     }
   });
 
+  it("keeps hreflang sets self-referencing and reciprocal", () => {
+    const pagesByPath = new Map(routableToolPages.map((tool) => [toolPath(tool.slug), tool]));
+
+    for (const tool of routableToolPages) {
+      if (!tool.alternates?.length) continue;
+
+      expect(tool.locale, `${tool.slug} locale`).toBeTruthy();
+
+      const hreflangs = tool.alternates.map((alternate) => alternate.hreflang);
+      expect(new Set(hreflangs).size, `${tool.slug} hreflang uniqueness`).toBe(hreflangs.length);
+      expect(
+        tool.alternates.some(
+          (alternate) =>
+            alternate.hreflang === tool.locale && alternate.path === toolPath(tool.slug),
+        ),
+        `${tool.slug} self hreflang`,
+      ).toBe(true);
+
+      for (const alternate of tool.alternates) {
+        if (alternate.hreflang === "x-default") continue;
+
+        const target = pagesByPath.get(alternate.path);
+        expect(target, `${tool.slug} -> ${alternate.path}`).toBeDefined();
+        expect(target?.locale).toBe(alternate.hreflang);
+        expect(
+          target?.alternates?.some(
+            (backlink) =>
+              backlink.hreflang === tool.locale && backlink.path === toolPath(tool.slug),
+          ),
+          `${alternate.path} -> ${toolPath(tool.slug)}`,
+        ).toBe(true);
+      }
+    }
+  });
+
   it("keeps example pages out of the index by default", () => {
     for (const tool of routableToolPages.filter((item) => item.status === "example")) {
       expect(createToolSeoPage(tool).noindex).toBe(true);
