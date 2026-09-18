@@ -48,9 +48,7 @@ function FaqContent({ tool }: { tool: ToolPageDefinition }) {
 
   return (
     <>
-      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
-        {copy.faq}
-      </h2>
+      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">{copy.faq}</h2>
       <div className="mt-6 divide-y border-y">
         {tool.faq.map((item) => (
           <details className="group py-5" key={item.question}>
