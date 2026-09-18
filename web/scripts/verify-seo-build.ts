@@ -109,6 +109,10 @@ const japaneseJsonFormatterHtml = await readOutput("ja", "tools", "json-formatte
 assertIncludes(japaneseJsonFormatterHtml, 'lang="ja"', "Japanese JSON formatter language");
 assertIncludes(japaneseJsonFormatterHtml, "JSON 整形ツール", "Japanese JSON formatter content");
 
+const japaneseJsonGuideHtml = await readOutput("ja", "guides", "json-syntax", "index.html");
+assertIncludes(japaneseJsonGuideHtml, 'lang="ja"', "Japanese JSON guide language");
+assertIncludes(japaneseJsonGuideHtml, "JSON 構文ガイド", "Japanese JSON guide content");
+
 const notFound = await readOutput("404.html");
 assertIncludes(notFound, "404 - Page not found", "404 HTML");
 assertIncludes(notFound, "noindex, nofollow", "404 HTML");
@@ -122,7 +126,10 @@ assertExcludes(redirects, "/404.html                404", "Cloudflare redirects"
 for (const rule of [
   "/tools/                 /tools                  301",
   "/tools/:slug/           /tools/:slug            301",
-  "/:locale/tools/:slug/   /:locale/tools/:slug    301",
+  "/:locale/tools/:slug/       /:locale/tools/:slug        301",
+  "/:locale/use-cases/:slug/   /:locale/use-cases/:slug    301",
+  "/:locale/compare/:slug/     /:locale/compare/:slug      301",
+  "/:locale/guides/:slug/      /:locale/guides/:slug       301",
   "/resources/             /resources              301",
   "/use-cases/:slug/       /use-cases/:slug        301",
   "/compare/:slug/         /compare/:slug          301",
@@ -146,6 +153,19 @@ for (const page of routableLandingPages) {
 
   if (seo.noindex) {
     assertIncludes(html, "noindex, follow", `${page.slug} landing HTML`);
+  }
+
+  for (const alternate of page.alternates || []) {
+    assertMatches(
+      html,
+      new RegExp(`hrefLang="${alternate.hreflang}"`, "i"),
+      `${page.slug} landing hreflang`,
+    );
+    assertIncludes(
+      html,
+      `href="${siteConfig.url}${alternate.path}"`,
+      `${page.slug} landing alternate URL`,
+    );
   }
 }
 
