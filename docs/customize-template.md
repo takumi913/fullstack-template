@@ -84,13 +84,19 @@ docs/tool-pages-seo.md
 
 如果这个站只有一个最核心的搜索需求，可以让首页第一屏直接提供工具，而不是先展示营销内容。
 
-在 `site-config.ts`：
+长期配置建议直接写在 `site-config.ts`：
 
 ```ts
 home: {
   primaryToolSlug: "image-translator",
   // ...
 },
+```
+
+需要在 CI、预览环境或同一代码的不同构建中临时切换时，也可以覆盖：
+
+```env
+VITE_HOME_PRIMARY_TOOL_SLUG=image-translator
 ```
 
 设置后：

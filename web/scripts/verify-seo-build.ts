@@ -83,7 +83,7 @@ assertIncludes(home, 'rel="canonical"', "home HTML");
 assertIncludes(home, `href="${siteConfig.url}/"`, "home canonical");
 assertIncludes(home, "application/ld+json", "home HTML");
 assertPublicHtmlDoesNotLoadPrivateApp(home, "home HTML");
-const homePrimaryTool = resolveHomepageTool(templateSiteConfig.home.primaryToolSlug);
+const homePrimaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug);
 if (homePrimaryTool) {
   assertHydratedHtml(home, "home primary tool HTML");
   assertIncludes(home, homePrimaryTool.name, "home primary tool name");

@@ -5,10 +5,11 @@ import { templateSiteConfig } from "@/config/site-config";
 import { resolveHomepageTool } from "@/content/homepage-tool";
 import { directoryToolPages, toolPath } from "@/content/tool-pages";
 import { publicSeoPages } from "@/seo/pages";
+import { siteConfig } from "@/seo/site";
 import { ToolRuntime } from "@/tools/registry";
 
 export default function HomePage() {
-  const primaryTool = resolveHomepageTool(templateSiteConfig.home.primaryToolSlug);
+  const primaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug);
   const showAuthLinks = templateSiteConfig.navigation.showAuthLinks;
 
   return (

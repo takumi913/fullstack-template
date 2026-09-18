@@ -76,6 +76,8 @@ VITE_SITE_PRIMARY_KEYWORD=example online tool
 VITE_SITE_TITLE=Example Online Tool
 VITE_SITE_DESCRIPTION=Describe the primary user value here.
 VITE_SITE_IMAGE=/og-image.svg
+# 可选：首页直接运行某个 ToolPageDefinition
+VITE_HOME_PRIMARY_TOOL_SLUG=image-translator
 
 # 生产 CI / Docker 构建建议开启。
 # 开启后会校验 canonical 域名，并阻止原始母模板品牌/title/description
@@ -100,7 +102,7 @@ https://example.com?a=1    ❌
 
 品牌与长文案的默认值集中在 `web/src/config/site-config.ts`。复制模板创建新站时，
 优先修改这个文件以及 `web/src/content/` 下的页面数据；`VITE_SITE_*` 变量用于部署时覆盖
-品牌名、标题、描述、主关键词、favicon、OG 图片等构建期值。
+品牌名、标题、描述、主关键词、favicon、OG 图片、首页核心工具等构建期值。
 
 本地开发可以不设置 `SEO_STRICT`。生产 strict 模式要求显式提供真实的
 `VITE_SITE_URL`，但品牌、title、description 不需要在环境变量里重复填写：
@@ -144,6 +146,7 @@ Dockerfile 中的品牌类 build args 默认为空，会自动回退到 `site-co
 --build-arg VITE_SITE_TITLE="Your SEO Title"
 --build-arg VITE_SITE_DESCRIPTION="Your product description"
 --build-arg VITE_SITE_IMAGE=/og-image.png
+--build-arg VITE_HOME_PRIMARY_TOOL_SLUG=image-translator
 ```
 
 `SEO_ALLOW_TEMPLATE_EXAMPLES=true` 仅用于母模板自身 CI/测试，不要在真实生产镜像中开启。

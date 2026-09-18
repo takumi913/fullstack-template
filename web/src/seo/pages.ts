@@ -3,7 +3,7 @@ import { resolveHomepageTool } from "../content/homepage-tool";
 import { absoluteUrl, siteConfig } from "./site";
 import type { SeoPage } from "./page";
 
-const homePrimaryTool = resolveHomepageTool(templateSiteConfig.home.primaryToolSlug);
+const homePrimaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug);
 
 const homeApplicationSchema = homePrimaryTool
   ? {

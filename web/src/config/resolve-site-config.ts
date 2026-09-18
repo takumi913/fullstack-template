@@ -26,5 +26,9 @@ export function resolveSiteConfig(env: SiteBuildEnvironment) {
       templateSiteConfig.seo.defaultDescription,
     ),
     defaultImage: configured(env["VITE_SITE_IMAGE"], templateSiteConfig.seo.defaultImage),
+    homePrimaryToolSlug: configured(
+      env["VITE_HOME_PRIMARY_TOOL_SLUG"],
+      templateSiteConfig.home.primaryToolSlug || "",
+    ) || null,
   } as const;
 }

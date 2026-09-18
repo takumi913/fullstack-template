@@ -149,3 +149,11 @@ jobs:
       - name: Build frontend
         working-directory: web
         run: bun run build
+
+      # 第二种母模板首页形态：第一屏直接运行核心工具。
+      # 这一步会再次执行 seo:verify，确保首页 hydration、工具首屏和 bundle 隔离都成立。
+      - name: Build interactive homepage variant
+        working-directory: web
+        env:
+          VITE_HOME_PRIMARY_TOOL_SLUG: json-formatter
+        run: bun run build

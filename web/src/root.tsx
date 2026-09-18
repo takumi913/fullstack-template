@@ -26,7 +26,7 @@ export default function Root() {
   const hydrate = shouldHydrateDocument(
     pathname,
     matches.length,
-    Boolean(templateSiteConfig.home.primaryToolSlug),
+    Boolean(siteConfig.homePrimaryToolSlug),
   );
 
   return (

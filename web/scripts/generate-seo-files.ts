@@ -31,7 +31,7 @@ assertProductionContentReady({
   allowTemplateExamples: process.env.SEO_ALLOW_TEMPLATE_EXAMPLES === "true",
   tools: toolPages,
   landings: landingPages,
-  homePrimaryToolSlug: templateSiteConfig.home.primaryToolSlug,
+  homePrimaryToolSlug: resolvedSite.homePrimaryToolSlug,
   homePrimaryKeyword: resolvedSite.primaryKeyword,
 });
 
