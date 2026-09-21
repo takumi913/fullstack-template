@@ -4,9 +4,9 @@
 
 ## 技术栈
 
-- Go 1.25、Echo v5、`database/sql`、sqlc
+- Go 1.26、Echo v5、`database/sql`、sqlc
 - SQLite（本地开发）和 PostgreSQL（生产部署）
-- React 19、TypeScript、Vite、Tailwind CSS、Zustand
+- React 19、React Router Framework Mode、TypeScript、Vite、Tailwind CSS、Zustand
 - bcrypt 密码哈希、HttpOnly Cookie Session
 
 前端不预装 UI 组件库，页面使用 `style.css` 中的 `.panel`、`.button-primary`、`.field` 等类。
@@ -20,6 +20,26 @@
 - Owner、Admin、Member 三种租户角色
 - SQLite/PostgreSQL 独立 migrations 和 sqlc 查询
 - 权限矩阵与租户隔离的接口级测试，前后端均有测试
+- Public SSG + Private SPA，适合 SEO 工具站
+- Tool Page Schema 自动生成 meta、JSON-LD、sitemap 与相关工具内链
+- 可选“首页即核心工具”模式：默认静态首页，配置后第一屏直接运行主工具
+- 多语言工具 URL、hreflang 与共享工具实现
+- Use Case / Comparison / Guide 数据驱动 SEO Landing Page
+
+## 从母模板创建新站
+
+复制仓库后，不需要到组件里到处搜索替换品牌。主要修改入口：
+
+```text
+web/src/config/site-config.ts      品牌、首页、导航、Hub 文案
+web/src/content/tool-pages.ts      工具页 SEO / SSG 数据
+web/src/content/landing-pages.ts   Use Case / Comparison / Guide
+web/src/content/legal-pages.ts     隐私政策与服务条款
+```
+
+完整流程见 [新站定制指南](docs/customize-template.md)。
+
+生产构建建议开启 `SEO_STRICT=true`，会阻止占位域名和母模板默认品牌直接上线。
 
 ## 快速开始
 
@@ -83,10 +103,22 @@ make lint            # 前后端代码检查
 make build           # 构建
 ```
 
-前端另有 `bun run format` 格式化（CI 会检查格式）。
+前端另有：
+
+```bash
+cd web
+bun run seo:preflight  # 构建前检查域名、品牌、示例内容、首页关键词和静态资源
+bun run build          # preflight -> SSG build -> SEO 文件生成 -> 产物验证
+bun run format         # 格式化（CI 会检查格式）
+```
+
+生产构建会先执行 `seo:preflight`。配置错误会在真正打包前失败，避免先跑完整 SSG 后才发现问题。
 
 ## 文档
 
+- [新站定制指南](docs/customize-template.md) — 从母模板创建一个新工具站的最短流程
+- [工具页 SEO / SSG](docs/tool-pages-seo.md) — 新增工具、多语言 URL、关键词配置、预渲染和内链规则
+- [SEO Landing Page](docs/landing-pages-seo.md) — Use Case、Comparison、Guide 与程序化 SEO 页面规则
 - [配置说明](docs/configuration.md) — 全部环境变量
 - [Docker 部署](docs/docker.md) — 镜像构建、生产配置与已知限制
 - [Go 代码检查](docs/golangci-lint.md) — golangci-lint 版本要求与用法

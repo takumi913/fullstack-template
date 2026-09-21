@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { userApi } from "@/api";
 import { useAsyncAction } from "@/lib/useAsyncAction";
 import { useAuthStore } from "@/store/authStore";

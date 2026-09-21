@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 import { useAuthStore } from "@/store/authStore";
 import { useTenantStore } from "@/store/tenantStore";
 // 恢复会话时一并填充租户 store，否则直接刷新 /tenant/* 页面会因为没有 activeTenant 而永远空白。

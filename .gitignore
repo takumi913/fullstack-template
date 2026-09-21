@@ -199,3 +199,6 @@ docker-compose.override.yml
 typings/
 .eslintcache
 .stylelintcache
+
+# React Router Framework Mode generated types
+web/.react-router/

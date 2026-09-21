@@ -1,15 +1,53 @@
 # 第一阶段：前端构建阶段
-# --platform=$BUILDPLATFORM：前端产物与目标架构无关，多架构构建时
-# 固定在宿主架构上只构建一次，避免在 QEMU 模拟下重复慢速构建
-FROM --platform=$BUILDPLATFORM oven/bun:1.4.2-alpine AS frontend-builder
+# Bun 负责依赖安装与 scripts；React Router/Vite 的 prerender/server build 需要
+# Node 专用的 react-dom/server API。纯 Bun runtime 会按 "bun" condition 解析到
+# server.bun.js（没有 renderToPipeableStream），因此构建镜像必须同时提供 Node。
+FROM --platform=$BUILDPLATFORM oven/bun:1.3.14-alpine AS bun-runtime
+
+FROM --platform=$BUILDPLATFORM node:22.22.0-alpine AS frontend-builder
+
+# 两个基础镜像都是 Alpine/musl，直接复用固定版本 Bun 二进制，避免 curl 安装和版本漂移。
+COPY --from=bun-runtime /usr/local/bin/bun /usr/local/bin/bun
 
 WORKDIR /app
 
-# 复制前端依赖清单（锁文件保证构建可重现）
+# 复制前端依赖清单
 COPY web/package.json web/bun.lock ./
 
 # 安装前端依赖
 RUN bun install --frozen-lockfile
+
+# SEO 元数据在构建期写入静态 HTML。
+# 品牌类 ARG 默认留空：resolveSiteConfig() 会回退到 web/src/config/site-config.ts，
+# 只有同一份代码需要按部署环境覆盖品牌时才传这些 build args。
+ARG VITE_SITE_URL
+ARG VITE_SITE_NAME
+ARG VITE_SITE_SHORT_NAME
+ARG VITE_SITE_MARK
+ARG VITE_SITE_FAVICON
+ARG VITE_SITE_LOCALE
+ARG VITE_SITE_PRIMARY_KEYWORD
+ARG VITE_SITE_TITLE
+ARG VITE_SITE_DESCRIPTION
+ARG VITE_SITE_IMAGE
+ARG VITE_HOME_PRIMARY_TOOL_SLUG
+ARG SEO_STRICT=false
+ARG SEO_ALLOW_TEMPLATE_EXAMPLES=false
+ARG SEO_ALLOW_SVG_SOCIAL_IMAGE=false
+ENV VITE_SITE_URL=$VITE_SITE_URL \
+    VITE_SITE_NAME=$VITE_SITE_NAME \
+    VITE_SITE_SHORT_NAME=$VITE_SITE_SHORT_NAME \
+    VITE_SITE_MARK=$VITE_SITE_MARK \
+    VITE_SITE_FAVICON=$VITE_SITE_FAVICON \
+    VITE_SITE_LOCALE=$VITE_SITE_LOCALE \
+    VITE_SITE_PRIMARY_KEYWORD=$VITE_SITE_PRIMARY_KEYWORD \
+    VITE_SITE_TITLE=$VITE_SITE_TITLE \
+    VITE_SITE_DESCRIPTION=$VITE_SITE_DESCRIPTION \
+    VITE_SITE_IMAGE=$VITE_SITE_IMAGE \
+    VITE_HOME_PRIMARY_TOOL_SLUG=$VITE_HOME_PRIMARY_TOOL_SLUG \
+    SEO_STRICT=$SEO_STRICT \
+    SEO_ALLOW_TEMPLATE_EXAMPLES=$SEO_ALLOW_TEMPLATE_EXAMPLES \
+    SEO_ALLOW_SVG_SOCIAL_IMAGE=$SEO_ALLOW_SVG_SOCIAL_IMAGE
 
 # 复制前端源码并构建
 COPY web/ ./
@@ -17,7 +55,7 @@ RUN bun run build
 
 # 第二阶段：后端构建阶段
 # 同样固定在宿主架构上运行，通过 GOOS/GOARCH 交叉编译出目标架构的二进制
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS backend-builder
+FROM --platform=$BUILDPLATFORM golang:1.26.0-alpine AS backend-builder
 
 WORKDIR /app
 
@@ -55,7 +93,7 @@ RUN addgroup -g 1000 app && adduser -D -u 1000 -G app app \
 # 二进制与静态文件保持 root 属主（app 用户只读、可执行），无需 chmod：
 # COPY 会保留构建阶段的可执行权限位
 COPY --from=backend-builder /app/server /app/server
-COPY --from=frontend-builder /app/dist /app/static
+COPY --from=frontend-builder /app/dist/client /app/static
 
 USER app
 
