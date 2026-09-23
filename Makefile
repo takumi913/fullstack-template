@@ -8,7 +8,7 @@ GOLANGCI_LINT_VERSION := v2.12.2
 SQLC_VERSION := v1.30.0
 AIR_VERSION := v1.61.7
 
-.PHONY: help deps sqlc-generate sqlc-verify test lint lint-go lint-web lint-web-fix build build-go build-web dev run clean docker tools check
+.PHONY: help deps sqlc-generate sqlc-verify test lint lint-go lint-web lint-web-fix build build-go build-web dev run clean docker tools check ensure-web-deps
 
 # 默认目标
 help: ## 显示帮助信息
@@ -57,11 +57,19 @@ lint-go: ## 运行 Go 代码检查
 		exit 1; \
 	fi
 
-lint-web: ## 运行前端代码检查
+lint-web: ensure-web-deps ## 运行前端代码检查
 	@echo "🔍 运行前端代码检查..."
 	@# 格式检查与 CI (ci.yml) 保持一致，否则 prettier 问题只会在推送后才暴露
 	cd web && bun run format:check
 	cd web && bun run lint
+
+# make lint 也应能在刚克隆、尚未安装前端依赖的工作区运行。
+# Prettier 和 ESLint 均从 web/package.json 的 devDependencies 安装，使用项目本地工具链。
+ensure-web-deps:
+	@if [ ! -x web/node_modules/.bin/prettier ] || [ ! -x web/node_modules/.bin/eslint ]; then \
+		echo "📦 前端依赖未安装，按 web/bun.lock 安装..."; \
+		cd web && bun install --frozen-lockfile; \
+	fi
 
 lint-web-fix: ## 自动修复前端格式与 lint 问题
 	@echo "🔧 格式化前端代码..."
