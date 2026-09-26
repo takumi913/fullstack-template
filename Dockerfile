@@ -4,7 +4,7 @@
 # server.bun.js（没有 renderToPipeableStream），因此构建镜像必须同时提供 Node。
 FROM --platform=$BUILDPLATFORM oven/bun:1.4.2-alpine AS bun-runtime
 
-FROM --platform=$BUILDPLATFORM node:22.22.0-alpine AS frontend-builder
+FROM --platform=$BUILDPLATFORM node:26.10.0-alpine AS frontend-builder
 
 # 两个基础镜像都是 Alpine/musl，直接复用固定版本 Bun 二进制，避免 curl 安装和版本漂移。
 COPY --from=bun-runtime /usr/local/bin/bun /usr/local/bin/bun
