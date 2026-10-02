@@ -9,11 +9,20 @@ updates:
     directory: "/web"
     schedule:
       interval: "weekly"
+    groups:
+      # Framework 的构建工具与运行时必须同版本升级。
+      react-router:
+        patterns: ["react-router", "@react-router/*"]
     ignore:
       # typescript-eslint 尚不支持 TypeScript 7.x
       # https://github.com/typescript-eslint/typescript-eslint/issues/10940
       - dependency-name: "typescript"
         versions: [">=7.0.0"]
+      # Framework 大版本需要迁移配置，不能只升级构建工具。
+      - dependency-name: "react-router"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@react-router/*"
+        update-types: ["version-update:semver-major"]
 
   # Go 依赖
   - package-ecosystem: "gomod"
@@ -37,3 +46,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # 这两个镜像随 web/package.json 的 packageManager 和 go.mod 同步升级；
+      # Docker 更新器只改镜像 tag，会使 CI 的工具链一致性检查失败。
+      - dependency-name: "oven/bun"
+      - dependency-name: "golang"
