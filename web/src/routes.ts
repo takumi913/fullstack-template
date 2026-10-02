@@ -1,33 +1,44 @@
 import { index, layout, route, type RouteConfig } from "@react-router/dev/routes";
+import { localizedPath, supportedLocales } from "./i18n/locales";
 
-export default [
-  layout("./routes/public-layout.tsx", [
-    index("./routes/home.tsx"),
-    route("tools", "./routes/tools-index.tsx"),
-    route("resources", "./routes/resources.tsx"),
-    route("tools/:slug", "./routes/tool.tsx"),
-    route(":locale/tools/:slug", "./routes/localized-tool.tsx"),
-    route("use-cases/:slug", "./routes/use-case.tsx"),
-    route("compare/:slug", "./routes/comparison.tsx"),
-    route("guides/:slug", "./routes/guide.tsx"),
-    route(":locale/use-cases/:slug", "./routes/localized-use-case.tsx"),
-    route(":locale/compare/:slug", "./routes/localized-comparison.tsx"),
-    route(":locale/guides/:slug", "./routes/localized-guide.tsx"),
-    route("404", "./routes/not-found.tsx"),
-    route("legal/privacy-policy", "./routes/privacy.tsx"),
-    route("legal/terms", "./routes/terms.tsx"),
-  ]),
+const publicRoutes = [
+  ["/tools", "tools-index"],
+  ["/resources", "resources"],
+  ["/tools/:slug", "tool"],
+  ["/use-cases/:slug", "use-case"],
+  ["/compare/:slug", "comparison"],
+  ["/guides/:slug", "guide"],
+  ["/legal/privacy-policy", "privacy"],
+  ["/legal/terms", "terms"],
+] as const;
+const authRoutes = [
+  ["/login", "login"],
+  ["/register", "register"],
+] as const;
+const appRoutes = [
+  ["/dashboard", "dashboard"],
+  ["/settings/profile", "profile-settings"],
+  ["/settings/security", "security-settings"],
+  ["/tenant/settings", "tenant-settings"],
+  ["/tenant/members", "tenant-members"],
+] as const;
 
-  layout("./routes/auth-layout.tsx", [
-    route("login", "./routes/login.tsx"),
-    route("register", "./routes/register.tsx"),
-  ]),
-
-  layout("./routes/app-layout.tsx", [
-    route("dashboard", "./routes/dashboard.tsx"),
-    route("settings/profile", "./routes/profile-settings.tsx"),
-    route("settings/security", "./routes/security-settings.tsx"),
-    route("tenant/settings", "./routes/tenant-settings.tsx"),
-    route("tenant/members", "./routes/tenant-members.tsx"),
-  ]),
-] satisfies RouteConfig;
+export default supportedLocales.flatMap((locale) => {
+  const localizedRoutes = (routes: readonly (readonly [string, string])[]) =>
+    routes.map(([path, module]) =>
+      route(localizedPath(path, locale).slice(1), `./routes/${module}.tsx`, {
+        id: `${module}-${locale}`,
+      }),
+    );
+  return [
+    layout("./routes/public-layout.tsx", { id: `public-${locale}` }, [
+      locale === "en"
+        ? index("./routes/home.tsx", { id: `home-${locale}` })
+        : route(localizedPath("/", locale).slice(1), "./routes/home.tsx", { id: `home-${locale}` }),
+      ...localizedRoutes(publicRoutes),
+      ...(locale === "en" ? [route("404", "./routes/not-found.tsx")] : []),
+    ]),
+    layout("./routes/auth-layout.tsx", { id: `auth-${locale}` }, localizedRoutes(authRoutes)),
+    layout("./routes/app-layout.tsx", { id: `app-${locale}` }, localizedRoutes(appRoutes)),
+  ];
+}) satisfies RouteConfig;

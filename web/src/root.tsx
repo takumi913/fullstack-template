@@ -13,6 +13,7 @@ import { shouldHydrateDocument } from "@/runtime/client-runtime";
 import { resolveDocumentLocale } from "@/seo/document-locale";
 import { publicAssetMimeType } from "@/seo/public-asset";
 import { siteConfig } from "@/seo/site";
+import { SiteI18nProvider } from "@/i18n/SiteI18nProvider";
 import "./style.css";
 
 export const links: LinksFunction = () => [
@@ -40,7 +41,9 @@ export default function Root() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <SiteI18nProvider key={locale} locale={locale}>
+          <Outlet />
+        </SiteI18nProvider>
         {hydrate ? (
           <>
             <ScrollRestoration />

@@ -1,9 +1,14 @@
+import { isIndexableContent } from "./localization";
+import { localizedPath, normalizeLocale } from "../i18n/locales";
+import { publicPageCopy } from "./ui-copy";
 import type { LandingPageDefinition } from "../content/landing-pages";
 import { toolPath } from "../content/tool-pages";
 import { absoluteUrl } from "./site";
 import type { SeoPage } from "./page";
 
 export function createLandingSeoPage(page: LandingPageDefinition): SeoPage {
+  const locale = normalizeLocale(page.locale);
+  const copy = publicPageCopy(locale);
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -11,14 +16,14 @@ export function createLandingSeoPage(page: LandingPageDefinition): SeoPage {
       {
         "@type": "ListItem",
         position: 1,
-        name: "Home",
-        item: absoluteUrl("/"),
+        name: copy.home,
+        item: absoluteUrl(localizedPath("/", locale)),
       },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Resources",
-        item: absoluteUrl("/resources"),
+        name: copy.resources,
+        item: absoluteUrl(localizedPath("/resources", locale)),
       },
       {
         "@type": "ListItem",
@@ -32,6 +37,7 @@ export function createLandingSeoPage(page: LandingPageDefinition): SeoPage {
   const webPageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
+    inLanguage: locale,
     name: page.h1,
     url: absoluteUrl(page.path),
     description: page.description,
@@ -42,6 +48,7 @@ export function createLandingSeoPage(page: LandingPageDefinition): SeoPage {
       ? {
           "@context": "https://schema.org",
           "@type": "FAQPage",
+          inLanguage: locale,
           mainEntity: page.faq.map((item) => ({
             "@type": "Question",
             name: item.question,
@@ -63,7 +70,7 @@ export function createLandingSeoPage(page: LandingPageDefinition): SeoPage {
     locale: page.locale,
     alternates: page.alternates,
     updatedAt: page.updatedAt,
-    noindex: page.noindex || page.templateExample || page.status !== "published",
+    noindex: !isIndexableContent(page),
     relatedPages: page.relatedToolSlugs.map((slug) => toolPath(slug)),
     schema: [webPageSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])],
   };

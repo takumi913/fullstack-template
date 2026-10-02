@@ -17,11 +17,11 @@ func (m *AuthMiddleware) Require(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c *echo.Context) error {
 		cookie, e := c.Cookie(SessionCookie)
 		if e != nil || cookie.Value == "" {
-			return echo.NewHTTPError(http.StatusUnauthorized, "用户未认证")
+			return echo.NewHTTPError(http.StatusUnauthorized, model.ErrUnauthenticated.ForLanguage(c.Request().Header.Get("Accept-Language")))
 		}
 		_, session, e := m.auth.Session(c.Request().Context(), cookie.Value)
 		if e != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Session已失效")
+			return echo.NewHTTPError(http.StatusUnauthorized, model.ErrSessionExpired.ForLanguage(c.Request().Header.Get("Accept-Language")))
 		}
 		c.Set("user_id", session.UserID)
 		c.Set("session", session)

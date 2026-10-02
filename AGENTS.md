@@ -71,7 +71,7 @@
 - **表单处理**: 原生受控组件 + `useAsyncAction`（未引入表单库），业务校验以后端 service 层为准
 - **图标**: lucide-react（已在用，不要再引入第二个图标库）
 - **HTTP 客户端**: Axios
-- **国际化**: UI 暂未引入 i18n 库；SEO 页面已支持显式 locale、本地化 URL 与 hreflang
+- **国际化**: i18next + react-i18next；英文默认根路径，简体中文 `/zh-cn`，UI 和 SEO 内容均按 URL 语言本地化
 - **主题切换**: 暂未引入
 - **通知组件**: 暂未引入，错误以表单内联红字展示
 - **包管理器**: Bun
@@ -176,7 +176,7 @@ func (h *UserHandler) Update(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, v, "更新成功")
+	return success(c, v, model.MessageUpdated)
 }
 ```
 
@@ -544,16 +544,17 @@ export interface CreateUserRequest {
 
 ## 6. 国际化 (i18n) 规范 🌍
 
-项目当前未引入 UI i18n 运行时，通用界面文案仍直接来自组件/站点配置；但 SEO 内容层已经支持独立 locale、显式本地化 path、可见语言切换与 reciprocal hreflang。两者不要混为一谈。
+项目使用 `i18next` 与 `react-i18next`，英文优先并完整支持简体中文。
 
-若确实需要多语言，再安装 `i18next` 与 `react-i18next`，并遵循：
-
-- **按功能模块分组**：相关文案放在同一命名空间下，通用文案（如按钮文字）放入 `common`
-- **命名空间层级不超过 3 层**
-- **保持各语言文件的键同步**，避免某种语言缺失键位导致回退
-
-在引入之前不要预先安装依赖——未使用的依赖会带来安装成本、
-锁文件变动和依赖升级噪音，却不产生任何价值。
+- `web/src/i18n/locales.json` 是语言与 URL 前缀的唯一来源，路由、Go SPA 前缀和静态托管重定向从中推导。
+- URL 决定语言；公开内容使用独立本地化 URL、self canonical、reciprocal hreflang 与英文 `x-default`，不按浏览器偏好自动跳转。
+- `common` 管理通用 UI，`app` 管理认证和工作区文案，仅在私有路由加载；命名空间层级不超过 3 层。
+- 各语言字典用 `satisfies typeof en` 保持键同步，SEO 正文使用完整本地化数据，不用 fallback 冒充已完成的翻译。
+- 每次预渲染创建独立 i18next instance，避免并发 SSG 共享可变语言状态。
+- Tool / Landing 用相同 `translationKey` 建立语言关系；仅真实存在且索引状态一致的版本进入 alternate family。
+- 英中隐私政策与服务条款在 `legal-pages.ts` 管理，草稿 noindex；strict 发布要求审核状态及生效日期。
+- API 业务提示在 `pkg/model/messages.go` 管理，HTTP 边界按 `Accept-Language` 展示，service 保留业务校验职责。
+- 详见 `docs/i18n-seo.md`。
 
 ## 7. 开发工具和环境 🛠️
 

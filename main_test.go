@@ -60,9 +60,11 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		}
 	})
 	writeStaticTestFile(t, staticDir, "index.html", "<h1>home</h1>")
+	writeStaticTestFile(t, staticDir, "zh-cn/index.html", "<h1>Chinese home</h1>")
+	writeStaticTestFile(t, staticDir, "zh-cn/legal/terms/index.html", "<h1>Chinese terms</h1>")
 	writeStaticTestFile(t, staticDir, "tools/example/index.html", "<h1>tool</h1>")
 	writeStaticTestFile(t, staticDir, "resources/index.html", "<h1>resources</h1>")
-	writeStaticTestFile(t, staticDir, "ja/tools/example/index.html", "<h1>localized tool</h1>")
+	writeStaticTestFile(t, staticDir, "zh-cn/tools/example/index.html", "<h1>localized tool</h1>")
 	writeStaticTestFile(t, staticDir, "use-cases/example/index.html", "<h1>use case</h1>")
 	writeStaticTestFile(t, staticDir, "api-tools/index.html", "<h1>api tools</h1>")
 	writeStaticTestFile(
@@ -87,8 +89,10 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 		want string
 	}{
 		{name: "tool", path: "/tools/example", want: "tool"},
+		{name: "Chinese home", path: "/zh-cn", want: "Chinese home"},
+		{name: "Chinese legal", path: "/zh-cn/legal/terms", want: "Chinese terms"},
 		{name: "resources hub", path: "/resources", want: "resources"},
-		{name: "localized tool", path: "/ja/tools/example", want: "localized tool"},
+		{name: "localized tool", path: "/zh-cn/tools/example", want: "localized tool"},
 		{name: "use case", path: "/use-cases/example", want: "use case"},
 		{name: "api-prefixed public page", path: "/api-tools", want: "api tools"},
 	} {
@@ -110,7 +114,7 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	}{
 		{name: "tool", from: "/tools/example/?ref=docs", to: "/tools/example?ref=docs"},
 		{name: "resources", from: "/resources/", to: "/resources"},
-		{name: "localized tool", from: "/ja/tools/example/", to: "/ja/tools/example"},
+		{name: "localized tool", from: "/zh-cn/tools/example/", to: "/zh-cn/tools/example"},
 		{name: "use case", from: "/use-cases/example/", to: "/use-cases/example"},
 	} {
 		t.Run("redirects "+tt.name+" trailing slash", func(t *testing.T) {
@@ -154,28 +158,32 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	})
 
 	t.Run("private SPA fallback is noindex", func(t *testing.T) {
-		rec := performStaticRequest(e, "/dashboard")
-		if rec.Code != http.StatusOK {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
-		}
-		if got := rec.Header().Get("X-Robots-Tag"); got != "noindex, nofollow" {
-			t.Fatalf("X-Robots-Tag = %q", got)
+		for _, path := range []string{"/dashboard", "/zh-cn/login", "/zh-cn/register", "/zh-cn/dashboard", "/zh-cn/settings/profile", "/zh-cn/tenant/members"} {
+			rec := performStaticRequest(e, path)
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+			}
+			if got := rec.Header().Get("X-Robots-Tag"); got != "noindex, nofollow" {
+				t.Fatalf("X-Robots-Tag = %q", got)
+			}
 		}
 	})
 
 	t.Run("unknown public path returns a real 404", func(t *testing.T) {
-		rec := performStaticRequest(e, "/definitely-missing")
-		if rec.Code != http.StatusNotFound {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
-		}
-		if !strings.Contains(rec.Body.String(), "not found") {
-			t.Fatalf("body = %q, want custom 404 page", rec.Body.String())
-		}
-		if got := rec.Header().Get("X-Robots-Tag"); got != "noindex, nofollow" {
-			t.Fatalf("X-Robots-Tag = %q", got)
-		}
-		if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
-			t.Fatalf("Cache-Control = %q, want %q", got, "no-cache")
+		for _, path := range []string{"/definitely-missing", "/zh-cn/missing", "/zh-cn/tools/missing", "/ja/login", "/zh-cnish/login"} {
+			rec := performStaticRequest(e, path)
+			if rec.Code != http.StatusNotFound {
+				t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
+			}
+			if !strings.Contains(rec.Body.String(), "not found") {
+				t.Fatalf("body = %q, want custom 404 page", rec.Body.String())
+			}
+			if got := rec.Header().Get("X-Robots-Tag"); got != "noindex, nofollow" {
+				t.Fatalf("X-Robots-Tag = %q", got)
+			}
+			if got := rec.Header().Get("Cache-Control"); got != "no-cache" {
+				t.Fatalf("Cache-Control = %q, want %q", got, "no-cache")
+			}
 		}
 	})
 

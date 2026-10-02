@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"fullstack-template/configs"
 	"fullstack-template/pkg/model"
 	"fullstack-template/pkg/repo"
@@ -46,27 +45,27 @@ const (
 
 func validateUsername(username string) error {
 	if len(username) < 3 || len(username) > maxUsernameLen {
-		return fmt.Errorf("用户名长度必须在3-%d个字符之间", maxUsernameLen)
+		return model.ErrUsernameLength.Format(maxUsernameLen)
 	}
 	return nil
 }
 
 func validateEmail(email string) error {
 	if email == "" || !strings.Contains(email, "@") {
-		return errors.New("邮箱格式不正确")
+		return model.ErrEmailInvalid
 	}
 	if len(email) > maxEmailLen {
-		return fmt.Errorf("邮箱长度不能超过 %d 个字符", maxEmailLen)
+		return model.ErrEmailLength.Format(maxEmailLen)
 	}
 	return nil
 }
 
 func validateTenantName(name string) error {
 	if name == "" {
-		return errors.New("租户名称不能为空")
+		return model.ErrTenantNameRequired
 	}
 	if len(name) > maxTenantName {
-		return fmt.Errorf("租户名称长度不能超过 %d 个字符", maxTenantName)
+		return model.ErrTenantNameLength.Format(maxTenantName)
 	}
 	return nil
 }
@@ -83,10 +82,10 @@ func validateCredentials(username, email, password string) error {
 		return err
 	}
 	if len(password) < 6 {
-		return errors.New("密码长度不能少于6个字符")
+		return model.ErrPasswordShort
 	}
 	if len(password) > maxPasswordLen {
-		return fmt.Errorf("密码长度不能超过 %d 个字节", maxPasswordLen)
+		return model.ErrPasswordLong.Format(maxPasswordLen)
 	}
 	return nil
 }
@@ -130,11 +129,11 @@ func (s *AuthService) Register(ctx context.Context, req model.RegisterRequest) (
 	})
 	if err != nil {
 		if errors.Is(err, repo.ErrConflict) {
-			return nil, "", errors.New("邮箱或用户名已被使用")
+			return nil, "", model.ErrAccountConflict
 		}
 		// 原始错误只记日志：它会被当作 400 返回，绕过 handler 层的 5xx 脱敏。
 		slog.Error("注册失败", "error", err)
-		return nil, "", errors.New("注册失败，请稍后重试")
+		return nil, "", model.ErrRegistration
 	}
 	user, err = s.store.GetUserByID(ctx, user.ID)
 	if err != nil {
@@ -158,13 +157,13 @@ func (s *AuthService) Login(ctx context.Context, req model.LoginRequest) (*model
 		if err := bcrypt.CompareHashAndPassword(dummyPasswordHash, []byte(req.Password)); err != nil {
 			_ = err
 		}
-		return nil, "", errors.New("邮箱或密码错误")
+		return nil, "", model.ErrCredentials
 	}
 	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)) != nil {
-		return nil, "", errors.New("邮箱或密码错误")
+		return nil, "", model.ErrCredentials
 	}
 	if user.Status != model.UserStatusActive {
-		return nil, "", errors.New("账户已停用")
+		return nil, "", model.ErrAccountInactive
 	}
 	tenants, err := s.store.ListTenants(ctx, user.ID)
 	if err != nil {

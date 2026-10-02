@@ -13,7 +13,7 @@ describe("client runtime policy", () => {
 
   it("hydrates interactive tool routes", () => {
     expect(shouldHydrateDocument("/tools/json-formatter", 3)).toBe(true);
-    expect(shouldHydrateDocument("/ja/tools/json-formatter", 3)).toBe(true);
+    expect(shouldHydrateDocument("/zh-cn/tools/json-formatter", 3)).toBe(true);
   });
 
   it("hydrates auth and private app routes", () => {
@@ -41,7 +41,7 @@ describe("client runtime policy", () => {
       "/tools",
       "/resources",
       "/guides/json-syntax",
-      "/ja/guides/json-syntax",
+      "/zh-cn/guides/json-syntax",
       "/use-cases/json-api-debugging",
       "/compare/json-formatter-vs-validator",
       "/legal/privacy-policy",

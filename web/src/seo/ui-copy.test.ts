@@ -2,18 +2,16 @@ import { describe, expect, it } from "vitest";
 import { publicPageCopy } from "./ui-copy";
 
 describe("publicPageCopy", () => {
-  it("uses Japanese labels for Japanese locale variants", () => {
-    expect(publicPageCopy("ja").faq).toBe("よくある質問");
-    expect(publicPageCopy("ja-JP").relatedTools).toBe("関連ツール");
+  it("uses English as the default language", () => {
+    expect(publicPageCopy().faq).toBe("Frequently asked questions");
+    expect(publicPageCopy("en").home).toBe("Home");
   });
-
-  it("uses Chinese labels for Chinese locale variants", () => {
+  it("uses Simplified Chinese labels for supported Chinese language tags", () => {
     expect(publicPageCopy("zh-CN").home).toBe("首页");
-    expect(publicPageCopy("zh-TW").resources).toBe("资源");
+    expect(publicPageCopy("zh-cn").resources).toBe("资源");
   });
-
-  it("falls back to English for unsupported or missing locales", () => {
-    expect(publicPageCopy("de").tools).toBe("Tools");
-    expect(publicPageCopy(undefined).language).toBe("Language");
+  it("does not present unsupported languages as translated versions", () => {
+    expect(publicPageCopy("ja").home).toBe("Home");
+    expect(publicPageCopy("zh-TW").home).toBe("Home");
   });
 });

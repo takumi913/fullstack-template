@@ -1,6 +1,8 @@
 // HTTP客户端配置，基于axios
 import axios from "axios";
 import type { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+import { localeFromPath } from "../i18n/locales";
+import { commonTranslations } from "../i18n/common";
 import { triggerUnauthorized } from "./auth-events";
 
 // API基础URL
@@ -40,7 +42,8 @@ const client: AxiosInstance = axios.create({
 // 请求拦截器
 client.interceptors.request.use(
   (config) => {
-    // 不再需要手动设置Authorization头，因为使用了cookie
+    // The URL language, not browser preferences, controls private API presentation.
+    config.headers.set("Accept-Language", localeFromPath(window.location.pathname));
     return config;
   },
   (error) => {
@@ -57,7 +60,8 @@ client.interceptors.response.use(
   (error: AxiosError) => {
     if (!error.response) {
       // 请求已发出但没有收到响应
-      const message = error.request ? "网络连接超时，请检查网络" : "网络错误，请稍后重试";
+      const copy = commonTranslations[localeFromPath(window.location.pathname)].api;
+      const message = error.request ? copy.timeout : copy.network;
       return Promise.reject(new ApiError(message, 0));
     }
 
@@ -71,11 +75,9 @@ client.interceptors.response.use(
 
     // 优先使用服务端返回的文案：后端已经对 5xx 做过脱敏，
     // 403 之类的拒绝原因也比前端硬编码的"权限不足"更具体。
-    const fallback: Record<number, string> = {
-      401: "未授权，请重新登录",
-      404: "请求的资源不存在",
-    };
-    const message = body?.message || fallback[status] || `请求失败 (${status})`;
+    const copy = commonTranslations[localeFromPath(window.location.pathname)].api;
+    const fallback: Record<number, string> = { 401: copy.unauthorized, 404: copy.notFound };
+    const message = body?.message || fallback[status] || `${copy.failed} (${status})`;
 
     return Promise.reject(new ApiError(message, status, body?.code));
   },

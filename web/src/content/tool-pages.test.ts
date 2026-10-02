@@ -90,7 +90,7 @@ describe("tool page definitions", () => {
       const localizedMatch = path.match(/^\/([^/]+)\/tools\//);
 
       if (localizedMatch) {
-        expect(tool.locale, `${tool.slug} locale`).toBe(localizedMatch[1]);
+        expect(tool.locale?.toLowerCase(), `${tool.slug} locale`).toBe(localizedMatch[1]);
       }
     }
   });

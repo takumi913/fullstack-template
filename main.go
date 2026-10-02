@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	_ "embed"
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"os"
@@ -134,9 +136,37 @@ func apiPath(path string) bool {
 	return path == "/api" || strings.HasPrefix(path, "/api/")
 }
 
+//go:embed web/src/i18n/locales.json
+var localeDefinitions []byte
+
+// localizedPathPrefixes uses the same language registry as the frontend router.
+func localizedPathPrefixes() []string {
+	var locales map[string]struct {
+		Prefix string `json:"prefix"`
+	}
+	if err := json.Unmarshal(localeDefinitions, &locales); err != nil {
+		panic("invalid embedded locale registry: " + err.Error())
+	}
+	prefixes := make([]string, 0, len(locales))
+	for _, locale := range locales {
+		if locale.Prefix != "" {
+			prefixes = append(prefixes, locale.Prefix+"/")
+		}
+	}
+	return prefixes
+}
+
+var publicLocalePrefixes = localizedPathPrefixes()
+
 // spaFallbackPath 判断路径是否属于只在浏览器中运行的应用页面。
 // 公开 SEO 页面必须由真实静态 HTML 命中；这里只允许登录和后台路由使用 SPA fallback。
 func spaFallbackPath(path string) bool {
+	for _, prefix := range publicLocalePrefixes {
+		if strings.HasPrefix(path, prefix) {
+			path = "/" + strings.TrimPrefix(path, prefix)
+			break
+		}
+	}
 	switch path {
 	case "/login", "/register", "/dashboard":
 		return true

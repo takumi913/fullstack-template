@@ -1,6 +1,6 @@
+import { localizedPath, normalizeLocale } from "@/i18n/locales";
 import { ArrowRight } from "lucide-react";
 import { Link, Navigate, useLocation } from "react-router";
-import { LanguageSwitcher } from "@/components/seo/LanguageSwitcher";
 import { getLandingPageByPath } from "@/content/landing-pages";
 import { getToolPageBySlug, toolPath } from "@/content/tool-pages";
 import { publicPageCopy } from "@/seo/ui-copy";
@@ -23,13 +23,19 @@ export default function LandingPage() {
       <nav aria-label={copy.breadcrumb} className="text-sm text-zinc-500">
         <ol className="flex items-center gap-2">
           <li>
-            <Link className="hover:text-zinc-950" to="/">
+            <Link
+              className="hover:text-zinc-950"
+              to={localizedPath("/", normalizeLocale(page.locale))}
+            >
               {copy.home}
             </Link>
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <Link className="hover:text-zinc-950" to="/resources">
+            <Link
+              className="hover:text-zinc-950"
+              to={localizedPath("/resources", normalizeLocale(page.locale))}
+            >
               {copy.resources}
             </Link>
           </li>
@@ -39,7 +45,6 @@ export default function LandingPage() {
           </li>
         </ol>
       </nav>
-      <LanguageSwitcher alternates={page.alternates} currentPath={pathname} locale={page.locale} />
 
       <header className="mt-8 max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">

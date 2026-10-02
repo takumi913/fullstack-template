@@ -35,4 +35,10 @@ describe("resolveSiteConfig", () => {
     expect(resolved.name).toBe(templateSiteConfig.brand.name);
     expect(resolved.defaultTitle).toBe(templateSiteConfig.seo.defaultTitle);
   });
+  it("preserves English as the canonical root language", () => {
+    expect(resolveSiteConfig({ VITE_SITE_LOCALE: "en" }).locale).toBe("en");
+    expect(() => resolveSiteConfig({ VITE_SITE_LOCALE: "zh-CN" })).toThrow(
+      /English is the default/,
+    );
+  });
 });

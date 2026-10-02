@@ -48,3 +48,27 @@ export function toOpenGraphLocale(locale: string) {
 
   return locale.replace(/-/g, "_");
 }
+
+export interface ContentPublication {
+  status: string;
+  noindex?: boolean;
+  templateExample?: boolean;
+}
+export function isIndexableContent(content: ContentPublication) {
+  return content.status === "published" && !content.noindex && !content.templateExample;
+}
+
+// Drafts have no URL. Indexable versions must not advertise noindex translations.
+export function createContentHreflangAlternates(
+  current: ContentPublication,
+  variants: (LocalizedPageVariant & ContentPublication)[],
+) {
+  const available = variants.filter(
+    (variant) =>
+      variant.status !== "draft" && isIndexableContent(variant) === isIndexableContent(current),
+  );
+  return createHreflangAlternates(
+    available,
+    available.find((variant) => variant.locale === "en")?.path,
+  );
+}

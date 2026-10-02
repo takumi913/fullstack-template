@@ -219,6 +219,24 @@ jobs:
           test "$(curl --silent --output /tmp/tool.html --write-out '%{http_code}' http://127.0.0.1:1323/tools/json-formatter)" = "200"
           grep -Fq "JSON Formatter" /tmp/tool.html
 
+          test "$(curl --silent --output /tmp/zh-home.html --write-out '%{http_code}' http://127.0.0.1:1323/zh-cn)" = "200"
+          grep -Fq 'lang="zh-CN"' /tmp/zh-home.html
+          grep -Fq 'href="https://docker-ci.fullstack.dev/zh-cn"' /tmp/zh-home.html
+
+          test "$(curl --silent --output /tmp/zh-tool.html --write-out '%{http_code}' http://127.0.0.1:1323/zh-cn/tools/json-formatter)" = "200"
+          grep -Fq "JSON 输入" /tmp/zh-tool.html
+
+          for path in /legal/privacy-policy /legal/terms /zh-cn/legal/privacy-policy /zh-cn/legal/terms; do
+            test "$(curl --silent --output /tmp/legal.html --write-out '%{http_code}' "http://127.0.0.1:1323${path}")" = "200"
+            grep -Fq 'noindex, follow' /tmp/legal.html
+          done
+
+          test "$(curl --silent --output /tmp/zh-missing.html --write-out '%{http_code}' http://127.0.0.1:1323/zh-cn/definitely-missing)" = "404"
+          test "$(curl --silent --output /tmp/unsupported.html --write-out '%{http_code}' http://127.0.0.1:1323/ja/login)" = "404"
+
+          curl --silent --dump-header /tmp/zh-login.headers --output /tmp/zh-login.html http://127.0.0.1:1323/zh-cn/login
+          grep -Eiq '^X-Robots-Tag: noindex, nofollow' /tmp/zh-login.headers
+
           test "$(curl --silent --output /tmp/missing.html --write-out '%{http_code}' http://127.0.0.1:1323/definitely-missing)" = "404"
 
           curl --silent --dump-header /tmp/dashboard.headers --output /tmp/dashboard.html http://127.0.0.1:1323/dashboard
@@ -229,6 +247,8 @@ jobs:
 
           curl --fail --silent http://127.0.0.1:1323/sitemap.xml > /tmp/sitemap.xml
           grep -Fq "<loc>https://docker-ci.fullstack.dev/</loc>" /tmp/sitemap.xml
+          grep -Fq "<loc>https://docker-ci.fullstack.dev/zh-cn</loc>" /tmp/sitemap.xml
+          grep -Fq 'hreflang="x-default" href="https://docker-ci.fullstack.dev/"' /tmp/sitemap.xml
 
       - name: Show container logs on failure
         if: failure()

@@ -16,7 +16,7 @@ func (h *UserHandler) Get(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 404, e)
 	}
-	return success(c, v, "获取成功")
+	return success(c, v, model.MessageLoaded)
 }
 func (h *UserHandler) Update(c *echo.Context) error {
 	var req model.UpdateProfileRequest
@@ -27,7 +27,7 @@ func (h *UserHandler) Update(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, v, "更新成功")
+	return success(c, v, model.MessageUpdated)
 }
 func (h *UserHandler) ChangePassword(c *echo.Context) error {
 	var req model.ChangePasswordRequest
@@ -37,5 +37,5 @@ func (h *UserHandler) ChangePassword(c *echo.Context) error {
 	if e := h.service.ChangePassword(c.Request().Context(), middleware.UserID(c), req); e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, nil, "密码修改成功，请重新登录")
+	return success(c, nil, model.MessagePasswordChanged)
 }

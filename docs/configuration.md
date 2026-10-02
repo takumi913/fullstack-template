@@ -71,7 +71,7 @@ VITE_SITE_NAME=Example
 VITE_SITE_SHORT_NAME=Example
 VITE_SITE_MARK=E
 VITE_SITE_FAVICON=/favicon.svg
-VITE_SITE_LOCALE=zh-CN
+VITE_SITE_LOCALE=en
 VITE_SITE_PRIMARY_KEYWORD=example online tool
 VITE_SITE_TITLE=Example Online Tool
 VITE_SITE_DESCRIPTION=Describe the primary user value here.
@@ -103,7 +103,7 @@ https://example.com?a=1    ❌
 它会作为 canonical、Open Graph URL、JSON-LD、sitemap 和 robots.txt 的域名来源。
 因此生产环境不要依赖默认值 `https://example.com`。
 
-品牌与长文案的默认值集中在 `web/src/config/site-config.ts`。复制模板创建新站时，
+品牌与英文 SEO 默认值在 `web/src/config/site-config.ts`，双语页面文案在 `site-copy.ts`，UI 命名空间在 `web/src/i18n/`。英文根路径固定为默认语言；`VITE_SITE_LOCALE` 仅接受 `en`，简体中文使用 `/zh-cn`。详见 [多语言 SEO](i18n-seo.md)。复制模板创建新站时，
 优先修改这个文件以及 `web/src/content/` 下的页面数据；`VITE_SITE_*` 变量用于部署时覆盖
 品牌名、标题、描述、主关键词、favicon、OG 图片、首页核心工具等构建期值。
 
@@ -115,7 +115,7 @@ strict 最终校验的是“解析后的站点身份”，并与不可编辑的 
 中的原始脚手架值比较。因此只要你已经把 `site-config.ts` 改成真实品牌，
 `VITE_SITE_NAME`、`VITE_SITE_TITLE`、`VITE_SITE_DESCRIPTION` 都可以省略。
 
-strict 模式还会拒绝 `status: "example"` 的 Tool/Landing 页面；母模板自己的 CI 通过
+strict 模式要求英中隐私政策及服务条款为已审核的 `published` 状态并填写 `updatedAt` 生效日期，同时会拒绝 `status: "example"` 的 Tool/Landing 页面；母模板自己的 CI 通过
 `SEO_ALLOW_TEMPLATE_EXAMPLES=true` 保留示例覆盖，真实生产站不要开启这个例外。
 
 另外，strict 模式默认要求社交分享图使用本地 `.png/.jpg/.jpeg` 资源。模板自身仍用

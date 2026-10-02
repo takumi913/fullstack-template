@@ -15,7 +15,7 @@ func (m *TenantMiddleware) Member(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c *echo.Context) error {
 		member, e := m.store.GetMember(c.Request().Context(), c.Param("tenantID"), UserID(c))
 		if e != nil {
-			return echo.NewHTTPError(http.StatusForbidden, "您不是该租户成员")
+			return echo.NewHTTPError(http.StatusForbidden, model.ErrNotMember.ForLanguage(c.Request().Header.Get("Accept-Language")))
 		}
 		c.Set("tenant_member", member)
 		return next(c)
@@ -26,7 +26,7 @@ func Require(permission model.Permission) echo.MiddlewareFunc {
 		return func(c *echo.Context) error {
 			member, ok := c.Get("tenant_member").(*model.TenantMember)
 			if !ok || member == nil || !model.HasPermission(member.Role, permission) {
-				return echo.NewHTTPError(http.StatusForbidden, "权限不足")
+				return echo.NewHTTPError(http.StatusForbidden, model.ErrPermission.ForLanguage(c.Request().Header.Get("Accept-Language")))
 			}
 			return next(c)
 		}

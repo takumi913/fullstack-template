@@ -1,26 +1,28 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
-import { templateSiteConfig } from "@/config/site-config";
-import { directoryToolPages, toolPath } from "@/content/tool-pages";
-import { publicSeoPages } from "@/seo/pages";
+import { siteCopies } from "@/config/site-copy";
+import { useLocale } from "@/i18n/useLocale";
+import { getDirectoryToolPages, toolPath } from "@/content/tool-pages";
+import { getPublicSeoPages } from "@/seo/pages";
 
 export default function ToolsPage() {
+  const locale = useLocale();
+  const publicSeoPages = getPublicSeoPages(locale);
+  const copy = siteCopies[locale].hubs.tools;
   return (
     <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
       <header className="max-w-3xl">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
-          {templateSiteConfig.hubs.tools.eyebrow}
+          {copy.eyebrow}
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
           {publicSeoPages.tools.h1}
         </h1>
-        <p className="mt-4 text-base leading-7 text-zinc-600">
-          {templateSiteConfig.hubs.tools.description}
-        </p>
+        <p className="mt-4 text-base leading-7 text-zinc-600">{copy.description}</p>
       </header>
 
       <section className="mt-10 grid gap-3 sm:grid-cols-2">
-        {directoryToolPages.map((tool) => (
+        {getDirectoryToolPages(locale).map((tool) => (
           <Link
             className="group rounded-xl border p-5 transition hover:border-zinc-400"
             key={tool.slug}

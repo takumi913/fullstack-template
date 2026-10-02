@@ -1,4 +1,5 @@
-import type { SeoAlternate } from "../seo/localization";
+import { createContentHreflangAlternates, type SeoAlternate } from "../seo/localization";
+import { normalizeLocale, type SiteLocale } from "../i18n/locales";
 
 export type ToolPageStatus = "draft" | "example" | "published";
 
@@ -10,6 +11,7 @@ export interface ToolFaqItem {
 export interface ToolPageDefinition {
   slug: string;
   componentKey: string;
+  translationKey?: string;
   status: ToolPageStatus;
   templateExample?: boolean;
   name: string;
@@ -33,20 +35,14 @@ export interface ToolPageDefinition {
   isFree?: boolean;
 }
 
-const jsonFormatterAlternates: SeoAlternate[] = [
-  { hreflang: "en", path: "/tools/json-formatter" },
-  { hreflang: "ja", path: "/ja/tools/json-formatter" },
-  { hreflang: "x-default", path: "/tools/json-formatter" },
-];
-
-export const toolPages: ToolPageDefinition[] = [
+const definitions: ToolPageDefinition[] = [
   {
     slug: "json-formatter",
     componentKey: "json-formatter",
     status: "example",
     templateExample: true,
     locale: "en",
-    alternates: jsonFormatterAlternates,
+    translationKey: "json-formatter",
     name: "JSON Formatter",
     category: "Developer Tool",
     primaryKeyword: "json formatter",
@@ -83,46 +79,49 @@ export const toolPages: ToolPageDefinition[] = [
     isFree: true,
   },
   {
-    slug: "json-formatter-ja",
+    slug: "json-formatter-zh-cn",
     componentKey: "json-formatter",
     status: "example",
     templateExample: true,
-    path: "/ja/tools/json-formatter",
-    locale: "ja",
-    alternates: jsonFormatterAlternates,
-    showInDirectory: false,
-    name: "JSON Formatter",
-    category: "開発ツール",
-    primaryKeyword: "json 整形",
-    title: "JSON 整形ツール - オンラインで JSON を整形・検証",
-    description: "ブラウザ上で JSON を整形、検証、圧縮できる日本語版のサンプルページです。",
-    h1: "JSON 整形ツール",
+    path: "/zh-cn/tools/json-formatter",
+    locale: "zh-CN",
+    translationKey: "json-formatter",
+
+    name: "JSON 格式化工具",
+    category: "开发工具",
+    primaryKeyword: "JSON 格式化",
+    title: "JSON 格式化工具 - 在线格式化、校验与压缩 JSON",
+    description:
+      "在浏览器内格式化、校验和压缩 JSON，快速阅读 API 响应或定位语法错误，数据不会上传到服务器。",
+    h1: "JSON 格式化工具",
     intro:
-      "JSON を貼り付けるだけで、読みやすい形式への整形、構文検証、圧縮をブラウザ内で実行できます。",
+      "粘贴接口响应或配置文件，立即获得清晰的缩进格式。也可以压缩 JSON，或在修改前检查语法错误。",
     features: [
-      "JSON を読みやすくインデントして整形",
-      "不正な JSON の構文エラーを表示",
-      "JSON をコンパクトに圧縮",
-      "処理はブラウザ内で完結",
+      "将 JSON 格式化为清晰的缩进结构",
+      "在格式化前显示 JSON 语法错误",
+      "压缩 JSON，减少文本体积",
+      "输入与输出均在浏览器内处理",
     ],
     howToSteps: [
-      "入力欄に JSON を貼り付けます。",
-      "Format で整形、Minify で圧縮します。",
-      "生成された JSON をコピーして利用します。",
+      "将 JSON 粘贴到输入框。",
+      "选择格式化以便阅读，或选择压缩获得紧凑输出。",
+      "复制输出，继续调试接口或编辑配置。",
     ],
     faq: [
+      { question: "输入的 JSON 会上传吗？", answer: "不会。JSON 解析与格式化均在浏览器内执行。" },
       {
-        question: "入力した JSON はサーバーに送信されますか？",
-        answer: "いいえ。このサンプルでは JSON の処理はブラウザ内だけで実行されます。",
+        question: "能检查无效的 JSON 吗？",
+        answer: "可以。工具会先解析输入，语法错误会显示在结果区域。",
       },
     ],
-    relatedSlugs: ["word-counter"],
+    relatedSlugs: ["word-counter-zh-cn"],
     updatedAt: "2026-09-18",
     noindex: true,
     isFree: true,
   },
   {
     slug: "word-counter",
+    translationKey: "word-counter",
     componentKey: "word-counter",
     status: "example",
     templateExample: true,
@@ -162,7 +161,67 @@ export const toolPages: ToolPageDefinition[] = [
     noindex: true,
     isFree: true,
   },
+  {
+    slug: "word-counter-zh-cn",
+    translationKey: "word-counter",
+    componentKey: "word-counter",
+    path: "/zh-cn/tools/word-counter",
+    locale: "zh-CN",
+    status: "example",
+    templateExample: true,
+    name: "英文词数统计工具",
+    category: "文本工具",
+    primaryKeyword: "英文词数统计",
+    title: "英文词数统计工具 - 在线统计词数、字符、行与段落",
+    description:
+      "在浏览器内统计英文词数、字符数、行数与段落数。适合检查英文文章长度，输入不会上传或保存。",
+    h1: "英文词数统计工具",
+    intro:
+      "写英文文章、摘要或邮件时，粘贴文本即可实时查看词数和字符数。词数按空白分隔，不用于统计中文分词。",
+    features: [
+      "实时统计按空白分隔的英文词数",
+      "查看字符数、行数与段落数",
+      "无需登录，也不上传文本",
+      "编辑文本后立即更新统计结果",
+    ],
+    howToSteps: [
+      "输入或粘贴英文文本。",
+      "查看词数、字符数、行数与段落数。",
+      "继续编辑，统计值会自动更新。",
+    ],
+    faq: [
+      {
+        question: "词数如何计算？",
+        answer: "非空文本按空白字符分隔，每个片段计为一个词。它不进行中文分词。",
+      },
+      { question: "文本会被保存吗？", answer: "不会。统计在浏览器内完成。" },
+    ],
+    relatedSlugs: ["json-formatter-zh-cn"],
+    updatedAt: "2026-10-02",
+    noindex: true,
+    isFree: true,
+  },
 ];
+
+export const toolPages: ToolPageDefinition[] = definitions.map((tool) => ({
+  ...tool,
+  alternates: tool.translationKey
+    ? createContentHreflangAlternates(
+        tool,
+        definitions
+          .filter((candidate) => candidate.translationKey === tool.translationKey)
+          .map((candidate) => ({
+            ...candidate,
+            locale: candidate.locale || "en",
+            path: candidate.path || `/tools/${candidate.slug}`,
+          })),
+      )
+    : tool.alternates,
+}));
+
+export function getDirectoryToolPages(locale: SiteLocale) {
+  return directoryToolPages.filter((tool) => normalizeLocale(tool.locale) === locale);
+}
 
 export function toolPath(tool: ToolPageDefinition | string) {
   if (typeof tool === "string") {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { LandingPageDefinition } from "../content/landing-pages";
 import type { ToolPageDefinition } from "../content/tool-pages";
+import { legalPages } from "../content/legal-pages";
 import { scaffoldSentinels } from "../config/scaffold-sentinels";
 import { assertProductionContentReady } from "./production-readiness";
 
@@ -156,6 +157,30 @@ describe("production SEO readiness", () => {
         tools: [{ ...baseTool, status: "published" }],
         landings: [{ ...baseLanding, status: "published" }],
       }),
+    ).not.toThrow();
+  });
+  it("requires reviewed and dated bilingual policies for production, but retains CI drafts", () => {
+    const options = {
+      strict: true,
+      tools: [],
+      landings: [],
+      policies: [{ ...legalPages.en.privacy, path: "/legal/privacy-policy" }],
+    };
+    expect(() => assertProductionContentReady(options)).toThrow(/Publish reviewed Privacy Policy/);
+    expect(() =>
+      assertProductionContentReady({
+        ...options,
+        policies: [{ ...options.policies[0]!, status: "published" }],
+      }),
+    ).toThrow(/effective dates/);
+    expect(() =>
+      assertProductionContentReady({
+        ...options,
+        policies: [{ ...options.policies[0]!, status: "published", updatedAt: "2026-10-02" }],
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertProductionContentReady({ ...options, allowTemplateExamples: true }),
     ).not.toThrow();
   });
 });

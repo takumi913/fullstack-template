@@ -1,112 +1,143 @@
-import { templateSiteConfig } from "../config/site-config";
+import { siteCopies } from "../config/site-copy";
 import { resolveHomepageTool } from "../content/homepage-tool";
+import { legalPages } from "../content/legal-pages";
+import { localizedPath, supportedLocales, type SiteLocale } from "../i18n/locales";
+import { createContentHreflangAlternates, createHreflangAlternates } from "./localization";
 import { absoluteUrl, siteConfig } from "./site";
 import type { SeoPage } from "./page";
 
-const homePrimaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug);
+export const publicPagePaths = {
+  home: "/",
+  tools: "/tools",
+  resources: "/resources",
+  privacy: "/legal/privacy-policy",
+  terms: "/legal/terms",
+} as const;
+export type PublicPageKind = keyof typeof publicPagePaths;
 
-const homeApplicationSchema = homePrimaryTool
-  ? {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      name: homePrimaryTool.name,
-      applicationCategory: homePrimaryTool.category,
-      operatingSystem: "Web",
-      isAccessibleForFree: homePrimaryTool.isFree,
-      url: absoluteUrl("/"),
-      description: homePrimaryTool.description,
-    }
-  : {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      name: siteConfig.name,
-      applicationCategory: "DeveloperApplication",
-      operatingSystem: "Web",
-      url: absoluteUrl("/"),
-      description: siteConfig.defaultDescription,
-    };
-
-const homeFaqSchema =
-  homePrimaryTool && homePrimaryTool.faq.length > 0
-    ? {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: homePrimaryTool.faq.map((item) => ({
-          "@type": "Question",
-          name: item.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: item.answer,
-          },
+export function getPublicSeoPages(locale: SiteLocale): Record<PublicPageKind, SeoPage> {
+  const copy = siteCopies[locale];
+  const homeTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug, undefined, locale);
+  const title =
+    locale === "en" ? siteConfig.defaultTitle : `${copy.home.title} | ${siteConfig.name}`;
+  const description = locale === "en" ? siteConfig.defaultDescription : copy.home.description;
+  return Object.fromEntries(
+    Object.entries(publicPagePaths).map(([key, basePath]) => {
+      const kind = key as PublicPageKind;
+      const path = localizedPath(basePath, locale);
+      const alternates = createHreflangAlternates(
+        supportedLocales.map((language) => ({
+          locale: language,
+          path: localizedPath(basePath, language),
         })),
+        basePath,
+      );
+      const common = { path, locale, alternates, updatedAt: "2026-10-02" };
+      if (kind === "home") {
+        return [
+          kind,
+          {
+            ...common,
+            title,
+            description,
+            h1: title,
+            intent: "commercial",
+            primaryKeyword: locale === "en" ? siteConfig.primaryKeyword : copy.home.primaryKeyword,
+            relatedPages: Object.values(publicPagePaths)
+              .filter((value) => value !== "/")
+              .map((value) => localizedPath(value, locale)),
+            schema: [
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: siteConfig.name,
+                url: absoluteUrl(path),
+                inLanguage: locale,
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": homeTool ? "WebApplication" : "SoftwareApplication",
+                name: homeTool?.name || siteConfig.name,
+                description: homeTool?.description || description,
+                url: absoluteUrl(path),
+                inLanguage: locale,
+                applicationCategory: homeTool?.category || "DeveloperApplication",
+                operatingSystem: "Web",
+                ...(homeTool ? { isAccessibleForFree: homeTool.isFree } : {}),
+              },
+              ...(homeTool?.faq.length
+                ? [
+                    {
+                      "@context": "https://schema.org",
+                      "@type": "FAQPage",
+                      inLanguage: locale,
+                      mainEntity: homeTool.faq.map((item) => ({
+                        "@type": "Question",
+                        name: item.question,
+                        acceptedAnswer: { "@type": "Answer", text: item.answer },
+                      })),
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ];
       }
-    : undefined;
-
-export const publicSeoPages = {
-  home: {
-    path: "/",
-    primaryKeyword: siteConfig.primaryKeyword,
-    title: siteConfig.defaultTitle,
-    description: siteConfig.defaultDescription,
-    h1: siteConfig.defaultTitle,
-    intent: "commercial",
-    updatedAt: "2026-09-18",
-    relatedPages: ["/tools", "/resources", "/legal/privacy-policy", "/legal/terms"],
-    schema: [
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: siteConfig.name,
-        url: absoluteUrl("/"),
-      },
-      homeApplicationSchema,
-      ...(homeFaqSchema ? [homeFaqSchema] : []),
-    ],
-  },
-  tools: {
-    path: "/tools",
-    primaryKeyword: templateSiteConfig.hubs.tools.primaryKeyword,
-    locale: "en",
-    title: `${templateSiteConfig.hubs.tools.title} | ${siteConfig.name}`,
-    description: templateSiteConfig.hubs.tools.description,
-    h1: templateSiteConfig.hubs.tools.title,
-    intent: "commercial",
-    updatedAt: "2026-09-18",
-    noindex: true,
-  },
-  resources: {
-    path: "/resources",
-    primaryKeyword: templateSiteConfig.hubs.resources.primaryKeyword,
-    locale: "en",
-    title: `${templateSiteConfig.hubs.resources.title} | ${siteConfig.name}`,
-    description: templateSiteConfig.hubs.resources.description,
-    h1: templateSiteConfig.hubs.resources.title,
-    intent: "informational",
-    updatedAt: "2026-09-18",
-    noindex: true,
-  },
-  privacy: {
-    path: "/legal/privacy-policy",
-    primaryKeyword: templateSiteConfig.legal.privacy.primaryKeyword,
-    title: `${templateSiteConfig.legal.privacy.title} | ${siteConfig.name}`,
-    description: `${siteConfig.name} ${templateSiteConfig.legal.privacy.description}`,
-    h1: templateSiteConfig.legal.privacy.title,
-    intent: "legal",
-    updatedAt: "2026-09-18",
-    noindex: true,
-  },
-  terms: {
-    path: "/legal/terms",
-    primaryKeyword: templateSiteConfig.legal.terms.primaryKeyword,
-    title: `${templateSiteConfig.legal.terms.title} | ${siteConfig.name}`,
-    description: `${siteConfig.name} ${templateSiteConfig.legal.terms.description}`,
-    h1: templateSiteConfig.legal.terms.title,
-    intent: "legal",
-    updatedAt: "2026-09-18",
-    noindex: true,
-  },
-} satisfies Record<string, SeoPage>;
-
-export const indexableSeoPages = Object.values(publicSeoPages).filter(
-  (page) => !("noindex" in page) || !page.noindex,
+      const content =
+        kind === "tools" || kind === "resources" ? copy.hubs[kind] : legalPages[locale][kind];
+      const legal = kind === "privacy" || kind === "terms";
+      return [
+        kind,
+        {
+          ...common,
+          alternates: legal
+            ? createContentHreflangAlternates(
+                {
+                  status:
+                    legalPages[locale][kind as "privacy" | "terms"].status === "draft"
+                      ? "example"
+                      : "published",
+                },
+                supportedLocales.map((language) => ({
+                  status:
+                    legalPages[language][kind as "privacy" | "terms"].status === "draft"
+                      ? "example"
+                      : "published",
+                  locale: language,
+                  path: localizedPath(basePath, language),
+                })),
+              )
+            : alternates,
+          primaryKeyword: content.primaryKeyword,
+          title: `${content.title} | ${siteConfig.name}`,
+          description: content.description,
+          h1: content.title,
+          intent: legal ? "legal" : kind === "tools" ? "commercial" : "informational",
+          noindex: legal
+            ? legalPages[locale][kind as "privacy" | "terms"].status !== "published"
+            : true,
+          updatedAt: legal
+            ? legalPages[locale][kind as "privacy" | "terms"].updatedAt
+            : common.updatedAt,
+          schema: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: content.title,
+            description: content.description,
+            url: absoluteUrl(path),
+            inLanguage: locale,
+          },
+        },
+      ];
+    }),
+  ) as Record<PublicPageKind, SeoPage>;
+}
+export const publicSeoPages = getPublicSeoPages("en");
+export const allPublicSeoPages = supportedLocales.flatMap((locale) =>
+  Object.values(getPublicSeoPages(locale)),
 );
+export const publicPrerenderPaths = allPublicSeoPages.map((page) => page.path);
+export const indexableSeoPages = allPublicSeoPages.filter((page) => !page.noindex);
+export function getPublicPageByPath(pathname: string) {
+  return allPublicSeoPages.find((page) => page.path === pathname);
+}

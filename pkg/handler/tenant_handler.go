@@ -16,7 +16,7 @@ func (h *TenantHandler) List(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 500, e)
 	}
-	return success(c, v, "获取成功")
+	return success(c, v, model.MessageLoaded)
 }
 func (h *TenantHandler) Create(c *echo.Context) error {
 	var req model.CreateTenantRequest
@@ -27,14 +27,14 @@ func (h *TenantHandler) Create(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, v, "创建成功")
+	return success(c, v, model.MessageCreated)
 }
 func (h *TenantHandler) Get(c *echo.Context) error {
 	v, e := h.service.Get(c.Request().Context(), c.Param("tenantID"))
 	if e != nil {
 		return failure(c, 404, e)
 	}
-	return success(c, v, "获取成功")
+	return success(c, v, model.MessageLoaded)
 }
 func (h *TenantHandler) Update(c *echo.Context) error {
 	var req model.UpdateTenantRequest
@@ -45,18 +45,18 @@ func (h *TenantHandler) Update(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, v, "更新成功")
+	return success(c, v, model.MessageUpdated)
 }
 func (h *TenantHandler) Delete(c *echo.Context) error {
 	if e := h.service.Delete(c.Request().Context(), c.Param("tenantID")); e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, nil, "删除成功")
+	return success(c, nil, model.MessageDeleted)
 }
 func (h *TenantHandler) Select(c *echo.Context) error {
 	session := middleware.Session(c)
 	if e := h.service.Select(c.Request().Context(), session.ID, middleware.UserID(c), c.Param("tenantID")); e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, nil, "切换成功")
+	return success(c, nil, model.MessageSelected)
 }

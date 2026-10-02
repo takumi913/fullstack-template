@@ -20,6 +20,7 @@
 - Owner、Admin、Member 三种租户角色
 - SQLite/PostgreSQL 独立 migrations 和 sqlc 查询
 - 权限矩阵与租户隔离的接口级测试，前后端均有测试
+- English-first i18next：英文根路径 + 简体中文 `/zh-cn`，包含双语隐私政策与服务条款
 - Public SSG + Private SPA，适合 SEO 工具站
 - Tool Page Schema 自动生成 meta、JSON-LD、sitemap 与相关工具内链
 - 可选“首页即核心工具”模式：默认静态首页，配置后第一屏直接运行主工具
@@ -31,7 +32,9 @@
 复制仓库后，不需要到组件里到处搜索替换品牌。主要修改入口：
 
 ```text
-web/src/config/site-config.ts      品牌、首页、导航、Hub 文案
+web/src/config/site-config.ts      品牌与英文默认 SEO
+web/src/config/site-copy.ts        双语首页 / Hub 文案
+web/src/i18n/                      英文 + 简体中文 UI 和语言注册表
 web/src/content/tool-pages.ts      工具页 SEO / SSG 数据
 web/src/content/landing-pages.ts   Use Case / Comparison / Guide
 web/src/content/legal-pages.ts     隐私政策与服务条款
@@ -117,6 +120,7 @@ bun run format         # 格式化（CI 会检查格式）
 ## 文档
 
 - [新站定制指南](docs/customize-template.md) — 从母模板创建一个新工具站的最短流程
+- [English-first i18n and SEO](docs/i18n-seo.md) — 语言架构、哥飞需求驱动 SEO、多语言发布流程
 - [工具页 SEO / SSG](docs/tool-pages-seo.md) — 新增工具、多语言 URL、关键词配置、预渲染和内链规则
 - [SEO Landing Page](docs/landing-pages-seo.md) — Use Case、Comparison、Guide 与程序化 SEO 页面规则
 - [配置说明](docs/configuration.md) — 全部环境变量

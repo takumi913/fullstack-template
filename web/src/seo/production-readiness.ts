@@ -1,3 +1,4 @@
+import type { LegalPageContent } from "../content/legal-pages";
 import type { LandingPageDefinition } from "../content/landing-pages";
 import type { ToolPageDefinition } from "../content/tool-pages";
 import { scaffoldSentinels } from "../config/scaffold-sentinels";
@@ -7,6 +8,7 @@ export interface ProductionReadinessOptions {
   allowTemplateExamples?: boolean;
   tools: readonly ToolPageDefinition[];
   landings: readonly LandingPageDefinition[];
+  policies?: readonly (LegalPageContent & { path: string })[];
   homePrimaryToolSlug?: string | null;
   homePrimaryKeyword?: string;
 }
@@ -24,6 +26,7 @@ export function assertProductionContentReady({
   allowTemplateExamples = false,
   tools,
   landings,
+  policies = [],
   homePrimaryToolSlug,
   homePrimaryKeyword,
 }: ProductionReadinessOptions) {
@@ -57,6 +60,14 @@ export function assertProductionContentReady({
   }
 
   if (!allowTemplateExamples) {
+    const unpublishedPolicies = policies.filter(
+      (policy) => policy.status !== "published" || !policy.updatedAt,
+    );
+    if (unpublishedPolicies.length) {
+      throw new Error(
+        `Publish reviewed Privacy Policy and Terms of Service with effective dates before launch: ${unpublishedPolicies.map((policy) => policy.path).join(", ")}. SEO_ALLOW_TEMPLATE_EXAMPLES=true is only for template CI/testing.`,
+      );
+    }
     const examples = [
       ...tools
         .filter(

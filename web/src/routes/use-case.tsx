@@ -4,12 +4,15 @@ import { createLandingSeoPage } from "@/seo/landing-page";
 import { createSeoMeta, notFoundPageMeta } from "@/seo/page";
 import type { Route } from "./+types/use-case";
 
-export const meta = ({ params }: Route.MetaArgs) => {
-  const page = getLandingPageByPath(`/use-cases/${params.slug}`);
+export const meta = ({ location }: Route.MetaArgs) => {
+  const page = getLandingPageByPath(location.pathname);
   if (!page) {
     return notFoundPageMeta();
   }
   return createSeoMeta(createLandingSeoPage(page));
 };
 
+export const handle = {
+  languageAlternates: (path: string) => getLandingPageByPath(path)?.alternates,
+};
 export default LandingPage;

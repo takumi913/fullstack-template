@@ -21,15 +21,15 @@ type Handlers struct {
 func SetupRoutes(e *echo.Echo, h Handlers, auth *middleware.AuthMiddleware, tenant *middleware.TenantMiddleware) {
 	v1 := e.Group("/api/v1")
 	v1.GET("/health", func(c *echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]any{"code": 0, "data": map[string]string{"status": "healthy"}, "message": "服务正常运行"})
+		return c.JSON(http.StatusOK, map[string]any{"code": 0, "data": map[string]string{"status": "healthy"}, "message": model.MessageHealthy.ForLanguage(c.Request().Header.Get("Accept-Language"))})
 	})
 	// 未认证的凭据接口按 IP 限流，缓解暴力破解和 bcrypt CPU 消耗。
 	// Rate 的单位是「次/秒」：0.2 即约 12 次/分钟，Burst 允许用户连续试错 10 次。
 	authLimiter := echomw.RateLimiterWithConfig(echomw.RateLimiterConfig{
 		Store: echomw.NewRateLimiterMemoryStoreWithConfig(echomw.RateLimiterMemoryStoreConfig{Rate: 0.2, Burst: 10, ExpiresIn: 15 * time.Minute}),
-		// 限流响应也要走统一的 {code,data,message} 结构，否则前端会显示英文原文。
+		// 限流响应与业务响应保持一致的结构及语言。
 		DenyHandler: func(c *echo.Context, _ string, _ error) error {
-			return c.JSON(http.StatusTooManyRequests, map[string]any{"code": 1, "data": nil, "message": "操作过于频繁，请稍后再试"})
+			return c.JSON(http.StatusTooManyRequests, map[string]any{"code": 1, "data": nil, "message": model.ErrRateLimit.ForLanguage(c.Request().Header.Get("Accept-Language"))})
 		},
 	})
 	v1.POST("/auth/register", h.Auth.Register, authLimiter)

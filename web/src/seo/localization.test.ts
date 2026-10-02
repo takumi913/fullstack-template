@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { createHreflangAlternates, isValidHreflang } from "./localization";
+import {
+  createHreflangAlternates,
+  createContentHreflangAlternates,
+  isValidHreflang,
+} from "./localization";
 
 describe("hreflang helpers", () => {
   it("accepts valid locale tags and x-default", () => {
@@ -27,6 +31,20 @@ describe("hreflang helpers", () => {
       { hreflang: "en", path: "/en/tools/image-translator" },
       { hreflang: "ja", path: "/ja/tools/image-translator" },
       { hreflang: "x-default", path: "/tools/image-translator" },
+    ]);
+  });
+  it("keeps publication states out of each other’s hreflang families", () => {
+    const variants = [
+      { locale: "en", path: "/tools/task", status: "published" },
+      { locale: "zh-CN", path: "/zh-cn/tools/task", status: "example" },
+      { locale: "fr", path: "/fr/tools/task", status: "draft" },
+    ];
+    expect(createContentHreflangAlternates(variants[0]!, variants)).toEqual([
+      { hreflang: "en", path: "/tools/task" },
+      { hreflang: "x-default", path: "/tools/task" },
+    ]);
+    expect(createContentHreflangAlternates(variants[1]!, variants)).toEqual([
+      { hreflang: "zh-CN", path: "/zh-cn/tools/task" },
     ]);
   });
 });

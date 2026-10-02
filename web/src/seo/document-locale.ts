@@ -1,19 +1,4 @@
-import { getLandingPageByPath } from "../content/landing-pages";
-import { getToolPageByPath } from "../content/tool-pages";
-import { publicSeoPages } from "./pages";
-import { siteConfig } from "./site";
-
+import { localeFromPath } from "../i18n/locales";
 export function resolveDocumentLocale(pathname: string) {
-  const tool = getToolPageByPath(pathname);
-  if (tool?.locale) return tool.locale;
-
-  const landing = getLandingPageByPath(pathname);
-  if (landing?.locale) return landing.locale;
-
-  const page = Object.values(publicSeoPages).find((candidate) => candidate.path === pathname);
-  if (page && "locale" in page && page.locale) {
-    return page.locale;
-  }
-
-  return siteConfig.locale;
+  return localeFromPath(pathname);
 }

@@ -1,4 +1,5 @@
-import type { SeoAlternate } from "../seo/localization";
+import { createContentHreflangAlternates, type SeoAlternate } from "../seo/localization";
+import { normalizeLocale, type SiteLocale } from "../i18n/locales";
 
 export type LandingPageStatus = "draft" | "example" | "published";
 export type LandingPageKind = "use-case" | "comparison" | "guide";
@@ -15,6 +16,7 @@ export interface LandingFaqItem {
 
 export interface LandingPageDefinition {
   slug: string;
+  translationKey?: string;
   kind: LandingPageKind;
   status: LandingPageStatus;
   templateExample?: boolean;
@@ -34,15 +36,10 @@ export interface LandingPageDefinition {
   noindex?: boolean;
 }
 
-const jsonSyntaxAlternates: SeoAlternate[] = [
-  { hreflang: "en", path: "/guides/json-syntax" },
-  { hreflang: "ja", path: "/ja/guides/json-syntax" },
-  { hreflang: "x-default", path: "/guides/json-syntax" },
-];
-
-export const landingPages: LandingPageDefinition[] = [
+const definitions: LandingPageDefinition[] = [
   {
     slug: "json-api-debugging",
+    translationKey: "json-api-debugging",
     kind: "use-case",
     status: "example",
     templateExample: true,
@@ -78,12 +75,13 @@ export const landingPages: LandingPageDefinition[] = [
   },
   {
     slug: "json-syntax",
+    translationKey: "json-syntax",
     kind: "guide",
     status: "example",
     templateExample: true,
     path: "/guides/json-syntax",
     locale: "en",
-    alternates: jsonSyntaxAlternates,
+
     primaryKeyword: "json syntax",
     title: "JSON Syntax Guide | Fullstack Template",
     description:
@@ -106,36 +104,8 @@ export const landingPages: LandingPageDefinition[] = [
     noindex: true,
   },
   {
-    slug: "json-syntax-ja",
-    kind: "guide",
-    status: "example",
-    templateExample: true,
-    path: "/ja/guides/json-syntax",
-    locale: "ja",
-    alternates: jsonSyntaxAlternates,
-    showInDirectory: false,
-    primaryKeyword: "json 構文",
-    title: "JSON 構文ガイド | Fullstack Template",
-    description: "JSON Formatter と連携する、日本語版 JSON 構文ガイドのサンプルページです。",
-    h1: "JSON 構文ガイド",
-    intro: "実際の API データを整形・検証する前に、JSON の基本的な構文ルールを確認します。",
-    sections: [
-      {
-        heading: "オブジェクトはキーと値の組で表現する",
-        body: "JSON オブジェクトは波括弧で囲み、ダブルクォートで囲んだキー、コロン、値の順で記述します。",
-      },
-      {
-        heading: "配列は順序を持つ値を表現する",
-        body: "JSON 配列は角括弧で囲み、文字列、数値、真偽値、null、オブジェクト、配列などを格納できます。",
-      },
-    ],
-    faq: [],
-    relatedToolSlugs: ["json-formatter-ja"],
-    updatedAt: "2026-09-18",
-    noindex: true,
-  },
-  {
     slug: "json-formatter-vs-validator",
+    translationKey: "json-formatter-vs-validator",
     kind: "comparison",
     status: "example",
     templateExample: true,
@@ -163,7 +133,118 @@ export const landingPages: LandingPageDefinition[] = [
     updatedAt: "2026-09-18",
     noindex: true,
   },
+  {
+    slug: "json-api-debugging-zh-cn",
+    translationKey: "json-api-debugging",
+    kind: "use-case",
+    status: "example",
+    templateExample: true,
+    path: "/zh-cn/use-cases/json-api-debugging",
+    locale: "zh-CN",
+    primaryKeyword: "JSON 接口调试",
+    title: "JSON 接口调试流程 - 排查 API 响应与语法错误",
+    description: "从格式化原始响应到确认语法有效性，用 JSON 工具逐步排查 API 返回数据中的问题。",
+    h1: "更高效地调试 JSON 接口",
+    intro: "接口返回错误时，先确认响应内容，再判断是 JSON 语法、上游接口还是业务代码出了问题。",
+    sections: [
+      {
+        heading: "先阅读响应结构",
+        body: "格式化原始响应，展开嵌套对象和数组，检查缺失字段、异常值以及数据类型。",
+      },
+      {
+        heading: "先校验语法，再排查业务逻辑",
+        body: "确认响应是有效的 JSON。不完整或格式错误的上游响应，也可能表现为业务代码报错。",
+      },
+    ],
+    faq: [
+      {
+        question: "场景页需要复制工具页吗？",
+        answer:
+          "不需要。场景页说明完成具体任务的流程，工具页让用户立即执行操作，两者服务不同的搜索意图。",
+      },
+    ],
+    relatedToolSlugs: ["json-formatter-zh-cn"],
+    updatedAt: "2026-10-02",
+    noindex: true,
+  },
+  {
+    slug: "json-syntax-zh-cn",
+    translationKey: "json-syntax",
+    kind: "guide",
+    status: "example",
+    templateExample: true,
+    path: "/zh-cn/guides/json-syntax",
+    locale: "zh-CN",
+    primaryKeyword: "JSON 语法",
+    title: "JSON 语法指南 - 对象、数组与常见规则",
+    description:
+      "学习 JSON 对象与数组的写法，理解键值对、双引号和允许的数据类型，再用格式化工具检查真实响应。",
+    h1: "JSON 语法指南",
+    intro: "在格式化或校验接口数据前，先掌握 JSON 的基本语法。",
+    sections: [
+      {
+        heading: "对象使用键值对",
+        body: "JSON 对象用花括号包围。键必须使用双引号，键和值之间用冒号分隔，多个键值对用逗号分隔。",
+      },
+      {
+        heading: "数组保持值的顺序",
+        body: "JSON 数组用方括号包围，可包含字符串、数字、布尔值、null、对象和其他数组，不允许尾随逗号。",
+      },
+    ],
+    faq: [],
+    relatedToolSlugs: ["json-formatter-zh-cn"],
+    updatedAt: "2026-10-02",
+    noindex: true,
+  },
+  {
+    slug: "json-formatter-vs-validator-zh-cn",
+    translationKey: "json-formatter-vs-validator",
+    kind: "comparison",
+    status: "example",
+    templateExample: true,
+    path: "/zh-cn/compare/json-formatter-vs-validator",
+    locale: "zh-CN",
+    primaryKeyword: "JSON 格式化和校验的区别",
+    title: "JSON 格式化和校验有什么区别？",
+    description:
+      "了解 JSON 格式化与语法校验分别解决什么问题，判断何时需要可读的缩进，何时需要定位语法错误。",
+    h1: "JSON 格式化与 JSON 校验",
+    intro: "格式化侧重阅读体验，校验侧重语法有效性。选择工具前，先确定你要完成哪种任务。",
+    sections: [
+      {
+        heading: "格式化用于提高可读性",
+        body: "格式化通过缩进和换行展示数据，让人更容易阅读嵌套结构，不改变 JSON 表达的内容。",
+      },
+      {
+        heading: "校验用于确认语法有效",
+        body: "校验检查输入是否符合 JSON 语法。输入无效时，需要先根据解析错误修正内容，再进行格式化。",
+      },
+    ],
+    faq: [],
+    relatedToolSlugs: ["json-formatter-zh-cn"],
+    updatedAt: "2026-10-02",
+    noindex: true,
+  },
 ];
+export const landingPages: LandingPageDefinition[] = definitions.map((page) => ({
+  ...page,
+  alternates: page.translationKey
+    ? createContentHreflangAlternates(
+        page,
+        definitions
+          .filter((candidate) => candidate.translationKey === page.translationKey)
+          .map((candidate) => ({
+            ...candidate,
+            locale: candidate.locale || "en",
+            path: candidate.path,
+          })),
+      )
+    : page.alternates,
+}));
+
+export function getDirectoryLandingPages(locale: SiteLocale) {
+  return directoryLandingPages.filter((page) => normalizeLocale(page.locale) === locale);
+}
 
 export const routableLandingPages = landingPages.filter((page) => page.status !== "draft");
 

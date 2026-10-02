@@ -1,6 +1,14 @@
+import { appTranslations } from "@/i18n/private";
+import { localeFromPath, localizedPath, supportedLocales } from "@/i18n/locales";
+import type { Route } from "./+types/dashboard";
 import DashboardPage from "@/pages/DashboardPage";
 import { privatePageTitleMeta } from "@/seo/page";
 
-export const meta = () => privatePageTitleMeta("Dashboard");
+export const meta = ({ location }: Route.MetaArgs) =>
+  privatePageTitleMeta(appTranslations[localeFromPath(location.pathname)].dashboard.manage);
 
+export const handle = {
+  languageAlternates: (path: string) =>
+    supportedLocales.map((locale) => ({ hreflang: locale, path: localizedPath(path, locale) })),
+};
 export default DashboardPage;

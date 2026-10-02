@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 
 export function WordCounterTool() {
+  const { t } = useTranslation();
   const [text, setText] = useState("");
 
   const stats = useMemo(() => {
@@ -16,20 +18,20 @@ export function WordCounterTool() {
   return (
     <div className="rounded-xl border bg-zinc-50 p-4 sm:p-6">
       <label className="text-sm font-medium text-zinc-800" htmlFor="word-counter-input">
-        Text
+        {t("counter.text")}
       </label>
       <textarea
         id="word-counter-input"
         className="mt-2 min-h-56 w-full rounded-lg border bg-white p-3 text-sm leading-6 outline-none focus:border-zinc-400"
-        placeholder="Type or paste text here..."
+        placeholder={t("counter.placeholder")}
         value={text}
         onChange={(event) => setText(event.target.value)}
       />
       <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {Object.entries(stats).map(([label, value]) => (
+        {(Object.keys(stats) as Array<keyof typeof stats>).map((label) => (
           <div className="rounded-lg border bg-white p-3" key={label}>
-            <dt className="text-xs capitalize text-zinc-500">{label}</dt>
-            <dd className="mt-1 text-xl font-semibold text-zinc-950">{value}</dd>
+            <dt className="text-xs capitalize text-zinc-500">{t(`counter.${label}`)}</dt>
+            <dd className="mt-1 text-xl font-semibold text-zinc-950">{stats[label]}</dd>
           </div>
         ))}
       </dl>

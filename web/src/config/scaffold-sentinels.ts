@@ -1,5 +1,6 @@
 export const scaffoldSentinels = {
   name: "Fullstack Template",
-  title: "Go + React 多租户 SaaS 全栈模板",
-  description: "基于 Go、React、sqlc、PostgreSQL/SQLite 与多租户 RBAC 的 SaaS 全栈母模板。",
+  title: "Go + React SaaS Starter with Multi-Tenant Workspaces",
+  description:
+    "Build a SaaS product with Go, React, secure sessions, multi-tenant workspaces, role-based access, and SQLite or PostgreSQL. Public pages are statically rendered for search.",
 } as const;

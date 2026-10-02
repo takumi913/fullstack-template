@@ -16,7 +16,7 @@ func (h *MemberHandler) List(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 500, e)
 	}
-	return success(c, v, "获取成功")
+	return success(c, v, model.MessageLoaded)
 }
 func (h *MemberHandler) Add(c *echo.Context) error {
 	var req model.AddMemberRequest
@@ -27,7 +27,7 @@ func (h *MemberHandler) Add(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, v, "添加成功")
+	return success(c, v, model.MessageAdded)
 }
 func (h *MemberHandler) Update(c *echo.Context) error {
 	var req model.UpdateMemberRoleRequest
@@ -38,12 +38,12 @@ func (h *MemberHandler) Update(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, nil, "更新成功")
+	return success(c, nil, model.MessageUpdated)
 }
 func (h *MemberHandler) Delete(c *echo.Context) error {
 	e := h.service.Delete(c.Request().Context(), c.Param("tenantID"), c.Param("userID"), *middleware.TenantMember(c))
 	if e != nil {
 		return failure(c, 400, e)
 	}
-	return success(c, nil, "删除成功")
+	return success(c, nil, model.MessageDeleted)
 }

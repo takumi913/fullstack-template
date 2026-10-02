@@ -1,8 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 const initialValue = '{\n  "hello": "world",\n  "count": 2\n}';
 
 export function JsonFormatterTool() {
+  const { t } = useTranslation();
   const [input, setInput] = useState(initialValue);
   const [output, setOutput] = useState(initialValue);
   const [error, setError] = useState("");
@@ -13,27 +15,27 @@ export function JsonFormatterTool() {
       setOutput(JSON.stringify(parsed, null, mode === "format" ? 2 : 0));
       setError("");
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Invalid JSON");
+      setError(cause instanceof Error ? cause.message : t("json.invalid"));
     }
   };
 
   return (
     <div className="rounded-xl border bg-zinc-50 p-4 sm:p-6">
       <label className="text-sm font-medium text-zinc-800" htmlFor="json-input">
-        JSON input
+        {t("json.input")}
       </label>
       <textarea
         id="json-input"
-        className="mt-2 min-h-52 w-full rounded-lg border bg-white p-3 font-mono text-sm outline-none focus:border-zinc-400"
+        className="mt-2 min-h-52 w-full rounded-lg border bg-white p-3 font-mono text-base outline-none focus:border-zinc-400"
         value={input}
         onChange={(event) => setInput(event.target.value)}
       />
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="button-primary" onClick={() => transform("format")} type="button">
-          Format
+          {t("json.format")}
         </button>
         <button className="button-secondary" onClick={() => transform("minify")} type="button">
-          Minify
+          {t("json.minify")}
         </button>
       </div>
       {error ? (

@@ -1,3 +1,4 @@
+import { unlocalizedPath } from "../i18n/locales";
 const privateAppExactPaths = new Set(["/dashboard"]);
 const privateAppPrefixes = ["/settings/", "/tenant/"] as const;
 const authPaths = new Set(["/login", "/register"]);
@@ -16,6 +17,7 @@ export function shouldHydrateDocument(
   // It must always keep the client runtime so non-prerendered auth/app URLs can hydrate.
   if (matchCount <= 1) return true;
 
+  pathname = unlocalizedPath(pathname);
   if (pathname === "/" && homeHasInteractiveTool) return true;
   if (authPaths.has(pathname)) return true;
   if (privateAppExactPaths.has(pathname)) return true;

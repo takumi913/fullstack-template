@@ -3,13 +3,19 @@ import { Link } from "react-router";
 import { ToolContentSections } from "@/components/tools/ToolContentSections";
 import { templateSiteConfig } from "@/config/site-config";
 import { resolveHomepageTool } from "@/content/homepage-tool";
-import { directoryToolPages, toolPath } from "@/content/tool-pages";
-import { publicSeoPages } from "@/seo/pages";
+import { getDirectoryToolPages, toolPath } from "@/content/tool-pages";
+import { getPublicSeoPages } from "@/seo/pages";
+import { siteCopies } from "@/config/site-copy";
+import { localizedPath } from "@/i18n/locales";
+import { useLocale } from "@/i18n/useLocale";
 import { siteConfig } from "@/seo/site";
 import { ToolRuntime } from "@/tools/registry";
 
 export default function HomePage() {
-  const primaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug);
+  const locale = useLocale();
+  const copy = siteCopies[locale].home;
+  const publicSeoPages = getPublicSeoPages(locale);
+  const primaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug, undefined, locale);
   const showAuthLinks = templateSiteConfig.navigation.showAuthLinks;
 
   return (
@@ -22,7 +28,7 @@ export default function HomePage() {
             {publicSeoPages.home.h1}
           </h1>
           <p className="mt-7 max-w-2xl text-base leading-7 text-zinc-600">
-            {templateSiteConfig.home.description}
+            {publicSeoPages.home.description}
           </p>
         </div>
 
@@ -35,11 +41,11 @@ export default function HomePage() {
           </div>
         ) : showAuthLinks ? (
           <div className="mt-9 flex flex-wrap gap-3">
-            <Link to="/register" className="button-primary">
-              {templateSiteConfig.home.primaryCta} <ArrowRight size={15} />
+            <Link to={localizedPath("/register", locale)} className="button-primary">
+              {copy.primaryCta} <ArrowRight size={15} />
             </Link>
-            <Link to="/login" className="button-secondary">
-              {templateSiteConfig.home.secondaryCta}
+            <Link to={localizedPath("/login", locale)} className="button-secondary">
+              {copy.secondaryCta}
             </Link>
           </div>
         ) : null}
@@ -51,13 +57,13 @@ export default function HomePage() {
         <>
           <section className="shell border-x border-t px-6 py-10 sm:px-12">
             <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
-              {templateSiteConfig.home.capabilitiesTitle}
+              {copy.capabilitiesTitle}
             </h2>
           </section>
 
           <section className="shell border-x border-t">
             <div className="grid md:grid-cols-2">
-              {templateSiteConfig.home.capabilities.map(([title, description], index) => (
+              {copy.capabilities.map(([title, description], index) => (
                 <div
                   key={title}
                   className={`min-h-44 p-7 sm:p-9 ${index % 2 === 0 ? "md:border-r" : ""} ${index > 1 ? "border-t" : index === 1 ? "border-t md:border-t-0" : ""}`}
@@ -75,23 +81,21 @@ export default function HomePage() {
           <section className="shell border-x border-t px-6 py-16 sm:px-12">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
-                {templateSiteConfig.home.examplesEyebrow}
+                {copy.examplesEyebrow}
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-zinc-950">
-                {templateSiteConfig.home.examplesTitle}
+                {copy.examplesTitle}
               </h2>
-              <p className="mt-3 text-sm leading-6 text-zinc-600">
-                {templateSiteConfig.home.examplesDescription}
-              </p>
+              <p className="mt-3 text-sm leading-6 text-zinc-600">{copy.examplesDescription}</p>
               <Link
                 className="mt-4 inline-flex text-sm font-medium text-zinc-700 hover:text-zinc-950"
-                to="/tools"
+                to={localizedPath("/tools", locale)}
               >
-                {templateSiteConfig.home.examplesLink} →
+                {copy.examplesLink} →
               </Link>
             </div>
             <div className="mt-7 grid gap-3 sm:grid-cols-2">
-              {directoryToolPages.map((tool) => (
+              {getDirectoryToolPages(locale).map((tool) => (
                 <Link
                   className="group rounded-xl border p-5 transition hover:border-zinc-400"
                   key={tool.slug}
@@ -101,7 +105,7 @@ export default function HomePage() {
                   <h3 className="mt-2 font-medium text-zinc-950">{tool.name}</h3>
                   <p className="mt-2 text-sm leading-6 text-zinc-500">{tool.description}</p>
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-zinc-700">
-                    {templateSiteConfig.home.exampleCardCta} <ArrowRight size={14} />
+                    {copy.exampleCardCta} <ArrowRight size={14} />
                   </span>
                 </Link>
               ))}
@@ -114,10 +118,13 @@ export default function HomePage() {
         <section className="shell border-x border-t px-6 py-20 sm:px-12">
           <div className="flex flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
             <h2 className="max-w-md text-3xl font-semibold tracking-[-0.035em]">
-              {templateSiteConfig.home.closingTitle}
+              {copy.closingTitle}
             </h2>
-            <Link to="/register" className="text-sm font-medium text-zinc-700 hover:text-zinc-950">
-              {templateSiteConfig.home.closingCta} →
+            <Link
+              to={localizedPath("/register", locale)}
+              className="text-sm font-medium text-zinc-700 hover:text-zinc-950"
+            >
+              {copy.closingCta} →
             </Link>
           </div>
         </section>

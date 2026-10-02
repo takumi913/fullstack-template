@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"fullstack-template/pkg/model"
 	"fullstack-template/pkg/repo"
 	"strings"
@@ -43,13 +42,13 @@ func (s *UserService) Update(ctx context.Context, id string, req model.UpdatePro
 	if req.AvatarURL != nil {
 		avatar := strings.TrimSpace(*req.AvatarURL)
 		if len(avatar) > maxAvatarURLLen {
-			return nil, fmt.Errorf("头像地址长度不能超过 %d 个字符", maxAvatarURLLen)
+			return nil, model.ErrAvatarLength.Format(maxAvatarURLLen)
 		}
 		u.AvatarURL = avatar
 	}
 	if e = s.store.UpdateUserProfile(ctx, u); e != nil {
 		if errors.Is(e, repo.ErrConflict) {
-			return nil, errors.New("邮箱或用户名已被使用")
+			return nil, model.ErrAccountConflict
 		}
 		return nil, e
 	}
@@ -58,17 +57,17 @@ func (s *UserService) Update(ctx context.Context, id string, req model.UpdatePro
 }
 func (s *UserService) ChangePassword(ctx context.Context, id string, req model.ChangePasswordRequest) error {
 	if len(req.NewPassword) < 6 {
-		return errors.New("新密码长度不能少于6个字符")
+		return model.ErrNewPasswordShort
 	}
 	if len(req.NewPassword) > maxPasswordLen {
-		return fmt.Errorf("新密码长度不能超过 %d 个字节", maxPasswordLen)
+		return model.ErrNewPasswordLong.Format(maxPasswordLen)
 	}
 	u, e := s.store.GetUserByID(ctx, id)
 	if e != nil {
 		return e
 	}
 	if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(req.OldPassword)) != nil {
-		return errors.New("原密码错误")
+		return model.ErrCurrentPassword
 	}
 	h, e := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
 	if e != nil {

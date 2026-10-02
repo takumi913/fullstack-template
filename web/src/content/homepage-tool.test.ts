@@ -38,4 +38,21 @@ describe("homepage tool configuration", () => {
       resolveHomepageTool("primary-tool", [{ ...publishedTool, status: "draft" }]),
     ).toThrow(/draft tool/);
   });
+  it("selects the actual translation and rejects a missing or draft translation", () => {
+    const english = { ...publishedTool, translationKey: "primary-tool", locale: "en" };
+    const chinese = {
+      ...publishedTool,
+      translationKey: "primary-tool",
+      locale: "zh-CN",
+      slug: "primary-tool-zh-cn",
+    };
+    expect(resolveHomepageTool("primary-tool", [english, chinese], "zh-CN")).toBe(chinese);
+    expect(resolveHomepageTool("primary-tool", [publishedTool], "en")).toBe(publishedTool);
+    expect(() => resolveHomepageTool("primary-tool", [english], "zh-CN")).toThrow(
+      /zh-CN translation/,
+    );
+    expect(() =>
+      resolveHomepageTool("primary-tool", [english, { ...chinese, status: "draft" }], "zh-CN"),
+    ).toThrow(/zh-CN translation/);
+  });
 });

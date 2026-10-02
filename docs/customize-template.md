@@ -17,13 +17,12 @@ web/src/config/site-config.ts
 - 品牌名
 - Header 短名称
 - Logo 文字标记
-- 默认 locale
+- 英文默认 SEO 配置（根路径固定为英文）
 - 首页 primary keyword
 - 首页 SEO title / description
-- 首页文案和 CTA
-- Tools / Resources Hub 文案
-- 导航标签
-- 法律页 SEO 摘要
+
+双语首页 / Hub 文案在 `site-copy.ts`，导航和交互文案在 `web/src/i18n/`，双语政策正文在 `legal-pages.ts`。
+多语言架构与新增语言流程见 [English-first i18n and SEO](i18n-seo.md)。
 
 不要先去 Header、Footer、HomePage 里搜索替换品牌，这些组件已经从站点配置读取。
 
@@ -48,6 +47,7 @@ strict 模式会阻止：
 - 原始母模板品牌
 - 原始母模板 title
 - 原始母模板 description
+- 尚未发布或填写生效日期的双语隐私政策 / 服务条款
 - 仍处于 `status: "example"` 的 Tool / Landing 页面
 - 仍带有 `templateExample: true` 的非 draft 页面
 - 已发布页面中残留的原始 `Fullstack Template` 品牌
@@ -157,7 +157,7 @@ docs/landing-pages-seo.md
 web/src/content/legal-pages.ts
 ```
 
-上线前必须根据实际产品的数据收集、支付、第三方服务和运营地区更新隐私政策与服务条款。
+上线前根据实际产品更新英文和简体中文隐私政策与服务条款，包括运营主体、联系方式、数据收集、第三方服务、保留期限、支付及运营地区。审核完成后设置 `status: "published"` 与 `updatedAt` 生效日期；草稿默认 noindex，strict 生产预检会校验发布状态。
 
 ## 6. Favicon 与 Manifest
 
@@ -216,7 +216,7 @@ VITE_SITE_IMAGE=/og-image.png
 - 示例 Use Case
 - 示例 Comparison
 - 示例 Guide
-- 示例日语页面
+- 示例简体中文页面
 
 保留示例不会进入 sitemap，但删除后项目更干净。
 

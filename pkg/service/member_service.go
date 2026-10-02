@@ -21,14 +21,14 @@ func (s *MemberService) List(ctx context.Context, tenantID string) ([]model.Tena
 }
 func (s *MemberService) Add(ctx context.Context, tenantID string, actor model.TenantMember, req model.AddMemberRequest) (*model.TenantMember, error) {
 	if !validRole(req.Role) {
-		return nil, errors.New("无效角色")
+		return nil, model.ErrRoleInvalid
 	}
 	if actor.Role == model.TenantRoleAdmin && req.Role == model.TenantRoleOwner {
-		return nil, errors.New("管理员不能添加所有者")
+		return nil, model.ErrAdminAddOwner
 	}
 	u, e := s.store.GetUserByEmail(ctx, strings.ToLower(strings.TrimSpace(req.Email)))
 	if e != nil {
-		return nil, errors.New("用户不存在，请先注册")
+		return nil, model.ErrUserMissing
 	}
 	m := &model.TenantMember{ID: uuid.NewString(), TenantID: tenantID, UserID: u.ID, Role: req.Role}
 	if e = s.store.CreateMember(ctx, m); e != nil {
@@ -38,14 +38,14 @@ func (s *MemberService) Add(ctx context.Context, tenantID string, actor model.Te
 }
 func (s *MemberService) UpdateRole(ctx context.Context, tenantID, userID string, actor model.TenantMember, role model.TenantRole) error {
 	if !validRole(role) {
-		return errors.New("无效角色")
+		return model.ErrRoleInvalid
 	}
 	target, e := s.store.GetMember(ctx, tenantID, userID)
 	if e != nil {
 		return e
 	}
 	if actor.Role == model.TenantRoleAdmin && (target.Role == model.TenantRoleOwner || role == model.TenantRoleOwner) {
-		return errors.New("管理员不能管理所有者")
+		return model.ErrAdminManageOwner
 	}
 	if target.Role == model.TenantRoleOwner && role != model.TenantRoleOwner {
 		owners, e := s.store.CountOwners(ctx, tenantID)
@@ -53,7 +53,7 @@ func (s *MemberService) UpdateRole(ctx context.Context, tenantID, userID string,
 			return e
 		}
 		if owners <= 1 {
-			return errors.New("租户至少需要一个所有者")
+			return model.ErrLastOwner
 		}
 	}
 	return s.store.UpdateMemberRole(ctx, tenantID, userID, role)
@@ -64,13 +64,13 @@ func (s *MemberService) Delete(ctx context.Context, tenantID, userID string, act
 		return e
 	}
 	if actor.Role == model.TenantRoleAdmin && target.Role == model.TenantRoleOwner {
-		return errors.New("管理员不能删除所有者")
+		return model.ErrAdminRemoveOwner
 	}
 	// 「至少保留一个 owner」的判断和删除必须原子完成，否则两个并发删除
 	// 会各自读到 owners=2 并双双放行，租户从此没有任何 owner。
 	if e = s.store.DeleteMemberKeepingOwner(ctx, tenantID, userID); e != nil {
 		if errors.Is(e, repo.ErrConflict) {
-			return errors.New("租户至少需要一个所有者")
+			return model.ErrLastOwner
 		}
 		return e
 	}

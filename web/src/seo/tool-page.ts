@@ -1,9 +1,14 @@
+import { isIndexableContent } from "./localization";
+import { localizedPath, normalizeLocale } from "../i18n/locales";
+import { publicPageCopy } from "./ui-copy";
 import { toolPath, type ToolPageDefinition } from "../content/tool-pages";
 import { absoluteUrl, siteConfig } from "./site";
 import type { SeoPage } from "./page";
 
 export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
   const path = toolPath(tool);
+  const locale = normalizeLocale(tool.locale);
+  const copy = publicPageCopy(locale);
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -11,14 +16,14 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
       {
         "@type": "ListItem",
         position: 1,
-        name: "Home",
-        item: absoluteUrl("/"),
+        name: copy.home,
+        item: absoluteUrl(localizedPath("/", locale)),
       },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Tools",
-        item: absoluteUrl("/tools"),
+        name: copy.tools,
+        item: absoluteUrl(localizedPath("/tools", locale)),
       },
       {
         "@type": "ListItem",
@@ -32,6 +37,7 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
   const applicationSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
+    inLanguage: locale,
     name: tool.name,
     url: absoluteUrl(path),
     description: tool.description,
@@ -45,6 +51,7 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
       ? {
           "@context": "https://schema.org",
           "@type": "FAQPage",
+          inLanguage: locale,
           mainEntity: tool.faq.map((item) => ({
             "@type": "Question",
             name: item.question,
@@ -66,7 +73,7 @@ export function createToolSeoPage(tool: ToolPageDefinition): SeoPage {
     locale: tool.locale,
     alternates: tool.alternates,
     updatedAt: tool.updatedAt,
-    noindex: tool.noindex || tool.templateExample || tool.status !== "published",
+    noindex: !isIndexableContent(tool),
     relatedPages: tool.relatedSlugs.map((slug) => toolPath(slug)),
     schema: [applicationSchema, breadcrumbSchema, ...(faqSchema ? [faqSchema] : [])],
     image: siteConfig.defaultImage,

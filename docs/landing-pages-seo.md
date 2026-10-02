@@ -75,41 +75,15 @@ Landing Page 会自动获得：
 
 ## 多语言 Landing Page
 
-Landing Page 与 Tool Page 使用同一套 `locale + alternates` 机制。
+首批支持英文和简体中文。英文使用 `/guides/json-syntax`，中文版使用 `/zh-cn/guides/json-syntax`；场景页和对比页遵循相同前缀规则。
 
-默认语言可以不带语言前缀：
-
-```text
-/guides/json-syntax
-```
-
-本地化版本使用显式 path：
-
-```text
-/ja/guides/json-syntax
-/ja/use-cases/example
-/ja/compare/example-a-vs-b
-```
-
-例如：
+每个版本设置独立内部 `slug`、`locale`、显式 `path` 和完整本地化内容，并与英文版本共享 `translationKey`。例如中文版：
 
 ```ts
-{
-  slug: "json-syntax-ja",
-  kind: "guide",
-  path: "/ja/guides/json-syntax",
-  locale: "ja",
-  alternates: [
-    { hreflang: "en", path: "/guides/json-syntax" },
-    { hreflang: "ja", path: "/ja/guides/json-syntax" },
-    { hreflang: "x-default", path: "/guides/json-syntax" },
-  ],
-  showInDirectory: false,
-  // ...
-}
+{ slug: "json-syntax-zh-cn", translationKey: "json-syntax", kind: "guide", path: "/zh-cn/guides/json-syntax", locale: "zh-CN", /* complete content */ }
 ```
 
-CI 会检查 hreflang 自引用、双向对应、目标路径存在，以及 URL 语言前缀与 locale 一致。
+hreflang、语言切换、SSG URL 和 sitemap 从实际定义自动推导。各语言 Hub 仅列出同语言内容。CI 检查自引用、双向对应、目标存在及 locale/URL 一致性。完整架构见 [English-first i18n and SEO](i18n-seo.md)。
 
 ## Resources Hub 与主题簇
 

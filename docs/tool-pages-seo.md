@@ -81,12 +81,12 @@ web/src/tools/ImageTranslatorTool.tsx
 }),
 ```
 
-一个工具实现可以服务多个 SEO 页面。比如日语、韩语图片翻译页面可以使用不同 slug，
+一个工具实现可以服务多个 SEO 页面。比如英文、简体中文图片翻译页面可以使用不同 slug，
 但共享 `componentKey: "image-translator"`。需要让交互功能读取页面差异时，将参数放在：
 
 ```ts
 runtime: {
-  targetLanguage: "ja",
+  targetLanguage: "en",
 }
 ```
 
@@ -155,37 +155,16 @@ CI 会检查：
 
 ## 多语言 SEO
 
-模板支持在 `ToolPageDefinition.alternates`（底层映射为 `SeoPage.alternates`）中声明真实存在的语言版本，并自动输出
-`<link rel="alternate" hreflang="...">`。只有当主要内容真正完成本地化后才应该声明 alternate。
-
-可以用 `createHreflangAlternates()` 生成配置：
+英文根路径与简体中文 `/zh-cn` 是首批完整支持的语言。每个版本包含本地化正文、关键词及元数据，用同一 `translationKey` 建立关系：
 
 ```ts
-alternates: createHreflangAlternates(
-  [
-    { locale: "en", path: "/tools/image-translator" },
-    { locale: "ja", path: "/ja/tools/image-translator" },
-  ],
-  "/tools/image-translator",
-)
+// English
+{ slug: "image-translator", translationKey: "image-translator", locale: "en", path: "/tools/image-translator", componentKey: "image-translator", /* ... */ }
+// Simplified Chinese
+{ slug: "image-translator-zh-cn", translationKey: "image-translator", locale: "zh-CN", path: "/zh-cn/tools/image-translator", componentKey: "image-translator", /* ... */ }
 ```
 
-每个语言版本都必须有自己的 `ToolPageDefinition`。本地化版本使用显式 `path`
-作为 canonical URL，例如：
-
-```ts
-{
-  slug: "image-translator-ja",
-  path: "/ja/tools/image-translator",
-  locale: "ja",
-  componentKey: "image-translator",
-}
-```
-
-这样 slug 只作为内部唯一标识，实际 SEO URL 由 `path` 决定，并继续复用同一个工具实现。每个版本都应该包含自己和其它版本，并保持双向对应；
-CI 会检查目标页面存在、语言匹配和反向链接。`x-default` 用于没有匹配语言时的兜底页面。
-
-模板只采用 HTML hreflang，不在 sitemap 再复制一套相同声明，减少两套配置漂移。
+定义自动生成自引用、双向 hreflang 和英文 `x-default`。HTML 与 sitemap 复用同一数据源，而非两套手写配置。各版本使用自 canonical；可索引页面仅声明同样可索引的翻译版本。工具实现通过 `useTranslation()` 读取当前 URL 的 UI 文案。完整流程见 [English-first i18n and SEO](i18n-seo.md)。
 
 ## 批量 / 程序化 SEO
 

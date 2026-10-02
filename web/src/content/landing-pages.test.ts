@@ -46,7 +46,7 @@ describe("landing page definitions", () => {
       const localizedMatch = page.path.match(/^\/([^/]+)\/(?:use-cases|compare|guides)\//);
 
       if (localizedMatch) {
-        expect(page.locale, `${page.slug} locale`).toBe(localizedMatch[1]);
+        expect(page.locale?.toLowerCase(), `${page.slug} locale`).toBe(localizedMatch[1]);
       }
     }
   });

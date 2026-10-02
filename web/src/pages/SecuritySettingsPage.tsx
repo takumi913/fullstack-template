@@ -1,12 +1,17 @@
+import { useTranslation } from "react-i18next";
+import { localizedPath } from "@/i18n/locales";
+import { useLocale } from "@/i18n/useLocale";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { userApi } from "@/api";
 import { useAsyncAction } from "@/lib/useAsyncAction";
 import { useAuthStore } from "@/store/authStore";
 import { Input } from "./LoginPage";
-import { SettingsPage } from "./ProfileSettingsPage";
+import { SettingsPage } from "@/components/layout/SettingsPage";
 
 export default function SecuritySettingsPage() {
+  const { t } = useTranslation(["app", "common"]);
+  const locale = useLocale();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const { error, pending, run } = useAsyncAction();
@@ -18,21 +23,31 @@ export default function SecuritySettingsPage() {
     void run(async () => {
       await userApi.changePassword({ old_password: oldPassword, new_password: newPassword });
       clearAuth();
-      navigate("/login");
+      navigate(localizedPath("/login", locale));
     });
   }
 
   return (
-    <SettingsPage title="账号安全" description="修改密码后，所有登录会话都会失效。">
+    <SettingsPage title={t("security.title")} description={t("security.description")}>
       <form onSubmit={submit} className="panel max-w-2xl p-6">
         <div className="space-y-5">
-          <Input label="当前密码" type="password" value={oldPassword} onChange={setOldPassword} />
-          <Input label="新密码" type="password" value={newPassword} onChange={setNewPassword} />
+          <Input
+            label={t("security.currentPassword")}
+            type="password"
+            value={oldPassword}
+            onChange={setOldPassword}
+          />
+          <Input
+            label={t("security.newPassword")}
+            type="password"
+            value={newPassword}
+            onChange={setNewPassword}
+          />
           {error && <p className="text-sm text-red-700">{error}</p>}
         </div>
         <div className="mt-6 border-t pt-5">
           <button className="button-primary" disabled={pending}>
-            {pending ? "更新中…" : "更新密码"}
+            {pending ? t("security.updating") : t("security.update")}
           </button>
         </div>
       </form>

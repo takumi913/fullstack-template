@@ -1,6 +1,7 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { locales, supportedLocales } from "../src/i18n/locales";
 import { templateSiteConfig } from "../src/config/site-config";
 import { routableLandingPages } from "../src/content/landing-pages";
 import { routableToolPages } from "../src/content/tool-pages";
@@ -97,7 +98,31 @@ const protectedSpaFallback = /<meta[^>]+name=["']robots["'][^>]*>/i.test(spaFall
   ? spaFallback.replace(/<meta[^>]+name=["']robots["'][^>]*>/i, noindexMeta)
   : spaFallback.replace("</head>", `${noindexMeta}</head>`);
 
+// Localized redirects mirror the English routing policy, without a catch-all SPA 200.
+const baseRedirects = await readFile(join(scriptDir, "..", "public", "_redirects"), "utf8");
+const localizedRedirects = supportedLocales
+  .filter((locale) => locales[locale].prefix)
+  .flatMap((locale) => {
+    const { prefix } = locales[locale];
+    return [
+      `${prefix}/ ${prefix} 301`,
+      ...baseRedirects
+        .split("\n")
+        .filter((line) => line.startsWith("/"))
+        .map((line) => {
+          const [source, target, status] = line.trim().split(/\s+/);
+          return `${prefix}${source} ${target === "/__spa-fallback.html" ? target : prefix + target} ${status}`;
+        }),
+    ];
+  });
 const generatedFiles = [
+  writeFile(
+    join(outputDir, "_redirects"),
+    baseRedirects +
+      "\n# Generated language-prefixed routes\n" +
+      localizedRedirects.join("\n") +
+      "\n",
+  ),
   writeFile(join(outputDir, "sitemap.xml"), sitemap),
   writeFile(join(outputDir, "robots.txt"), robots),
   writeFile(join(outputDir, "manifest.webmanifest"), manifest + "\n"),

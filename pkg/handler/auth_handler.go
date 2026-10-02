@@ -27,7 +27,7 @@ func (h *AuthHandler) Register(c *echo.Context) error {
 		return failure(c, 400, e)
 	}
 	h.setCookie(c, t)
-	return success(c, v, "注册成功")
+	return success(c, v, model.MessageRegistered)
 }
 func (h *AuthHandler) Login(c *echo.Context) error {
 	var req model.LoginRequest
@@ -39,7 +39,7 @@ func (h *AuthHandler) Login(c *echo.Context) error {
 		return failure(c, 401, e)
 	}
 	h.setCookie(c, t)
-	return success(c, v, "登录成功")
+	return success(c, v, model.MessageLoggedIn)
 }
 func (h *AuthHandler) Logout(c *echo.Context) error {
 	if cookie, e := c.Cookie(middleware.SessionCookie); e == nil {
@@ -48,7 +48,7 @@ func (h *AuthHandler) Logout(c *echo.Context) error {
 		}
 	}
 	c.SetCookie(&http.Cookie{Name: middleware.SessionCookie, Value: "", Path: "/", MaxAge: -1, Expires: time.Unix(0, 0), HttpOnly: true, Secure: configs.AppConfig.Session.CookieSecure, SameSite: http.SameSiteLaxMode})
-	return success(c, nil, "退出成功")
+	return success(c, nil, model.MessageLoggedOut)
 }
 func (h *AuthHandler) Session(c *echo.Context) error {
 	cookie, e := c.Cookie(middleware.SessionCookie)
@@ -59,5 +59,5 @@ func (h *AuthHandler) Session(c *echo.Context) error {
 	if e != nil {
 		return failure(c, 401, e)
 	}
-	return success(c, v, "获取成功")
+	return success(c, v, model.MessageLoaded)
 }

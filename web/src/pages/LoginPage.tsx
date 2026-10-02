@@ -1,3 +1,6 @@
+import { useTranslation } from "react-i18next";
+import { localizedPath } from "@/i18n/locales";
+import { useLocale } from "@/i18n/useLocale";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAsyncAction } from "@/lib/useAsyncAction";
@@ -5,6 +8,8 @@ import { useAuthStore } from "@/store/authStore";
 import { useTenantStore } from "@/store/tenantStore";
 
 export default function LoginPage() {
+  const { t } = useTranslation(["app", "common"]);
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { error, pending, run } = useAsyncAction();
@@ -17,23 +22,31 @@ export default function LoginPage() {
     // 登录响应本身就带着租户列表，直接用它填充，无需再请求一次 /tenants。
     void run(async () => {
       hydrate(await login({ email, password }));
-      navigate("/dashboard");
+      navigate(localizedPath("/dashboard", locale));
     });
   }
 
   return (
-    <AuthCard title="欢迎回来" description="使用你的工作邮箱继续。">
+    <AuthCard title={t("auth.loginTitle")} description={t("auth.loginDescription")}>
       <form onSubmit={submit} className="space-y-4">
-        <Input label="邮箱" type="email" value={email} onChange={setEmail} />
-        <Input label="密码" type="password" value={password} onChange={setPassword} />
+        <Input label={t("common:fields.email")} type="email" value={email} onChange={setEmail} />
+        <Input
+          label={t("common:fields.password")}
+          type="password"
+          value={password}
+          onChange={setPassword}
+        />
         {error && <p className="text-sm text-red-700">{error}</p>}
         <button className="button-primary mt-1 w-full" disabled={pending}>
-          {pending ? "登录中…" : "登录"}
+          {pending ? t("auth.loggingIn") : t("common:navigation.login")}
         </button>
         <p className="pt-2 text-center text-sm text-zinc-500">
-          还没有账号？{" "}
-          <Link className="font-medium text-zinc-900 hover:underline" to="/register">
-            创建账号
+          {t("auth.noAccount")}
+          <Link
+            className="font-medium text-zinc-900 hover:underline"
+            to={localizedPath("/register", locale)}
+          >
+            {t("common:navigation.register")}
           </Link>
         </p>
       </form>

@@ -10,12 +10,18 @@ function configured(value: string | boolean | undefined, fallback: string) {
 }
 
 export function resolveSiteConfig(env: SiteBuildEnvironment) {
+  const locale = configured(env["VITE_SITE_LOCALE"], templateSiteConfig.seo.locale);
+  if (locale !== "en") {
+    throw new Error(
+      "English is the default URL language. Configure translations in i18n/locales.ts and site-copy.ts instead of changing VITE_SITE_LOCALE.",
+    );
+  }
   return {
     name: configured(env["VITE_SITE_NAME"], templateSiteConfig.brand.name),
     shortName: configured(env["VITE_SITE_SHORT_NAME"], templateSiteConfig.brand.shortName),
     mark: configured(env["VITE_SITE_MARK"], templateSiteConfig.brand.mark),
     favicon: configured(env["VITE_SITE_FAVICON"], templateSiteConfig.brand.favicon),
-    locale: configured(env["VITE_SITE_LOCALE"], templateSiteConfig.seo.locale),
+    locale: "en" as const,
     primaryKeyword: configured(
       env["VITE_SITE_PRIMARY_KEYWORD"],
       templateSiteConfig.seo.primaryKeyword,

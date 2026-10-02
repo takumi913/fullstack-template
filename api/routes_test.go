@@ -201,3 +201,41 @@ func TestOwnerHasFullAccess(t *testing.T) {
 		}
 	}
 }
+
+func TestAPILocalizedMessages(t *testing.T) {
+	e := newTestServer(t)
+	for _, tc := range []struct{ language, want string }{
+		{"", "Username must be between 3 and 50 characters."},
+		{"en", "Username must be between 3 and 50 characters."},
+		{"zh-CN", "用户名长度必须在3-50个字符之间"},
+		{"en;q=0.9,zh-CN;q=0.5", "Username must be between 3 and 50 characters."},
+		{"fr", "Username must be between 3 and 50 characters."},
+	} {
+		t.Run(tc.language, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, "/api/v1/auth/register", strings.NewReader(`{"username":"a","email":"test@example.com","password":"secret12"}`))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			req.Header.Set("Accept-Language", tc.language)
+			rec := httptest.NewRecorder()
+			e.ServeHTTP(rec, req)
+			var payload struct {
+				Code    int
+				Message string
+			}
+			if err := json.Unmarshal(rec.Body.Bytes(), &payload); err != nil {
+				t.Fatal(err)
+			}
+			if rec.Code != http.StatusBadRequest || payload.Code != 1 || payload.Message != tc.want {
+				t.Fatalf("response = %d %s, want 400 localized validation %q", rec.Code, rec.Body.String(), tc.want)
+			}
+		})
+	}
+	for _, tc := range []struct{ language, want string }{{"en", "Please log in."}, {"zh-CN", "用户未认证"}} {
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/auth/session", nil)
+		req.Header.Set("Accept-Language", tc.language)
+		rec := httptest.NewRecorder()
+		e.ServeHTTP(rec, req)
+		if rec.Code != http.StatusUnauthorized || !strings.Contains(rec.Body.String(), tc.want) {
+			t.Fatalf("authentication language %s: %d %s", tc.language, rec.Code, rec.Body.String())
+		}
+	}
+}
