@@ -43,7 +43,7 @@ describe("resolveDocumentLocale", () => {
         createElement(SiteI18nProvider, { locale, children: createElement(Navigation) }),
       );
     expect(render("zh-CN")).toBe("<span>隐私政策</span>");
-    expect(render("en")).toBe("<span>Privacy Policy</span>");
+    expect(render("en")).toBe("<span>Privacy policy</span>");
     expect(render("zh-CN")).toBe("<span>隐私政策</span>");
   });
 });

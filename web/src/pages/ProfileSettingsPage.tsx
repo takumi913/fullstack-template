@@ -38,13 +38,15 @@ export default function ProfileSettingsPage() {
             onChange={setAvatar}
             required={false}
           />
-          {error && <p className="text-sm text-red-700">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
         <div className="mt-6 flex items-center gap-3 border-t pt-5">
           <button className="button-primary" disabled={pending}>
             {pending ? t("common:actions.saving") : t("common:actions.save")}
           </button>
-          {saved && <span className="text-sm text-zinc-500">{t("common:actions.saved")}</span>}
+          {saved && (
+            <span className="text-sm text-muted-foreground">{t("common:actions.saved")}</span>
+          )}
         </div>
       </form>
     </SettingsPage>

@@ -1,5 +1,7 @@
 import { createContentHreflangAlternates, type SeoAlternate } from "../seo/localization";
-import { normalizeLocale, type SiteLocale } from "../i18n/locales";
+import { localizedPath, normalizeLocale, supportedLocales, type SiteLocale } from "../i18n/locales";
+import { catalogLanguage, toolsmithCatalog } from "./toolsmith-catalog";
+import { toolsmithCopy } from "../config/toolsmith-copy";
 
 export type ToolPageStatus = "draft" | "example" | "published";
 
@@ -35,7 +37,40 @@ export interface ToolPageDefinition {
   isFree?: boolean;
 }
 
+const designDefinitions: ToolPageDefinition[] = supportedLocales.flatMap((locale) => {
+  const language = catalogLanguage(locale);
+  const copy = toolsmithCopy(locale);
+  return toolsmithCatalog.map((tool) => ({
+    slug: locale === "en" ? tool.id : `${tool.id}-zh-cn`,
+    componentKey: "ai-text",
+    translationKey: tool.id,
+    status: "example",
+    templateExample: true,
+    locale,
+    path: localizedPath(`/tools/${tool.id}`, locale),
+    name: tool[language][0],
+    category: tool.cat,
+    primaryKeyword: tool[language][0],
+    title: `${tool[language][0]} | Toolsmith`,
+    description: tool[language][1],
+    h1: tool[language][0],
+    intro: tool[language][1],
+    features: copy.trust,
+    howToSteps: copy.how.map((step) => step.d),
+    faq: copy.faq.map(([question, answer]) => ({ question, answer })),
+    relatedSlugs: toolsmithCatalog
+      .filter((item) => item.id !== tool.id && (item.cat === tool.cat || item.hot))
+      .slice(0, 4)
+      .map((item) => (locale === "en" ? item.id : `${item.id}-zh-cn`)),
+    runtime: { toolId: tool.id, preview: true },
+    updatedAt: "2026-10-03",
+    noindex: true,
+    isFree: true,
+  }));
+});
+
 const definitions: ToolPageDefinition[] = [
+  ...designDefinitions,
   {
     slug: "json-formatter",
     componentKey: "json-formatter",
@@ -48,10 +83,10 @@ const definitions: ToolPageDefinition[] = [
     primaryKeyword: "json formatter",
     title: "JSON Formatter - Format and Validate JSON Online",
     description:
-      "Format, validate, and minify JSON directly in your browser. This example page demonstrates the reusable tool-page SEO architecture.",
+      "Format, validate and minify JSON directly in your browser. Read API responses clearly and find syntax errors without uploading your data.",
     h1: "JSON Formatter",
     intro:
-      "Paste JSON to format, validate, or minify it locally in your browser. Replace this example with your own tool implementation when creating a new site.",
+      "Paste an API response or configuration file. Add readable indentation, check syntax or get compact JSON — all in your browser.",
     features: [
       "Format JSON with readable indentation",
       "Validate malformed JSON with a clear error",
@@ -66,7 +101,7 @@ const definitions: ToolPageDefinition[] = [
     faq: [
       {
         question: "Does the JSON leave my browser?",
-        answer: "No. This example processes the JSON in the browser and does not upload it.",
+        answer: "No. JSON is parsed and formatted entirely in your browser. Nothing is uploaded.",
       },
       {
         question: "Can it detect invalid JSON?",
@@ -131,15 +166,15 @@ const definitions: ToolPageDefinition[] = [
     primaryKeyword: "word counter",
     title: "Word Counter - Count Words and Characters Online",
     description:
-      "Count words, characters, lines, and paragraphs instantly. This example demonstrates related-tool internal linking and reusable SSG pages.",
+      "Count words, characters, lines and paragraphs as you type. Check the length of an article or email without uploading your text.",
     h1: "Word Counter",
     intro:
-      "Enter text to calculate common writing statistics instantly. This is a working example tool included to demonstrate the mother-template architecture.",
+      "Paste a draft, article or email to see word and character counts instantly. Words are counted as whitespace-separated text segments.",
     features: [
       "Count words and characters instantly",
       "Track lines and paragraphs",
       "No upload or account required",
-      "Useful as a reference implementation for text tools",
+      "Counts update immediately as you edit",
     ],
     howToSteps: [
       "Type or paste text into the input area.",
@@ -153,7 +188,7 @@ const definitions: ToolPageDefinition[] = [
       },
       {
         question: "Is my text stored?",
-        answer: "No. The example performs counting locally in the browser.",
+        answer: "No. Counting happens locally in your browser.",
       },
     ],
     relatedSlugs: ["json-formatter"],
@@ -205,6 +240,7 @@ const definitions: ToolPageDefinition[] = [
 
 export const toolPages: ToolPageDefinition[] = definitions.map((tool) => ({
   ...tool,
+  showInDirectory: tool.componentKey === "ai-text",
   alternates: tool.translationKey
     ? createContentHreflangAlternates(
         tool,

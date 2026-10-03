@@ -2,6 +2,18 @@ import { describe, expect, it } from "vitest";
 import { shouldHydrateDocument } from "./client-runtime";
 
 describe("client runtime policy", () => {
+  it("hydrates prerendered pages when the shared shell has interactive controls", () => {
+    for (const path of [
+      "/",
+      "/tools",
+      "/resources",
+      "/guides/json-syntax",
+      "/zh-cn/legal/terms",
+      "/404",
+    ]) {
+      expect(shouldHydrateDocument(path, 3, false, true), path).toBe(true);
+    }
+  });
   it("always hydrates the generic SPA fallback", () => {
     expect(shouldHydrateDocument("/", 1)).toBe(true);
   });

@@ -9,23 +9,23 @@ export function LegalPage({ kind }: { kind: LegalPageKind }) {
   const { t } = useTranslation();
   const page = legalPages[locale][kind];
   return (
-    <article className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
+    <article className="shell page-shell">
       <header className="max-w-3xl">
-        <h1 className="text-4xl font-semibold tracking-[-0.04em]">{page.title}</h1>
-        <p className="mt-4 text-base leading-7 text-zinc-600">{page.description}</p>
+        <h1 className="page-title !mt-0">{page.title}</h1>
+        <p className="mt-4 text-base leading-7 text-muted-foreground">{page.description}</p>
         {page.status === "draft" && (
-          <p className="panel mt-6 p-4 text-sm leading-6 text-zinc-600">{page.notice}</p>
+          <p className="panel mt-6 p-4 text-sm leading-6 text-muted-foreground">{page.notice}</p>
         )}
         {page.updatedAt && (
-          <time className="mt-4 block text-sm text-zinc-500" dateTime={page.updatedAt}>
+          <time className="mt-4 block text-sm text-muted-foreground" dateTime={page.updatedAt}>
             {page.updatedAt}
           </time>
         )}
       </header>
-      <div className="mt-10 max-w-3xl space-y-8 text-sm leading-7 text-zinc-600">
+      <div className="mt-10 max-w-3xl space-y-10 text-base leading-8 text-muted-foreground">
         {page.sections.map((section) => (
           <section key={section.heading}>
-            <h2 className="text-xl font-medium text-zinc-950">{section.heading}</h2>
+            <h2 className="text-xl font-medium text-foreground">{section.heading}</h2>
             <p className="mt-3">{section.body}</p>
           </section>
         ))}

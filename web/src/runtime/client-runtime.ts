@@ -12,7 +12,10 @@ export function shouldHydrateDocument(
   pathname: string,
   matchCount: number,
   homeHasInteractiveTool = false,
+  hasInteractiveShell = false,
 ) {
+  // Theme controls and mobile navigation need the runtime even on prerendered pages.
+  if (hasInteractiveShell) return true;
   // React Router's SPA fallback renders only the root route at build time.
   // It must always keep the client runtime so non-prerendered auth/app URLs can hydrate.
   if (matchCount <= 1) return true;

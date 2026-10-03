@@ -4,6 +4,7 @@ import { localizedPath, supportedLocales } from "./i18n/locales";
 const publicRoutes = [
   ["/tools", "tools-index"],
   ["/resources", "resources"],
+  ["/pricing", "pricing"],
   ["/tools/:slug", "tool"],
   ["/use-cases/:slug", "use-case"],
   ["/compare/:slug", "comparison"],

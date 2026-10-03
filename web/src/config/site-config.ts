@@ -1,25 +1,24 @@
-import { scaffoldSentinels } from "./scaffold-sentinels";
-
 export const templateSiteConfig = {
   brand: {
-    name: scaffoldSentinels.name,
-    shortName: "Fullstack",
-    mark: "F",
-    favicon: "/favicon.svg",
+    name: "Toolsmith",
+    shortName: "Toolsmith",
+    mark: "◆",
+    favicon: "/toolsmith.svg",
   },
   seo: {
     locale: "en",
-    primaryKeyword: "go react saas template",
-    defaultTitle: scaffoldSentinels.title,
-    defaultDescription: scaffoldSentinels.description,
+    primaryKeyword: "AI text tools",
+    defaultTitle: "Toolsmith — Rewrite, Summarize and Translate Text",
+    defaultDescription:
+      "A set of small AI tools for people who work with words every day. Rewrite, summarize and translate text in one simple workspace.",
     defaultImage: "/og-image.svg",
   },
   appearance: {
-    themeColor: "#ffffff",
-    backgroundColor: "#ffffff",
-    iconBackground: "#18181b",
-    iconForeground: "#ffffff",
+    themeColor: "#0c0d0f",
+    backgroundColor: "#0c0d0f",
+    iconBackground: "#0c0d0f",
+    iconForeground: "#c3ed72",
   },
   navigation: { showAuthLinks: true as boolean },
-  home: { primaryToolSlug: null as string | null },
+  home: { primaryToolSlug: "rewriter" as string | null },
 } as const;

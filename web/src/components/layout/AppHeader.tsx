@@ -1,61 +1,92 @@
-import { Link, useNavigate, useLocation } from "react-router";
-import { useTranslation } from "react-i18next";
-import { localizedPath, supportedLocales } from "@/i18n/locales";
+import { Link, NavLink, useNavigate } from "react-router";
+import { localizedPath } from "@/i18n/locales";
 import { useLocale } from "@/i18n/useLocale";
-import { LanguageSwitcher } from "@/components/seo/LanguageSwitcher";
-import { siteConfig } from "@/seo/site";
+import { toolsmithPrivateCopy } from "@/config/toolsmith-private-copy";
 import { useAuthStore } from "@/store/authStore";
+import { useTenantStore } from "@/store/tenantStore";
+import { useAsyncAction } from "@/lib/useAsyncAction";
+import { Brand } from "./Brand";
+import { ThemeToggle } from "./ThemeToggle";
+import { ShortLanguageToggle } from "./ShortLanguageToggle";
 
 export function AppHeader() {
-  const { t } = useTranslation();
-  const locale = useLocale();
-  const { pathname } = useLocation();
-  const logout = useAuthStore((state) => state.logout);
-  const navigate = useNavigate();
-
+  const locale = useLocale(),
+    copy = toolsmithPrivateCopy(locale),
+    navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout),
+    user = useAuthStore((state) => state.user);
+  const activeTenant = useTenantStore((state) => state.activeTenant),
+    members = useTenantStore((state) => state.members);
+  const { error, pending, run } = useAsyncAction();
+  async function signOut() {
+    if (await run(logout)) navigate(localizedPath("/", locale));
+  }
+  const paths = ["/dashboard", "/tenant/members", null, "/tenant/settings"];
   return (
-    <header className="border-b bg-white">
-      <div className="shell flex min-h-14 items-center justify-between gap-4 py-2">
-        <Link
-          to={localizedPath("/", locale)}
-          className="flex items-center gap-2 text-sm font-semibold tracking-[-0.01em]"
-        >
-          <span className="grid size-5 place-items-center rounded-[4px] bg-zinc-900 text-[10px] text-white">
-            {siteConfig.mark}
-          </span>
-          {siteConfig.shortName}
-        </Link>
-        <nav
-          aria-label={t("navigation.primary")}
-          className="flex flex-wrap items-center justify-end gap-1"
-        >
-          <Link
-            className="inline-flex min-h-11 items-center rounded-md px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
-            to={localizedPath("/dashboard", locale)}
-          >
-            {t("navigation.dashboard")}
-          </Link>
+    <aside className="design-sidebar">
+      <Brand />
+      <Link className="design-workspace-switcher" to={localizedPath("/dashboard", locale)}>
+        <span className="design-workspace-icon">
+          {activeTenant?.name.slice(0, 1).toUpperCase()}
+        </span>
+        <div className="design-workspace-info">
+          <div className="design-workspace-info-name">{activeTenant?.name}</div>
+          <div className="design-workspace-info-meta">
+            {members.length} {copy.seats}
+          </div>
+        </div>
+        <span className="design-workspace-caret">⌄</span>
+      </Link>
+      <nav className="design-workspace-nav">
+        {copy.ws.map((label, index) =>
+          paths[index] ? (
+            <NavLink
+              key={label}
+              className="design-workspace-link"
+              to={localizedPath(paths[index]!, locale)}
+            >
+              <span className="design-workspace-nav-dot" />
+              {label}
+            </NavLink>
+          ) : (
+            <a
+              key={label}
+              className="design-workspace-link"
+              href="#"
+              onClick={(event) => event.preventDefault()}
+            >
+              <span className="design-workspace-nav-dot" />
+              {label}
+            </a>
+          ),
+        )}
+      </nav>
+      <div className="design-sidebar-account">
+        <div className="design-sidebar-controls">
+          <ShortLanguageToggle />
+          <ThemeToggle />
+        </div>
+        <div className="design-user-row">
+          <span className="design-user-avatar">{user?.username.slice(0, 1).toUpperCase()}</span>
+          <div className="design-user-info">
+            <div className="design-user-name">{user?.username}</div>
+            <div className="design-user-email">{user?.email}</div>
+          </div>
           <button
-            className="inline-flex min-h-11 items-center rounded-md px-3 py-2 text-sm text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
-            onClick={() => {
-              logout()
-                .catch(() => {})
-                .finally(() => navigate(localizedPath("/", locale)));
-            }}
             type="button"
+            className="design-signout"
+            disabled={pending}
+            onClick={() => void signOut()}
           >
-            {t("navigation.logout")}
+            {copy.signOut}
           </button>
-          <LanguageSwitcher
-            alternates={supportedLocales.map((language) => ({
-              hreflang: language,
-              path: localizedPath(pathname, language),
-            }))}
-            currentPath={pathname}
-            locale={locale}
-          />
-        </nav>
+        </div>
+        {error && (
+          <p className="text-sm text-destructive" role="alert">
+            {error}
+          </p>
+        )}
       </div>
-    </header>
+    </aside>
   );
 }

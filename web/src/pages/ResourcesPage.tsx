@@ -1,48 +1,55 @@
-import { ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router";
-import { siteCopies } from "@/config/site-copy";
+import { toolsmithCopy } from "@/config/toolsmith-copy";
+import { localizedPath } from "@/i18n/locales";
 import { useLocale } from "@/i18n/useLocale";
-import { getDirectoryLandingPages } from "@/content/landing-pages";
-import { publicPageCopy } from "@/seo/ui-copy";
-import { getPublicSeoPages } from "@/seo/pages";
+import { trackSpot } from "@/lib/track-spot";
 
 export default function ResourcesPage() {
-  const locale = useLocale();
-  const publicSeoPages = getPublicSeoPages(locale);
-  const copy = siteCopies[locale].hubs.resources;
+  const locale = useLocale(),
+    copy = toolsmithCopy(locale);
+  const [tag, setTag] = useState(0);
   return (
-    <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
-      <header className="max-w-3xl">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
-          {copy.eyebrow}
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
-          {publicSeoPages.resources.h1}
-        </h1>
-        <p className="mt-4 text-base leading-7 text-zinc-600">{copy.description}</p>
-      </header>
-
-      <section className="mt-10 grid gap-3 sm:grid-cols-2">
-        {getDirectoryLandingPages(locale).map((page) => (
-          <Link
-            className="group rounded-xl border p-5 transition hover:border-zinc-400"
-            key={page.path}
-            to={page.path}
+    <section className="design-container design-blog" data-screen-label="Blog">
+      <div className="design-eyebrow">{copy.navBlog}</div>
+      <h1 className="design-page-title">{copy.blogTitle}</h1>
+      <p className="design-page-subtitle">{copy.blogSub}</p>
+      <div className="design-filters design-blog-filters">
+        {copy.blogTagsL.map((label, index) => (
+          <button
+            type="button"
+            key={label}
+            className={`design-filter ${tag === index ? "active" : ""}`}
+            aria-pressed={tag === index}
+            onClick={() => setTag(index)}
           >
-            <p className="text-xs text-zinc-500">{publicPageCopy(locale).kinds[page.kind]}</p>
-            <div className="mt-2 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="font-medium text-zinc-950">{page.h1}</h2>
-                <p className="mt-2 text-sm leading-6 text-zinc-500">{page.description}</p>
-              </div>
-              <ArrowRight
-                className="mt-1 shrink-0 text-zinc-400 transition group-hover:translate-x-0.5"
-                size={16}
-              />
-            </div>
-          </Link>
+            {label}
+          </button>
         ))}
-      </section>
-    </main>
+      </div>
+      <div className="design-post-grid">
+        {copy.posts
+          .filter((post) => !tag || post.tag === tag)
+          .map((post) => (
+            <Link
+              className="design-post"
+              key={post.title}
+              to={localizedPath("/guides/read-paper", locale)}
+              onMouseMove={trackSpot}
+            >
+              <div className="design-post-top">
+                <span className="design-post-tag">{copy.blogTagsL[post.tag]}</span>
+                <span className="design-post-date">{post.date}</span>
+              </div>
+              <div className="design-post-title">{post.title}</div>
+              <div className="design-post-description">{post.desc}</div>
+              <div className="design-post-bottom">
+                <span>{post.read}</span>
+                <span>{copy.readGuide} →</span>
+              </div>
+            </Link>
+          ))}
+      </div>
+    </section>
   );
 }

@@ -2,18 +2,21 @@ import { PrivateI18nProvider } from "@/i18n/PrivateI18nProvider";
 import { Outlet } from "react-router";
 import { ProtectedRoute } from "@/router/RouteGuards";
 import { AppHeader } from "./AppHeader";
-import { Footer } from "./Footer";
-
+import { PointerGlow } from "./DesignEffects";
+import { CommandPalette } from "./CommandPalette";
 export function AppLayout() {
   return (
     <PrivateI18nProvider>
       <ProtectedRoute>
-        <div className="flex min-h-screen flex-col bg-white">
-          <AppHeader />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
+        <div className="design-site">
+          <PointerGlow />
+          <section className="design-workspace" data-screen-label="Workspace">
+            <AppHeader />
+            <main className="design-workspace-main">
+              <Outlet />
+            </main>
+          </section>
+          <CommandPalette />
         </div>
       </ProtectedRoute>
     </PrivateI18nProvider>

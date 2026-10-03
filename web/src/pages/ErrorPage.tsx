@@ -13,12 +13,12 @@ export default function ErrorPage() {
   return (
     <div className="grid min-h-[calc(100vh-113px)] place-items-center px-5 py-16">
       <div className="w-full max-w-[440px] text-center">
-        <h1 className="text-2xl font-semibold tracking-[-0.025em] text-zinc-950">
+        <h1 className="text-2xl font-semibold tracking-[-0.025em] text-foreground">
           {t("error.title")}
         </h1>
-        <p className="mt-2 text-sm text-zinc-500">{t("error.description")}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t("error.description")}</p>
         {detail && (
-          <p className="mt-4 break-words rounded border bg-zinc-50 p-3 text-left text-xs text-zinc-600">
+          <p className="mt-4 break-words rounded border bg-card p-3 text-left text-xs text-muted-foreground">
             {detail}
           </p>
         )}
@@ -27,7 +27,7 @@ export default function ErrorPage() {
             {t("error.reload")}
           </button>
           <Link
-            className="self-center text-zinc-500 hover:text-zinc-950"
+            className="self-center text-muted-foreground hover:text-foreground"
             to={localizedPath("/", locale)}
           >
             {t("error.home")}

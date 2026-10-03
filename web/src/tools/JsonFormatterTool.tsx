@@ -1,52 +1,91 @@
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 
-const initialValue = '{\n  "hello": "world",\n  "count": 2\n}';
+const initialValue =
+  '{\n  "name": "Toolsmith",\n  "private": true,\n  "free": true,\n  "tools": ["JSON Formatter", "Word Counter"]\n}';
 
-export function JsonFormatterTool() {
+interface JsonFormatterToolProps {
+  navigation?: ReactNode;
+}
+
+export function JsonFormatterTool({ navigation }: JsonFormatterToolProps) {
   const { t } = useTranslation();
   const [input, setInput] = useState(initialValue);
-  const [output, setOutput] = useState(initialValue);
+  const [output, setOutput] = useState("");
   const [error, setError] = useState("");
+  const [mode, setMode] = useState<"format" | "minify">("format");
 
-  const transform = (mode: "format" | "minify") => {
+  function updateInput(value: string) {
+    setInput(value);
+    setOutput("");
+    setError("");
+  }
+  function transform() {
     try {
       const parsed = JSON.parse(input) as unknown;
       setOutput(JSON.stringify(parsed, null, mode === "format" ? 2 : 0));
       setError("");
     } catch (cause) {
+      setOutput("");
       setError(cause instanceof Error ? cause.message : t("json.invalid"));
     }
-  };
-
+  }
   return (
-    <div className="rounded-xl border bg-zinc-50 p-4 sm:p-6">
-      <label className="text-sm font-medium text-zinc-800" htmlFor="json-input">
-        {t("json.input")}
-      </label>
-      <textarea
-        id="json-input"
-        className="mt-2 min-h-52 w-full rounded-lg border bg-white p-3 font-mono text-base outline-none focus:border-zinc-400"
-        value={input}
-        onChange={(event) => setInput(event.target.value)}
-      />
-      <div className="mt-3 flex flex-wrap gap-2">
-        <button className="button-primary" onClick={() => transform("format")} type="button">
-          {t("json.format")}
-        </button>
-        <button className="button-secondary" onClick={() => transform("minify")} type="button">
-          {t("json.minify")}
-        </button>
-      </div>
-      {error ? (
-        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </p>
-      ) : (
-        <pre className="mt-4 min-h-28 overflow-auto rounded-lg border bg-white p-3 text-sm text-zinc-700">
-          {output}
-        </pre>
-      )}
-    </div>
+    <ToolWorkspace
+      navigation={
+        navigation ?? (
+          <span className="flex items-center gap-3 px-2 font-semibold">
+            <span className="tool-glyph">{"{}"}</span>
+            {t("json.input")}
+          </span>
+        )
+      }
+      options={
+        <>
+          <span className="eyebrow !text-muted-foreground mr-1">{t("workbench.format")}</span>
+          {(["format", "minify"] as const).map((option) => (
+            <button
+              className="option-pill"
+              type="button"
+              aria-pressed={mode === option}
+              key={option}
+              onClick={() => {
+                setMode(option);
+                setOutput("");
+              }}
+            >
+              {t(`json.${option}`)}
+            </button>
+          ))}
+        </>
+      }
+      input={
+        <>
+          <label className="sr-only" htmlFor="json-input">
+            {t("json.input")}
+          </label>
+          <textarea
+            id="json-input"
+            className="tool-textarea font-mono"
+            value={input}
+            spellCheck={false}
+            onChange={(event) => updateInput(event.target.value)}
+            onKeyDown={(event) => {
+              if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+                event.preventDefault();
+                transform();
+              }
+            }}
+          />
+        </>
+      }
+      inputLength={input.length}
+      output={output}
+      error={error}
+      onSample={() => updateInput(initialValue)}
+      onClear={() => updateInput("")}
+      onRun={transform}
+    />
   );
 }

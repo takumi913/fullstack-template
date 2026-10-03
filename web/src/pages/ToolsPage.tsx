@@ -1,47 +1,84 @@
-import { ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router";
-import { siteCopies } from "@/config/site-copy";
 import { useLocale } from "@/i18n/useLocale";
-import { getDirectoryToolPages, toolPath } from "@/content/tool-pages";
-import { getPublicSeoPages } from "@/seo/pages";
+import { toolsmithCopy } from "@/config/toolsmith-copy";
+import {
+  catalogLanguage,
+  catalogToolPath,
+  filterCatalog,
+  toolsmithCatalog,
+  toolsmithCategories,
+} from "@/content/toolsmith-catalog";
+import { trackSpot } from "@/lib/track-spot";
 
 export default function ToolsPage() {
-  const locale = useLocale();
-  const publicSeoPages = getPublicSeoPages(locale);
-  const copy = siteCopies[locale].hubs.tools;
+  const locale = useLocale(),
+    language = catalogLanguage(locale),
+    copy = toolsmithCopy(locale);
+  const [query, setQuery] = useState(""),
+    [category, setCategory] = useState("all");
+  const tools = filterCatalog(query, category);
   return (
-    <main className="shell border-x px-6 py-12 sm:px-12 sm:py-16">
-      <header className="max-w-3xl">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-zinc-500">
-          {copy.eyebrow}
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">
-          {publicSeoPages.tools.h1}
-        </h1>
-        <p className="mt-4 text-base leading-7 text-zinc-600">{copy.description}</p>
-      </header>
-
-      <section className="mt-10 grid gap-3 sm:grid-cols-2">
-        {getDirectoryToolPages(locale).map((tool) => (
+    <section className="design-container design-directory" data-screen-label="Directory">
+      <div className="design-eyebrow">{copy.dirEyebrow}</div>
+      <h1 className="design-page-title">{copy.dirTitle}</h1>
+      <p className="design-page-subtitle">{copy.dirSub}</p>
+      <div className="design-directory-controls">
+        <label className="design-search">
+          <span className="design-search-circle" aria-hidden="true" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={copy.dirSearch}
+            aria-label={copy.search}
+          />
+        </label>
+        <div className="design-filters">
+          {toolsmithCategories.map((cat) => (
+            <button
+              type="button"
+              className={`design-filter ${category === cat.id ? "active" : ""}`}
+              key={cat.id}
+              aria-pressed={category === cat.id}
+              onClick={() => setCategory(cat.id)}
+            >
+              {cat[language]}
+              <span className="design-filter-count">
+                {cat.id === "all"
+                  ? toolsmithCatalog.length
+                  : toolsmithCatalog.filter((tool) => tool.cat === cat.id).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="design-directory-grid">
+        {tools.map((tool) => (
           <Link
-            className="group rounded-xl border p-5 transition hover:border-zinc-400"
-            key={tool.slug}
-            to={toolPath(tool)}
+            key={tool.id}
+            className="design-directory-card"
+            to={catalogToolPath(tool.id, locale)}
+            onMouseMove={trackSpot}
           >
-            <p className="text-xs text-zinc-500">{tool.category}</p>
-            <div className="mt-2 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="font-medium text-zinc-950">{tool.name}</h2>
-                <p className="mt-2 text-sm leading-6 text-zinc-500">{tool.description}</p>
-              </div>
-              <ArrowRight
-                className="mt-1 shrink-0 text-zinc-400 transition group-hover:translate-x-0.5"
-                size={16}
-              />
+            <div className="design-card-top">
+              <span className="design-directory-glyph">{tool.g}</span>
+              {(tool.hot || tool.isNew) && (
+                <span className="design-tool-badge">
+                  {tool.isNew ? "New" : language === "zh" ? "热门" : "Popular"}
+                </span>
+              )}
+            </div>
+            <div>
+              <div className="design-directory-name">{tool[language][0]}</div>
+              <div className="design-directory-desc">{tool[language][1]}</div>
+            </div>
+            <div className="design-directory-category">
+              {toolsmithCategories.find((cat) => cat.id === tool.cat)![language]}
             </div>
           </Link>
         ))}
-      </section>
-    </main>
+      </div>
+      {!tools.length && <div className="design-directory-empty">{copy.noResult}</div>}
+    </section>
   );
 }

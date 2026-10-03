@@ -1,15 +1,19 @@
 import { Outlet } from "react-router";
 import { Footer } from "./Footer";
 import { PublicHeader } from "./PublicHeader";
+import { PointerGlow } from "./DesignEffects";
+import { CommandPalette } from "./CommandPalette";
 
 export function PublicLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="design-site">
+      <PointerGlow />
       <PublicHeader />
-      <main className="flex-1">
+      <main>
         <Outlet />
       </main>
       <Footer />
+      <CommandPalette />
     </div>
   );
 }

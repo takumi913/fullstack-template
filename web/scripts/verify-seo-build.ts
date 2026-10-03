@@ -16,6 +16,7 @@ import { legalPages } from "../src/content/legal-pages";
 import { localizedPath, supportedLocales } from "../src/i18n/locales";
 import { commonTranslations } from "../src/i18n/common";
 import { siteConfig } from "../src/seo/site";
+import { toolsmithCopy } from "../src/config/toolsmith-copy";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const clientDir = join(scriptDir, "..", "dist", "client");
@@ -68,12 +69,6 @@ function assertPublicHtmlDoesNotLoadPrivateApp(html: string, label: string) {
   }
 }
 
-function assertStaticHtmlDoesNotHydrate(html: string, label: string) {
-  assertExcludes(html, "entry.client-", `${label} client runtime`);
-  assertExcludes(html, 'rel="modulepreload"', `${label} module preload`);
-  assertExcludes(html, 'type="module"', `${label} module script`);
-}
-
 function assertHydratedHtml(html: string, label: string) {
   assertIncludes(html, "entry.client-", `${label} client runtime`);
 }
@@ -90,11 +85,18 @@ const homePrimaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug);
 if (homePrimaryTool) {
   assertHydratedHtml(home, "home primary tool HTML");
   assertIncludes(home, homePrimaryTool.name, "home primary tool name");
-  if (homePrimaryTool.features[0]) {
+  if (homePrimaryTool.componentKey === "ai-text") {
+    const copy = toolsmithCopy("en");
+    assertIncludes(home, copy.h1b, "home design headline");
+    assertIncludes(home, copy.heroSub, "home design trust note");
+    for (const mode of ["Rewrite", "Summarize", "Translate"]) {
+      assertIncludes(home, mode, "home design mode tabs");
+    }
+  } else if (homePrimaryTool.features[0]) {
     assertIncludes(home, homePrimaryTool.features[0], "home primary tool feature");
   }
 } else {
-  assertStaticHtmlDoesNotHydrate(home, "home HTML");
+  assertHydratedHtml(home, "home HTML");
 }
 
 const toolsHub = await readOutput("tools", "index.html");
@@ -102,19 +104,19 @@ assertIncludes(toolsHub, publicSeoPages.tools.title, "tools hub HTML");
 assertIncludes(toolsHub, "noindex, follow", "tools hub HTML");
 assertIncludes(toolsHub, 'lang="en"', "tools hub document language");
 assertPublicHtmlDoesNotLoadPrivateApp(toolsHub, "tools hub HTML");
-assertStaticHtmlDoesNotHydrate(toolsHub, "tools hub HTML");
+assertHydratedHtml(toolsHub, "tools hub HTML");
 
 const resourcesHub = await readOutput("resources", "index.html");
 assertIncludes(resourcesHub, publicSeoPages.resources.title, "resources hub HTML");
 assertIncludes(resourcesHub, "noindex, follow", "resources hub HTML");
 assertPublicHtmlDoesNotLoadPrivateApp(resourcesHub, "resources hub HTML");
-assertStaticHtmlDoesNotHydrate(resourcesHub, "resources hub HTML");
+assertHydratedHtml(resourcesHub, "resources hub HTML");
 
 for (const page of allPublicSeoPages) {
   if (!("noindex" in page) || !page.noindex) continue;
   const html = await readOutput(...htmlOutputParts(page.path));
   assertIncludes(html, "noindex, follow", `${page.path} public noindex HTML`);
-  assertStaticHtmlDoesNotHydrate(html, `${page.path} public noindex HTML`);
+  assertHydratedHtml(html, `${page.path} public noindex HTML`);
 }
 
 for (const locale of supportedLocales) {
@@ -148,7 +150,7 @@ for (const locale of supportedLocales) {
       assertHydratedHtml(html, page.path);
       assertIncludes(html, primary.h1, `${page.path} localized primary tool`);
     } else {
-      assertStaticHtmlDoesNotHydrate(html, page.path);
+      assertHydratedHtml(html, page.path);
     }
     if (locale === "en") {
       // Native language names in the switcher are intentional; English page copy is not Chinese.
@@ -231,7 +233,7 @@ assertIncludes(chineseGuide, "首页", "Chinese guide breadcrumb");
 const notFound = await readOutput("404.html");
 assertIncludes(notFound, "404 - Page not found", "404 HTML");
 assertIncludes(notFound, "noindex, nofollow", "404 HTML");
-assertStaticHtmlDoesNotHydrate(notFound, "404 HTML");
+assertHydratedHtml(notFound, "404 HTML");
 await assertOutputMissing("404", "index.html");
 
 const spaFallback = await readOutput("__spa-fallback.html");
@@ -307,7 +309,7 @@ for (const page of routableLandingPages) {
   const seo = createLandingSeoPage(page);
 
   assertPublicHtmlDoesNotLoadPrivateApp(html, `${page.slug} landing HTML`);
-  assertStaticHtmlDoesNotHydrate(html, `${page.slug} landing HTML`);
+  assertHydratedHtml(html, `${page.slug} landing HTML`);
   assertIncludes(html, page.title, `${page.slug} landing HTML`);
   assertIncludes(html, page.h1, `${page.slug} landing HTML`);
   assertIncludes(html, 'rel="canonical"', `${page.slug} landing HTML`);

@@ -29,10 +29,10 @@ export default function TenantSettingsPage() {
         )}
         <form onSubmit={create} className="panel p-6">
           <h2 className="text-lg font-medium">{t("workspace.newTitle")}</h2>
-          <p className="mt-1 text-sm text-zinc-500">{t("workspace.newDescription")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("workspace.newDescription")}</p>
           <div className="mt-6">
             <Input label={t("common:fields.name")} value={newName} onChange={setNewName} />
-            {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
+            {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
           </div>
           <div className="mt-6 border-t pt-5">
             <button className="button-primary" disabled={pending}>
@@ -62,11 +62,11 @@ function CurrentTenantForm({ tenant, reload }: { tenant: Tenant; reload: () => P
   return (
     <form onSubmit={update} className="panel p-6">
       <h2 className="text-lg font-medium">{t("workspace.current")}</h2>
-      <p className="mt-1 text-sm text-zinc-500">{t("workspace.currentDescription")}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{t("workspace.currentDescription")}</p>
       <div className="mt-6 space-y-5">
         <Input label={t("common:fields.name")} value={name} onChange={setName} />
         <Input label="Slug" value={slug} onChange={setSlug} />
-        {error && <p className="text-sm text-red-700">{error}</p>}
+        {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
       <div className="mt-6 border-t pt-5">
         <button className="button-primary" disabled={pending}>

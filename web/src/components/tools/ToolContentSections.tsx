@@ -1,76 +1,8 @@
+import { Check } from "lucide-react";
 import type { ToolPageDefinition } from "@/content/tool-pages";
 import { RelatedResources } from "@/components/seo/RelatedResources";
 import { RelatedTools } from "@/components/seo/RelatedTools";
 import { publicPageCopy } from "@/seo/ui-copy";
-
-function FeaturesAndHowTo({ tool }: { tool: ToolPageDefinition }) {
-  const copy = publicPageCopy(tool.locale);
-
-  return (
-    <>
-      <div>
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
-          {copy.whatThisToolDoes}
-        </h2>
-        <ul className="mt-5 space-y-3 text-sm leading-6 text-zinc-600">
-          {tool.features.map((feature) => (
-            <li className="flex gap-3" key={feature}>
-              <span
-                aria-hidden="true"
-                className="mt-2 size-1.5 shrink-0 rounded-full bg-zinc-400"
-              />
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">{copy.howToUse}</h2>
-        <ol className="mt-5 space-y-4 text-sm leading-6 text-zinc-600">
-          {tool.howToSteps.map((step, index) => (
-            <li className="flex gap-3" key={step}>
-              <span className="grid size-6 shrink-0 place-items-center rounded-full border text-xs text-zinc-600">
-                {index + 1}
-              </span>
-              <span>{step}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </>
-  );
-}
-
-function FaqContent({ tool }: { tool: ToolPageDefinition }) {
-  const copy = publicPageCopy(tool.locale);
-  if (tool.faq.length === 0) return null;
-
-  return (
-    <>
-      <h2 className="text-2xl font-semibold tracking-[-0.03em] text-zinc-950">{copy.faq}</h2>
-      <div className="mt-6 divide-y border-y">
-        {tool.faq.map((item) => (
-          <details className="group py-5" key={item.question}>
-            <summary className="cursor-pointer list-none font-medium text-zinc-900">
-              {item.question}
-            </summary>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">{item.answer}</p>
-          </details>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function RelatedContent({ tool }: { tool: ToolPageDefinition }) {
-  return (
-    <div className="space-y-14">
-      <RelatedResources tool={tool} />
-      <RelatedTools tool={tool} />
-    </div>
-  );
-}
 
 export function ToolContentSections({
   tool,
@@ -79,41 +11,52 @@ export function ToolContentSections({
   tool: ToolPageDefinition;
   surface?: "page" | "home";
 }) {
-  if (surface === "home") {
-    return (
-      <>
-        <section className="shell grid gap-10 border-x border-t px-6 py-12 sm:px-12 lg:grid-cols-2">
-          <FeaturesAndHowTo tool={tool} />
-        </section>
-
-        {tool.faq.length > 0 ? (
-          <section className="shell border-x border-t px-6 py-12 sm:px-12">
-            <FaqContent tool={tool} />
-          </section>
-        ) : null}
-
-        <section className="shell border-x border-t px-6 py-12 sm:px-12">
-          <RelatedContent tool={tool} />
-        </section>
-      </>
-    );
-  }
-
+  const copy = publicPageCopy(tool.locale);
   return (
-    <>
-      <section className="mt-14 grid gap-10 border-t pt-12 lg:grid-cols-2">
-        <FeaturesAndHowTo tool={tool} />
+    <div className={surface === "home" ? "home-tool-content" : "pb-8"}>
+      <section className="content-section">
+        <h2 className="text-lg font-semibold">{copy.whatThisToolDoes}</h2>
+        <ul className="mt-5 grid gap-4 text-sm text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
+          {tool.features.map((feature) => (
+            <li className="flex items-start gap-3 leading-6" key={feature}>
+              <Check size={15} className="mt-1 shrink-0 text-accent" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
       </section>
-
-      {tool.faq.length > 0 ? (
-        <section className="mt-14 border-t pt-12">
-          <FaqContent tool={tool} />
+      <section className="content-section">
+        <p className="eyebrow">01 — 02 — 03</p>
+        <h2 className="section-title">{copy.howToUse}</h2>
+        <ol className="steps-grid">
+          {tool.howToSteps.map((step, index) => (
+            <li className="step-card" key={step}>
+              <span className="step-number">0{index + 1}</span>
+              <p>{step}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+      {tool.faq.length > 0 && (
+        <section className="faq-section">
+          <div>
+            <p className="eyebrow">FAQ</p>
+            <h2 className="section-title">{copy.faq}</h2>
+          </div>
+          <div className="faq-items">
+            {tool.faq.map((item) => (
+              <details className="faq-item" key={item.question}>
+                <summary>{item.question}</summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
         </section>
-      ) : null}
-
-      <div className="mt-14">
-        <RelatedContent tool={tool} />
+      )}
+      <div className="space-y-12 pt-16">
+        <RelatedResources tool={tool} />
+        <RelatedTools tool={tool} />
       </div>
-    </>
+    </div>
   );
 }

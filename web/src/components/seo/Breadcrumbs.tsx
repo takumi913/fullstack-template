@@ -7,11 +7,11 @@ export function Breadcrumbs({ tool }: { tool: ToolPageDefinition }) {
   const copy = publicPageCopy(tool.locale);
 
   return (
-    <nav aria-label={copy.breadcrumb} className="text-sm text-zinc-500">
-      <ol className="flex items-center gap-2">
+    <nav aria-label={copy.breadcrumb} className="text-sm text-muted-foreground">
+      <ol className="flex flex-wrap items-center gap-2">
         <li>
           <Link
-            className="hover:text-zinc-950"
+            className="hover:text-foreground"
             to={localizedPath("/", normalizeLocale(tool.locale))}
           >
             {copy.home}
@@ -20,14 +20,14 @@ export function Breadcrumbs({ tool }: { tool: ToolPageDefinition }) {
         <li aria-hidden="true">/</li>
         <li>
           <Link
-            className="hover:text-zinc-950"
+            className="hover:text-foreground"
             to={localizedPath("/tools", normalizeLocale(tool.locale))}
           >
             {copy.tools}
           </Link>
         </li>
         <li aria-hidden="true">/</li>
-        <li aria-current="page" className="text-zinc-700">
+        <li aria-current="page" className="text-foreground">
           {tool.name}
         </li>
       </ol>

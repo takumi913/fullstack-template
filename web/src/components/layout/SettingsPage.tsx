@@ -17,18 +17,18 @@ export function SettingsPage({
     <div className="shell py-12 sm:py-16">
       <div className="mb-9 flex flex-col gap-5 border-b pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-[-0.025em]">{title}</h1>
-          {description && <p className="mt-2 text-sm text-zinc-500">{description}</p>}
+          <h1 className="page-title !mt-0 !text-4xl">{title}</h1>
+          {description && <p className="mt-2 text-sm text-muted-foreground">{description}</p>}
         </div>
         <div className="flex gap-4 text-sm">
           <Link
-            className="text-zinc-500 hover:text-zinc-950"
+            className="text-muted-foreground hover:text-foreground"
             to={localizedPath("/dashboard", locale)}
           >
             {t("common:navigation.dashboard")}
           </Link>
           <Link
-            className="text-zinc-500 hover:text-zinc-950"
+            className="text-muted-foreground hover:text-foreground"
             to={localizedPath("/settings/security", locale)}
           >
             {t("security.link")}

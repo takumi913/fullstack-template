@@ -1,5 +1,6 @@
 import { createContentHreflangAlternates, type SeoAlternate } from "../seo/localization";
-import { normalizeLocale, type SiteLocale } from "../i18n/locales";
+import { localizedPath, normalizeLocale, supportedLocales, type SiteLocale } from "../i18n/locales";
+import { toolsmithCopy } from "../config/toolsmith-copy";
 
 export type LandingPageStatus = "draft" | "example" | "published";
 export type LandingPageKind = "use-case" | "comparison" | "guide";
@@ -37,6 +38,28 @@ export interface LandingPageDefinition {
 }
 
 const definitions: LandingPageDefinition[] = [
+  ...supportedLocales.map((locale): LandingPageDefinition => {
+    const copy = toolsmithCopy(locale);
+    return {
+      slug: locale === "en" ? "read-paper" : "read-paper-zh-cn",
+      translationKey: "read-paper",
+      kind: "guide",
+      status: "example",
+      templateExample: true,
+      path: localizedPath("/guides/read-paper", locale),
+      locale,
+      primaryKeyword: locale === "en" ? "AI paper summary" : "AI 论文摘要",
+      title: copy.guideTitle,
+      description: copy.posts[0].desc,
+      h1: copy.guideTitle,
+      intro: copy.guideIntro,
+      sections: copy.gSteps.map((step) => ({ heading: step.t, body: step.d })),
+      faq: [],
+      relatedToolSlugs: [locale === "en" ? "summarizer" : "summarizer-zh-cn"],
+      updatedAt: "2026-09-18",
+      noindex: true,
+    };
+  }),
   {
     slug: "json-api-debugging",
     translationKey: "json-api-debugging",
@@ -46,12 +69,12 @@ const definitions: LandingPageDefinition[] = [
     path: "/use-cases/json-api-debugging",
     locale: "en",
     primaryKeyword: "json api debugging",
-    title: "JSON API Debugging Workflow | Fullstack Template",
+    title: "JSON API Debugging — A Practical Workflow",
     description:
-      "A reusable example landing page showing how a JSON formatter can support API debugging workflows.",
+      "Find malformed responses and unexpected values. A practical workflow for formatting and validating JSON API payloads.",
     h1: "Debug JSON APIs Faster",
     intro:
-      "This noindex example demonstrates how a use-case landing page can explain a real workflow and link directly to the relevant tool.",
+      "Start with the response itself: format it for readability, confirm the syntax, then follow the data into your application.",
     sections: [
       {
         heading: "Inspect the response payload",
@@ -64,9 +87,9 @@ const definitions: LandingPageDefinition[] = [
     ],
     faq: [
       {
-        question: "Should a use-case page duplicate the tool page?",
+        question: "Should I format or validate the response first?",
         answer:
-          "No. The use-case page should answer a different search intent and explain a workflow, while the tool page should focus on completing the task immediately.",
+          "Validate first. A formatter needs valid JSON before it can add indentation. The JSON Formatter parses your input and shows syntax errors before producing output.",
       },
     ],
     relatedToolSlugs: ["json-formatter"],
@@ -83,9 +106,9 @@ const definitions: LandingPageDefinition[] = [
     locale: "en",
 
     primaryKeyword: "json syntax",
-    title: "JSON Syntax Guide | Fullstack Template",
+    title: "JSON Syntax Guide — Objects, Arrays and Values",
     description:
-      "A concise JSON syntax guide example connected to the JSON Formatter tool and localized with hreflang.",
+      "Understand objects, arrays, quoted keys and value types. Learn the essentials before working with real API responses.",
     h1: "JSON Syntax Guide",
     intro: "Learn the core JSON syntax rules before formatting or validating real API payloads.",
     sections: [
@@ -112,12 +135,12 @@ const definitions: LandingPageDefinition[] = [
     path: "/compare/json-formatter-vs-validator",
     locale: "en",
     primaryKeyword: "json formatter vs json validator",
-    title: "JSON Formatter vs JSON Validator | Fullstack Template",
+    title: "JSON Formatter vs JSON Validator — Which Do You Need?",
     description:
-      "A noindex comparison-page example for separating formatting intent from validation intent.",
+      "Formatting improves readability. Validation checks syntax. Learn when to use each and how they work together.",
     h1: "JSON Formatter vs JSON Validator",
     intro:
-      "This example shows how comparison pages can target a distinct decision-oriented query without creating another thin copy of the tool page.",
+      "Trying to read nested data, or tracking down a parsing error? Formatting and validation solve different parts of the same workflow.",
     sections: [
       {
         heading: "Use a formatter for readability",
@@ -228,6 +251,7 @@ const definitions: LandingPageDefinition[] = [
 ];
 export const landingPages: LandingPageDefinition[] = definitions.map((page) => ({
   ...page,
+  showInDirectory: page.translationKey === "read-paper",
   alternates: page.translationKey
     ? createContentHreflangAlternates(
         page,

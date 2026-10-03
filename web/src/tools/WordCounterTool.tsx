@@ -1,40 +1,69 @@
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { useMemo, useState } from "react";
+import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 
-export function WordCounterTool() {
+interface WordCounterToolProps {
+  navigation?: ReactNode;
+}
+
+export function WordCounterTool({ navigation }: WordCounterToolProps) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
-
-  const stats = useMemo(() => {
-    const trimmed = text.trim();
-    return {
-      words: trimmed ? trimmed.split(/\s+/).length : 0,
-      characters: text.length,
-      lines: text ? text.split(/\r?\n/).length : 0,
-      paragraphs: trimmed ? trimmed.split(/\n\s*\n/).filter(Boolean).length : 0,
-    };
-  }, [text]);
-
+  const trimmed = text.trim();
+  const stats = {
+    words: trimmed ? trimmed.split(/\s+/).length : 0,
+    characters: text.length,
+    lines: text ? text.split(/\r?\n/).length : 0,
+    paragraphs: trimmed ? trimmed.split(/\n\s*\n/).filter(Boolean).length : 0,
+  };
+  const labels = Object.keys(stats) as Array<keyof typeof stats>;
+  const output = text
+    ? labels.map((label) => `${t(`counter.${label}`)}: ${stats[label]}`).join("\n")
+    : "";
   return (
-    <div className="rounded-xl border bg-zinc-50 p-4 sm:p-6">
-      <label className="text-sm font-medium text-zinc-800" htmlFor="word-counter-input">
-        {t("counter.text")}
-      </label>
-      <textarea
-        id="word-counter-input"
-        className="mt-2 min-h-56 w-full rounded-lg border bg-white p-3 text-sm leading-6 outline-none focus:border-zinc-400"
-        placeholder={t("counter.placeholder")}
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-      />
-      <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {(Object.keys(stats) as Array<keyof typeof stats>).map((label) => (
-          <div className="rounded-lg border bg-white p-3" key={label}>
-            <dt className="text-xs capitalize text-zinc-500">{t(`counter.${label}`)}</dt>
-            <dd className="mt-1 text-xl font-semibold text-zinc-950">{stats[label]}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+    <ToolWorkspace
+      navigation={
+        navigation ?? (
+          <span className="flex items-center gap-3 px-2 font-semibold">
+            <span className="tool-glyph">Aa</span>
+            {t("counter.text")}
+          </span>
+        )
+      }
+      options={
+        <span className="trust-note">
+          <span className="status-dot active" aria-hidden="true" />
+          {t("workbench.statistics")}
+        </span>
+      }
+      input={
+        <>
+          <label className="sr-only" htmlFor="word-counter-input">
+            {t("counter.text")}
+          </label>
+          <textarea
+            id="word-counter-input"
+            className="tool-textarea"
+            placeholder={t("counter.placeholder")}
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+          />
+        </>
+      }
+      inputLength={text.length}
+      output={output}
+      result={
+        <dl className="counter-stats">
+          {labels.map((label) => (
+            <div className="counter-stat" key={label}>
+              <dt>{t(`counter.${label}`)}</dt>
+              <dd>{stats[label].toLocaleString()}</dd>
+            </div>
+          ))}
+        </dl>
+      }
+      onSample={() => setText(t("workbench.sampleText"))}
+      onClear={() => setText("")}
+    />
   );
 }

@@ -1,36 +1,53 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { tenantApi, type TenantRole } from "@/api";
 import { useAsyncAction } from "@/lib/useAsyncAction";
+import { useAuthStore } from "@/store/authStore";
 import { useTenantStore } from "@/store/tenantStore";
-import { SettingsPage } from "@/components/layout/SettingsPage";
+import { useLocale } from "@/i18n/useLocale";
+import { toolsmithPrivateCopy } from "@/config/toolsmith-private-copy";
+
+const roleMatrix = [
+  [1, 1, 1],
+  [1, 1, 1],
+  [1, 1, 0],
+  [1, 0, 0],
+  [1, 0, 0],
+  [1, 0, 0],
+];
 
 export default function TenantMembersPage() {
   const { t } = useTranslation(["app", "common"]);
-  const { activeTenant, members, membership, loadMembers } = useTenantStore();
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<TenantRole>("member");
-  const [loadError, setLoadError] = useState("");
-  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const copy = toolsmithPrivateCopy(useLocale());
+  const activeTenant = useTenantStore((state) => state.activeTenant),
+    members = useTenantStore((state) => state.members),
+    membership = useTenantStore((state) => state.membership),
+    loadMembers = useTenantStore((state) => state.loadMembers);
+  const user = useAuthStore((state) => state.user);
+  const [email, setEmail] = useState(""),
+    [role, setRole] = useState<TenantRole>("member");
+  const [loadError, setLoadError] = useState(""),
+    [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ message: string } | null>(null);
   const { error, pending, run } = useAsyncAction();
-  const activeTenantID = activeTenant?.id ?? null;
-  // 依赖 id 而非对象：loadTenants 每次都会产出新对象，依赖对象会让本效果重复触发。
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(null), 2200);
+    return () => clearTimeout(timer);
+  }, [notice]);
+  const tenantID = activeTenant?.id ?? null;
   useEffect(() => {
     let cancelled = false;
     loadMembers()
       .then(() => !cancelled && setLoadError(""))
       .catch((caught: Error) => !cancelled && setLoadError(caught.message))
-      .finally(() => !cancelled && setLoadedFor(activeTenantID));
-    // 切换工作区时丢弃上一次请求的结果，避免先发后到覆盖新数据。
+      .finally(() => !cancelled && setLoadedFor(tenantID));
     return () => {
       cancelled = true;
     };
-  }, [activeTenantID, loadMembers]);
-  // 由「已为当前工作区加载完成」推导，避免在效果里同步 setState。
-  const loaded = loadedFor === activeTenantID;
-  // 成员列表未加载完时不能认为有管理权限，否则会短暂显示越权的管理表单。
+  }, [tenantID, loadMembers]);
+  const loaded = loadedFor === tenantID;
   const canManage = loaded && (membership?.role === "owner" || membership?.role === "admin");
-
   function add(event: React.FormEvent) {
     event.preventDefault();
     if (!activeTenant) return;
@@ -39,78 +56,134 @@ export default function TenantMembersPage() {
       setEmail("");
       setRole("member");
       await loadMembers();
+    }).then((ok) => {
+      if (ok) setNotice({ message: t("members.added") });
     });
   }
-
   function remove(userID: string) {
     if (!activeTenant) return;
     void run(async () => {
       await tenantApi.removeMember(activeTenant.id, userID);
       await loadMembers();
+    }).then((ok) => {
+      if (ok) setNotice({ message: copy.removed });
     });
   }
-
+  function updateRole(userID: string, next: TenantRole) {
+    if (!activeTenant) return;
+    void run(async () => {
+      await tenantApi.updateMember(activeTenant.id, userID, next);
+      await loadMembers();
+    }).then((ok) => {
+      if (ok) setNotice({ message: copy.roleChanged });
+    });
+  }
   return (
-    <SettingsPage title={t("members.title")} description={t("members.description")}>
+    <>
+      <div className="design-members-heading">
+        <div>
+          <div className="design-members-crumb">
+            {activeTenant?.name} / {copy.wsMembers}
+          </div>
+          <h1>{copy.wsMembers}</h1>
+          <p>{copy.wsMembersSub}</p>
+        </div>
+      </div>
       {canManage && (
-        <form onSubmit={add} className="panel mb-6 flex flex-col gap-3 p-4 sm:flex-row">
+        <form className="design-invite-form" onSubmit={add}>
           <input
-            className="field flex-1"
+            className="design-invite-input"
             type="email"
-            aria-label={t("members.email")}
-            placeholder={t("members.email")}
+            aria-label={copy.email}
+            placeholder={copy.invitePh}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
           <select
-            className="field sm:w-36"
-            aria-label={t("common:fields.role")}
+            className="design-invite-role"
             value={role}
+            aria-label={copy.colRole}
             onChange={(event) => setRole(event.target.value as TenantRole)}
           >
-            <option value="member">{t("members.roles.member")}</option>
-            <option value="admin">{t("members.roles.admin")}</option>
-            {membership?.role === "owner" && (
-              <option value="owner">{t("members.roles.owner")}</option>
-            )}
+            <option value="admin">Admin</option>
+            <option value="member">Member</option>
           </select>
-          <button className="button-primary" disabled={pending}>
-            {pending ? t("common:actions.processing") : t("members.add")}
+          <button className="design-invite-submit" disabled={pending}>
+            {pending ? t("common:actions.processing") : copy.invite}
           </button>
         </form>
       )}
-      {(error || loadError) && <p className="mb-6 text-sm text-red-700">{error || loadError}</p>}
-      <div className="panel overflow-hidden">
-        <div className="grid grid-cols-[1fr_auto] border-b bg-zinc-50 px-5 py-3 text-xs font-medium text-zinc-500">
-          <span>{t("members.user")}</span>
-          <span>{t("common:fields.role")}</span>
-        </div>
-        <div className="rule-list">
-          {/* 加载中和「确实没有成员」必须区分开，否则两者看起来完全一样 */}
+      {(error || loadError) && (
+        <p className="mt-4 text-sm text-destructive" role="alert">
+          {error || loadError}
+        </p>
+      )}
+      <div className="design-members-table">
+        <div className="design-members-table-inner">
+          <div className="design-members-columns header">
+            <span>{copy.colMember}</span>
+            <span>{copy.colRole}</span>
+            <span>{copy.colJoined}</span>
+            <span />
+          </div>
           {!loaded && (
-            <p className="px-5 py-4 text-sm text-zinc-500">{t("common:actions.loading")}</p>
+            <p className="px-5 py-4 text-sm text-muted-foreground">{t("common:actions.loading")}</p>
           )}
-          {loaded && !loadError && members.length === 0 && (
-            <p className="px-5 py-4 text-sm text-zinc-500">{t("members.empty")}</p>
+          {loaded && !loadError && !members.length && (
+            <p className="px-5 py-4 text-sm text-muted-foreground">{t("members.empty")}</p>
           )}
-          {members.map((member) => (
-            <div key={member.id} className="flex items-center justify-between gap-4 px-5 py-4">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-zinc-900">{member.username}</p>
-                <p className="mt-0.5 truncate text-sm text-zinc-500">{member.email}</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-xs font-medium capitalize text-zinc-600">
-                  {t(`members.roles.${member.role}`)}
+          {members.map((member, index) => (
+            <div className="design-members-columns design-member-row" key={member.id}>
+              <div className="design-member-identity">
+                <span
+                  className="design-member-avatar"
+                  style={
+                    { "--avatar-color": `var(--color-avatar-${(index % 5) + 1})` } as CSSProperties
+                  }
+                >
+                  {member.username.slice(0, 1).toUpperCase()}
                 </span>
-                {canManage && member.user_id !== membership?.user_id && (
+                <div className="min-w-0">
+                  <div className="design-member-name">
+                    {member.username}
+                    {member.user_id === user?.id && (
+                      <span className="design-member-tag">{copy.you}</span>
+                    )}
+                  </div>
+                  <div className="design-member-email">{member.email}</div>
+                </div>
+              </div>
+              <div>
+                {member.role === "owner" ? (
+                  <span className="design-owner-badge">Owner</span>
+                ) : canManage ? (
+                  <select
+                    className="design-member-role"
+                    value={member.role}
+                    aria-label={`${member.username} ${copy.colRole}`}
+                    disabled={pending}
+                    onChange={(event) =>
+                      updateRole(member.user_id, event.target.value as TenantRole)
+                    }
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="member">Member</option>
+                  </select>
+                ) : (
+                  <span className="capitalize text-sm">{member.role}</span>
+                )}
+              </div>
+              <span className="design-member-joined">{member.created_at.slice(0, 10)}</span>
+              <div className="text-right">
+                {canManage && member.role !== "owner" && member.user_id !== membership?.user_id && (
                   <button
-                    className="text-xs text-zinc-400 hover:text-red-700 disabled:opacity-50"
+                    type="button"
+                    className="design-member-remove"
                     disabled={pending}
                     onClick={() => remove(member.user_id)}
                   >
-                    {t("common:actions.remove")}
+                    {copy.remove}
                   </button>
                 )}
               </div>
@@ -118,6 +191,39 @@ export default function TenantMembersPage() {
           ))}
         </div>
       </div>
-    </SettingsPage>
+      {notice && (
+        <div className="design-success-notice" role="status">
+          <div>{notice.message}</div>
+        </div>
+      )}
+      <div className="design-role-matrix">
+        <h2>{copy.matrixTitle}</h2>
+        <p>{copy.matrixSub}</p>
+        <div className="design-role-table">
+          <div className="design-role-grid">
+            {["", "Owner", "Admin", "Member"].map((label, index) => (
+              <div className={`design-role-cell heading ${index ? "text-center" : ""}`} key={label}>
+                {label}
+              </div>
+            ))}
+            {copy.perms.map((permission, index) => (
+              <RoleRow key={permission} permission={permission} roles={roleMatrix[index]} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+function RoleRow({ permission, roles }: { permission: string; roles: number[] }) {
+  return (
+    <>
+      <div className="design-role-cell">{permission}</div>
+      {roles.map((allowed, index) => (
+        <div key={index} className={`design-role-cell permission ${allowed ? "" : "denied"}`}>
+          {allowed ? "●" : "—"}
+        </div>
+      ))}
+    </>
   );
 }

@@ -10,6 +10,7 @@ export const publicPagePaths = {
   home: "/",
   tools: "/tools",
   resources: "/resources",
+  pricing: "/pricing",
   privacy: "/legal/privacy-policy",
   terms: "/legal/terms",
 } as const;
@@ -83,9 +84,8 @@ export function getPublicSeoPages(locale: SiteLocale): Record<PublicPageKind, Se
           },
         ];
       }
-      const content =
-        kind === "tools" || kind === "resources" ? copy.hubs[kind] : legalPages[locale][kind];
       const legal = kind === "privacy" || kind === "terms";
+      const content = legal ? legalPages[locale][kind] : copy.hubs[kind];
       return [
         kind,
         {
@@ -112,7 +112,7 @@ export function getPublicSeoPages(locale: SiteLocale): Record<PublicPageKind, Se
           title: `${content.title} | ${siteConfig.name}`,
           description: content.description,
           h1: content.title,
-          intent: legal ? "legal" : kind === "tools" ? "commercial" : "informational",
+          intent: legal ? "legal" : kind === "resources" ? "informational" : "commercial",
           noindex: legal
             ? legalPages[locale][kind as "privacy" | "terms"].status !== "published"
             : true,

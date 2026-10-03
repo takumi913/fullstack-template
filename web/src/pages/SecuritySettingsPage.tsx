@@ -43,7 +43,7 @@ export default function SecuritySettingsPage() {
             value={newPassword}
             onChange={setNewPassword}
           />
-          {error && <p className="text-sm text-red-700">{error}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
         <div className="mt-6 border-t pt-5">
           <button className="button-primary" disabled={pending}>
