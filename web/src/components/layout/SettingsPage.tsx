@@ -1,41 +1,39 @@
-import { Link } from "react-router";
-import { useTranslation } from "react-i18next";
+import type { JSX } from "@solidjs/web";
+import { useTranslation } from "@/i18n/context";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/useLocale";
-export function SettingsPage({
-  title,
-  description,
-  children,
-}: {
+import { useLocale } from "@/i18n/context";
+export function SettingsPage(props: {
   title: string;
   description?: string;
-  children: React.ReactNode;
+  children: JSX.Element;
 }) {
   const { t } = useTranslation(["app", "common"]);
   const locale = useLocale();
   return (
-    <div className="shell py-12 sm:py-16">
-      <div className="mb-9 flex flex-col gap-5 border-b pb-7 sm:flex-row sm:items-end sm:justify-between">
+    <div class="shell py-12 sm:py-16">
+      <div class="mb-9 flex flex-col gap-5 border-b pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="page-title !mt-0 !text-4xl">{title}</h1>
-          {description && <p className="mt-2 text-sm text-muted-foreground">{description}</p>}
+          <h1 class="page-title !mt-0 !text-4xl">{props.title}</h1>
+          {props.description && (
+            <p class="mt-2 text-sm text-muted-foreground">{props.description}</p>
+          )}
         </div>
-        <div className="flex gap-4 text-sm">
-          <Link
-            className="text-muted-foreground hover:text-foreground"
-            to={localizedPath("/dashboard", locale)}
+        <div class="flex gap-4 text-sm">
+          <a
+            class="text-muted-foreground hover:text-foreground"
+            href={localizedPath("/dashboard", locale())}
           >
             {t("common:navigation.dashboard")}
-          </Link>
-          <Link
-            className="text-muted-foreground hover:text-foreground"
-            to={localizedPath("/settings/security", locale)}
+          </a>
+          <a
+            class="text-muted-foreground hover:text-foreground"
+            href={localizedPath("/settings/security", locale())}
           >
             {t("security.link")}
-          </Link>
+          </a>
         </div>
       </div>
-      {children}
+      {props.children}
     </div>
   );
 }

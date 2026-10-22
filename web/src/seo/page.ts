@@ -1,6 +1,45 @@
-import type { MetaDescriptor } from "react-router";
+import { createComponent, type Component } from "solid-js";
+import { useHead, type HeadTag } from "@solidjs/web";
+import { useLocation } from "@solidjs/router";
 import { toOpenGraphLocale, type SeoAlternate } from "./localization";
 import { absoluteUrl, siteConfig } from "./site";
+
+export type MetaDescriptor =
+  | { title: string }
+  | { name: string; content: string }
+  | { property: string; content: string }
+  | { tagName: "link"; rel: string; href: string; hrefLang?: string }
+  | { "script:ld+json": Record<string, unknown> | Array<Record<string, unknown>> };
+
+function headTag(meta: MetaDescriptor): HeadTag {
+  if ("title" in meta) return { tag: "title", props: { children: meta.title } };
+  if ("script:ld+json" in meta)
+    return {
+      tag: "script",
+      key: "page-schema",
+      props: {
+        type: "application/ld+json",
+        children: JSON.stringify(meta["script:ld+json"]).replace(/</g, "\\u003c"),
+      },
+    };
+  if ("tagName" in meta) {
+    const { tagName, hrefLang, ...props } = meta;
+    return { tag: tagName, props: { ...props, ...(hrefLang ? { hreflang: hrefLang } : {}) } };
+  }
+  return { tag: "meta", props: meta };
+}
+
+export function withPageMeta<P extends object>(
+  Page: Component<P>,
+  meta: (pathname: string) => MetaDescriptor[],
+): Component<P> {
+  // Hydration preloads the route's default export, including its head registration.
+  return (props) => {
+    const location = useLocation();
+    useHead(() => meta(location.pathname).map(headTag));
+    return createComponent(Page, props);
+  };
+}
 
 export type SeoIntent = "tool" | "informational" | "comparison" | "commercial" | "legal";
 

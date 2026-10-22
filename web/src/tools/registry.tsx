@@ -1,60 +1,43 @@
-import {
-  lazy,
-  Suspense,
-  type ComponentType,
-  type LazyExoticComponent,
-  type ReactNode,
-} from "react";
+import { For, lazy, Loading, type Component, type Element } from "solid-js";
 import type { ToolPageDefinition } from "@/content/tool-pages";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/i18n/context";
 import { ToolPageProvider } from "./context";
 
-type ToolComponent = LazyExoticComponent<ComponentType<{ navigation?: ReactNode }>>;
+type ToolComponent = Component<{ navigation?: Element }>;
 
 export const toolComponents: Record<string, ToolComponent> = {
-  "ai-text": lazy(async () => {
-    const module = await import("./TextWorkbench");
-    return { default: module.TextWorkbench };
-  }),
-  "json-formatter": lazy(async () => {
-    const module = await import("./JsonFormatterTool");
-    return { default: module.JsonFormatterTool };
-  }),
-  "word-counter": lazy(async () => {
-    const module = await import("./WordCounterTool");
-    return { default: module.WordCounterTool };
-  }),
+  // 保留直接 import，让构建器为 SSR 与 hydration 记录同一模块的预载信息。
+  "ai-text": lazy(() => import("./TextWorkbench"), { export: "TextWorkbench" }),
+  "json-formatter": lazy(() => import("./JsonFormatterTool"), { export: "JsonFormatterTool" }),
+  "word-counter": lazy(() => import("./WordCounterTool"), { export: "WordCounterTool" }),
 };
 
-export function ToolRuntime({
-  page,
-  navigation,
-}: {
-  page: ToolPageDefinition;
-  navigation?: ReactNode;
-}) {
+export function ToolRuntime(props: { page: ToolPageDefinition; navigation?: Element }) {
   const { t } = useTranslation();
-  const Component = toolComponents[page.componentKey];
-
-  if (!Component) {
-    return (
-      <div className="rounded-xl border border-dashed p-8 text-sm text-muted-foreground">
-        Register <code>{page.componentKey}</code> in <code>src/tools/registry.tsx</code>.
-      </div>
-    );
-  }
-
   return (
-    <ToolPageProvider page={page}>
-      <Suspense
-        fallback={
-          <div className="rounded-xl border bg-card p-8 text-sm text-muted-foreground">
-            {t("actions.loading")}
-          </div>
-        }
-      >
-        <Component navigation={navigation} />
-      </Suspense>
-    </ToolPageProvider>
+    <For each={[props.page]}>
+      {(page) => {
+        const Tool = toolComponents[page.componentKey];
+        return (
+          <ToolPageProvider page={page}>
+            <Loading
+              fallback={
+                <div class="rounded-xl border bg-card p-8 text-sm text-muted-foreground">
+                  {t("actions.loading")}
+                </div>
+              }
+            >
+              {Tool ? (
+                <Tool navigation={props.navigation} />
+              ) : (
+                <div class="rounded-xl border border-dashed p-8 text-sm text-muted-foreground">
+                  Register <code>{page.componentKey}</code> in <code>src/tools/registry.tsx</code>.
+                </div>
+              )}
+            </Loading>
+          </ToolPageProvider>
+        );
+      }}
+    </For>
   );
 }

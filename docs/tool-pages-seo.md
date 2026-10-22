@@ -3,9 +3,9 @@
 这个模板把工具站公开页面拆成两层：
 
 - `src/content/tool-pages.ts`：纯数据，负责 slug、关键词、标题、描述、H1、FAQ、关联工具、索引状态。
-- `src/tools/`：真正的 React 工具实现。
+- `src/tools/`：真正的 Solid 2 工具实现。
 
-React Router 使用同一个 `/tools/:slug` Route Module。构建时读取工具配置自动生成预渲染 URL，所以新增工具不需要重复维护 sitemap 或 prerender 列表。
+Solid Router 使用同一个 `/tools/:slug` 页面模块，`scripts/prerender.ts` 调用构建期渲染入口生成 HTML。构建时读取工具配置自动生成预渲染 URL，所以新增工具不需要重复维护 sitemap 或 prerender 列表。
 
 ## 新增一个工具
 
@@ -56,7 +56,7 @@ React Router 使用同一个 `/tools/:slug` Route Module。构建时读取工具
 如果暂时不希望已发布页面被搜索引擎收录，可以显式设置：
 
 ```ts
-noindex: true
+noindex: true;
 ```
 
 ## 2. 编写工具组件
@@ -75,11 +75,12 @@ web/src/tools/ImageTranslatorTool.tsx
 因此不会把所有工具代码一次性下载：
 
 ```ts
-"image-translator": lazy(async () => {
-  const module = await import("./ImageTranslatorTool");
-  return { default: module.ImageTranslatorTool };
+"image-translator": lazy(() => import("./ImageTranslatorTool"), {
+  export: "ImageTranslatorTool",
 }),
 ```
+
+保留直接 import 与原始模块，让构建器记录预加载信息；异步包装后返回新对象会破坏同步 hydration，导致工具短暂显示加载占位并产生布局位移。
 
 一个工具实现可以服务多个 SEO 页面。比如英文、简体中文图片翻译页面可以使用不同 slug，
 但共享 `componentKey: "image-translator"`。需要让交互功能读取页面差异时，将参数放在：
@@ -90,14 +91,14 @@ runtime: {
 }
 ```
 
-工具组件可以通过 `useToolPageDefinition()` 读取当前页面定义和 runtime 参数。
+工具组件通过 `useToolPageDefinition()` 取得 accessor，在 JSX 或派生计算中调用它读取当前页面定义和 runtime 参数。
 
 ## 自动获得的 SEO 能力
 
 一个 routable 工具定义会自动得到：
 
 - `/tools/<slug>` URL
-- React Router SSG HTML
+- Solid 2 SSG HTML
 - title / description
 - canonical
 - robots
@@ -122,7 +123,7 @@ home: {
 ```
 
 首页会直接复用这个 ToolPageDefinition 的真实工具组件、features、how-to、FAQ 和相关内容。
-默认没有配置时，首页仍是静态模板介绍页，不会加载工具客户端运行时。
+默认没有配置时，首页不嵌入工具实现，但仍保留主题切换与导航所需的客户端运行时。
 
 为了避免关键词内耗，如果首页的 primary keyword 与这个工具页相同，应把独立工具 URL 设置为
 `noindex: true`（通常也建议 `showInDirectory: false`），让首页承担这个搜索意图。
@@ -189,7 +190,6 @@ sitemap / GSC
 ```
 
 只有在每个页面确实满足不同需求时，才应该扩大页面规模。
-
 
 ## updatedAt / sitemap lastmod
 

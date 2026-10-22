@@ -1,51 +1,58 @@
+import { createSignal, untrack } from "solid-js";
 import { SettingsPage } from "@/components/layout/SettingsPage";
-import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useTranslation } from "@/i18n/context";
 import { userApi } from "@/api";
-import { useAsyncAction } from "@/lib/useAsyncAction";
-import { useAuthStore } from "@/store/authStore";
+import { createAsyncAction } from "@/lib/createAsyncAction";
+import { useAuth } from "@/store/AppState";
 import { Input } from "./LoginPage";
 
 export default function ProfileSettingsPage() {
   const { t } = useTranslation(["app", "common"]);
-  const user = useAuthStore((state) => state.user)!;
-  const setUser = useAuthStore((state) => state.setUser);
-  const [username, setUsername] = useState(user.username);
-  const [email, setEmail] = useState(user.email);
-  const [avatar, setAvatar] = useState(user.avatar_url);
-  const [saved, setSaved] = useState(false);
-  const { error, pending, run } = useAsyncAction();
+  const auth = useAuth();
+  // 表单编辑独立于后台状态更新，初始化时只取一次当前用户。
+  const user = untrack(() => ({ ...auth.state.user! }));
+  const [username, setUsername] = createSignal(user.username);
+  const [email, setEmail] = createSignal(user.email);
+  const [avatar, setAvatar] = createSignal(user.avatar_url);
+  const [saved, setSaved] = createSignal(false);
+  const { error, pending, run } = createAsyncAction();
 
-  function submit(event: React.FormEvent) {
+  function submit(event: SubmitEvent) {
     event.preventDefault();
     setSaved(false);
+    const data = { username: username(), email: email(), avatar_url: avatar() };
     void run(async () => {
-      const response = await userApi.updateProfile({ username, email, avatar_url: avatar });
-      setUser(response.data);
+      const response = await userApi.updateProfile(data);
+      auth.setUser(response.data);
       setSaved(true);
     });
   }
 
   return (
     <SettingsPage title={t("profile.title")} description={t("profile.description")}>
-      <form onSubmit={submit} className="panel max-w-2xl p-6">
-        <div className="space-y-5">
-          <Input label={t("common:fields.username")} value={username} onChange={setUsername} />
-          <Input label={t("common:fields.email")} type="email" value={email} onChange={setEmail} />
+      <form onSubmit={submit} class="panel max-w-2xl p-6">
+        <div class="space-y-5">
+          <Input label={t("common:fields.username")} value={username()} onChange={setUsername} />
+          <Input
+            label={t("common:fields.email")}
+            type="email"
+            value={email()}
+            onChange={setEmail}
+          />
           <Input
             label={t("common:fields.avatar")}
-            value={avatar}
+            value={avatar()}
             onChange={setAvatar}
             required={false}
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error() && <p class="text-sm text-destructive">{error()}</p>}
         </div>
-        <div className="mt-6 flex items-center gap-3 border-t pt-5">
-          <button className="button-primary" disabled={pending}>
-            {pending ? t("common:actions.saving") : t("common:actions.save")}
+        <div class="mt-6 flex items-center gap-3 border-t pt-5">
+          <button class="button-primary" disabled={pending()}>
+            {pending() ? t("common:actions.saving") : t("common:actions.save")}
           </button>
-          {saved && (
-            <span className="text-sm text-muted-foreground">{t("common:actions.saved")}</span>
+          {saved() && (
+            <span class="text-sm text-muted-foreground">{t("common:actions.saved")}</span>
           )}
         </div>
       </form>

@@ -132,7 +132,6 @@ const en = {
   ctaSub: "Start free. Upgrade any time.",
   ctaBtn: "Create a free account",
   fTag: "A set of small AI tools for people who work with words every day.",
-  rights: "Privacy · Terms · Cookies",
   fCols: [
     {
       h: "Popular tools",
@@ -383,7 +382,6 @@ const zh = {
   ctaSub: "免费版即可开始，随时升级。",
   ctaBtn: "免费创建账号",
   fTag: "为每天和文字打交道的人准备的一组 AI 小工具。",
-  rights: "隐私政策 · 服务条款 · Cookie 政策",
   fCols: [
     {
       h: "热门工具",

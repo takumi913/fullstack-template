@@ -4,10 +4,10 @@
 
 English is the default and SEO source language. Simplified Chinese is a fully localized version, not a browser-only toggle.
 
-| Language | Home | Tool | Privacy / terms |
-| --- | --- | --- | --- |
-| `en` | `/` | `/tools/json-formatter` | `/legal/privacy-policy`, `/legal/terms` |
-| `zh-CN` | `/zh-cn` | `/zh-cn/tools/json-formatter` | `/zh-cn/legal/privacy-policy`, `/zh-cn/legal/terms` |
+| Language | Home     | Tool                          | Privacy / terms                                     |
+| -------- | -------- | ----------------------------- | --------------------------------------------------- |
+| `en`     | `/`      | `/tools/json-formatter`       | `/legal/privacy-policy`, `/legal/terms`             |
+| `zh-CN`  | `/zh-cn` | `/zh-cn/tools/json-formatter` | `/zh-cn/legal/privacy-policy`, `/zh-cn/legal/terms` |
 
 `web/src/i18n/locales.json` is the shared registry for the frontend route generator, Go private SPA fallback prefixes, and generated static-host redirects. The URL determines the document and UI language. There is no automatic IP, browser-language, or cookie redirect. Public links keep the selected language. Google recommends separate language URLs, a consistently localized visible page, and explicit language links. [Google multilingual sites](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites).
 
@@ -23,7 +23,7 @@ Each translation has a **self-canonical**, not a canonical to English. Reciproca
 - `content/legal-pages.ts`: complete policies per language, review status and effective date.
 - `pkg/model/messages.go`: bilingual user-facing API messages. Services retain business validation; HTTP boundaries select language using `Accept-Language`. The private Axios client sends the URL language.
 
-The Chinese dictionaries use `satisfies typeof en`, and i18next keys are typed. Keep both languages complete rather than relying on English fallback for Chinese page content. `SiteI18nProvider` creates an independent synchronous i18next instance per document; concurrent prerenders do not share a mutable language singleton. [react-i18next SSR](https://react.i18next.com/latest/ssr), [i18next configuration](https://www.i18next.com/overview/configuration-options).
+The Chinese dictionaries use `satisfies typeof en`, and i18next keys are typed. Keep both languages complete rather than relying on English fallback for Chinese page content. `i18n/context.tsx` provides Solid `useLocale()` (an accessor) and `useTranslation()`; its `SiteI18nProvider` creates an independent synchronous i18next instance per document; concurrent prerenders do not share a mutable language singleton. [i18next configuration](https://www.i18next.com/overview/configuration-options).
 
 ## Adding a translated tool or guide
 

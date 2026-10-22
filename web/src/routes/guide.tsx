@@ -1,18 +1,14 @@
 import LandingPage from "@/pages/LandingPage";
 import { getLandingPageByPath } from "@/content/landing-pages";
 import { createLandingSeoPage } from "@/seo/landing-page";
-import { createSeoMeta, notFoundPageMeta } from "@/seo/page";
-import type { Route } from "./+types/guide";
+import { createSeoMeta, notFoundPageMeta, withPageMeta } from "@/seo/page";
 
-export const meta = ({ location }: Route.MetaArgs) => {
-  const page = getLandingPageByPath(location.pathname);
+export const meta = (pathname: string) => {
+  const page = getLandingPageByPath(pathname);
   if (!page) {
     return notFoundPageMeta();
   }
   return createSeoMeta(createLandingSeoPage(page));
 };
 
-export const handle = {
-  languageAlternates: (path: string) => getLandingPageByPath(path)?.alternates,
-};
-export default LandingPage;
+export default withPageMeta(LandingPage, meta);

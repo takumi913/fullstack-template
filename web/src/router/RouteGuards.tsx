@@ -1,39 +1,77 @@
-import { useTranslation } from "react-i18next";
+import { createEffect, onSettled, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { useNavigate } from "@solidjs/router";
+import { useTranslation, useLocale } from "@/i18n/context";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/useLocale";
-import { useEffect } from "react";
-import { Navigate } from "react-router";
-import { useAuthStore } from "@/store/authStore";
-import { useTenantStore } from "@/store/tenantStore";
-// 恢复会话时一并填充租户 store，否则直接刷新 /tenant/* 页面会因为没有 activeTenant 而永远空白。
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+import { useAuth, useTenant } from "@/store/AppState";
+
+export function ProtectedRoute(props: { children: JSX.Element }) {
   const { t } = useTranslation();
   const locale = useLocale();
-  const { isAuthenticated, loading, loadSession } = useAuthStore();
-  useEffect(() => {
-    if (loading)
-      void loadSession().then((auth) => {
-        if (auth) useTenantStore.getState().hydrate(auth);
+  const auth = useAuth();
+  const tenant = useTenant();
+  const navigate = useNavigate();
+  onSettled(() => {
+    if (auth.state.loading)
+      void auth.loadSession().then((session) => {
+        // 直接刷新租户页面时，会话响应同时恢复当前工作区。
+        if (session) tenant.hydrate(session);
       });
-  }, [loading, loadSession]);
-  if (loading) return <div className="p-12 text-center">{t("actions.loading")}</div>;
-  return isAuthenticated ? (
-    <>{children}</>
-  ) : (
-    <Navigate to={localizedPath("/login", locale)} replace />
+  });
+  createEffect(
+    () => ({
+      loading: auth.state.loading,
+      authenticated: auth.state.isAuthenticated,
+      locale: locale(),
+    }),
+    (state) => {
+      if (!state.loading && !state.authenticated)
+        navigate(localizedPath("/login", state.locale), { replace: true });
+    },
+  );
+  return (
+    <Show
+      when={!auth.state.loading && auth.state.isAuthenticated}
+      fallback={
+        <Show when={auth.state.loading}>
+          <div class="p-12 text-center">{t("actions.loading")}</div>
+        </Show>
+      }
+    >
+      {props.children}
+    </Show>
   );
 }
-export function PublicRoute({ children }: { children: React.ReactNode }) {
+
+export function PublicRoute(props: { children: JSX.Element }) {
   const { t } = useTranslation();
   const locale = useLocale();
-  const { isAuthenticated, loading, loadSession } = useAuthStore();
-  useEffect(() => {
-    if (loading) void loadSession();
-  }, [loading, loadSession]);
-  if (loading) return <div className="p-12 text-center">{t("actions.loading")}</div>;
-  return isAuthenticated ? (
-    <Navigate to={localizedPath("/dashboard", locale)} replace />
-  ) : (
-    <>{children}</>
+  const auth = useAuth();
+  const navigate = useNavigate();
+  onSettled(() => {
+    if (auth.state.loading) void auth.loadSession();
+  });
+  createEffect(
+    () => ({
+      loading: auth.state.loading,
+      authenticated: auth.state.isAuthenticated,
+      locale: locale(),
+    }),
+    (state) => {
+      if (!state.loading && state.authenticated)
+        navigate(localizedPath("/dashboard", state.locale), { replace: true });
+    },
+  );
+  return (
+    <Show
+      when={!auth.state.loading && !auth.state.isAuthenticated}
+      fallback={
+        <Show when={auth.state.loading}>
+          <div class="p-12 text-center">{t("actions.loading")}</div>
+        </Show>
+      }
+    >
+      {props.children}
+    </Show>
   );
 }

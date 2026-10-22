@@ -1,24 +1,23 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, type Element } from "solid-js";
 import type { ToolPageDefinition } from "@/content/tool-pages";
 
-const ToolPageContext = createContext<ToolPageDefinition | null>(null);
+const ToolPageContext = createContext<{ readonly page: ToolPageDefinition }>();
 
-export function ToolPageProvider({
-  page,
-  children,
-}: {
-  page: ToolPageDefinition;
-  children: ReactNode;
-}) {
-  return <ToolPageContext.Provider value={page}>{children}</ToolPageContext.Provider>;
+export function ToolPageProvider(props: { page: ToolPageDefinition; children?: Element }) {
+  return (
+    <ToolPageContext
+      value={{
+        get page() {
+          return props.page;
+        },
+      }}
+    >
+      {props.children}
+    </ToolPageContext>
+  );
 }
 
 export function useToolPageDefinition() {
-  const page = useContext(ToolPageContext);
-
-  if (!page) {
-    throw new Error("useToolPageDefinition must be used inside ToolPageProvider");
-  }
-
-  return page;
+  const context = useContext(ToolPageContext);
+  return () => context.page;
 }

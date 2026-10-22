@@ -6,7 +6,7 @@
 
 - **只做必要的事**：避免过度设计和过早优化。只引入当前功能所必需的依赖和抽象。
 - **代码自解释**：优先通过清晰的命名（变量、函数、文件）和合理的代码结构来让代码不言自明，注释是必要的补充。
-- **利用框架/库的优势**：充分使用 Echo、sqlc、React、TailwindCSS 等工具提供的原生能力，而不是在其上构建不必要的封装。
+- **利用框架/库的优势**：充分使用 Echo、sqlc、Solid、TailwindCSS 等工具提供的原生能力，而不是在其上构建不必要的封装。
 
 ### 1.2 开发原则
 
@@ -62,17 +62,17 @@
 ### 前端 (Frontend)
 
 - **语言**: TypeScript
-- **框架**: React 19+
+- **框架**: Solid 2（核心与 `@solidjs/web` 同版本锁定；版本以 `web/package.json` 为准）
 - **构建工具**: Vite
 - **CSS**: TailwindCSS v4+
-- **状态管理**: Zustand (支持持久化)
-- **路由**: React Router Framework Mode v7.18+（统一从 `react-router` 导入，不使用 `react-router-dom`）
-- **UI 组件**: 页面使用 `style.css` 中的 `.panel`/`.button-primary`/`.field` 等类；如需成品组件，用 `bunx shadcn@latest add <组件>` 按需引入
-- **表单处理**: 原生受控组件 + `useAsyncAction`（未引入表单库），业务校验以后端 service 层为准
-- **图标**: lucide-react（已在用，不要再引入第二个图标库）
+- **状态管理**: Solid `createStore` + `AppStateProvider`；当前工作区由服务端 Session 恢复
+- **路由**: `@solidjs/router` 2，集中路由表 + `solid-js` lazy 模块
+- **UI 组件**: 页面使用 `style.css` 中的 `.panel`/`.button-primary`/`.field` 等类；优先原生 HTML 交互，复杂组件按实际需要选择兼容 Solid 2 的实现
+- **表单处理**: 原生受控组件 + `createAsyncAction`（未引入表单库），业务校验以后端 service 层为准
+- **图标**: `@lucide/solid`（已在用，不要再引入第二个图标库）
 - **HTTP 客户端**: Axios
-- **国际化**: i18next + react-i18next；英文默认根路径，简体中文 `/zh-cn`，UI 和 SEO 内容均按 URL 语言本地化
-- **主题切换**: 暂未引入
+- **国际化**: i18next + Solid Context；英文默认根路径，简体中文 `/zh-cn`，UI 和 SEO 内容均按 URL 语言本地化
+- **主题切换**: 自有 `ThemeProvider`，默认深色，支持明暗主题与本地持久化
 - **通知组件**: 暂未引入，错误以表单内联红字展示
 - **包管理器**: Bun
 
@@ -129,7 +129,7 @@
 │   ├── build.sh           # 完整构建脚本
 │   └── lint.sh            # 代码检查脚本
 │
-└── web/                   # 前端 React 项目
+└── web/                   # 前端 Solid 项目
     ├── public/            # 静态资源
     ├── src/               # 源代码
     │   ├── api/           # API 调用
@@ -139,14 +139,13 @@
     │   ├── config/        # 站点配置与脚手架 sentinel
     │   ├── content/       # Tool / Landing / Legal SEO 内容数据
     │   ├── pages/         # 页面级 UI 组件
-    │   ├── routes/        # React Router Framework route modules
+    │   ├── routes/        # 页面组件与 SEO 路由模块
     │   ├── router/        # 认证守卫等路由辅助逻辑
     │   ├── seo/           # meta、hreflang、sitemap、发布门禁
-    │   ├── store/         # Zustand store（只服务私有 App 依赖）
+    │   ├── store/         # Solid 状态工厂与私有 App Context
     │   ├── tools/         # 工具实现与 lazy registry
-    │   ├── routes.ts      # Framework Mode 路由表
+    │   ├── routes.tsx     # Solid Router 路由表
     │   └── style.css      # 全局样式和主题配置
-    ├── components.json    # shadcn 配置（供 bunx shadcn add 按需引入组件）
     ├── package.json       # 前端依赖
     ├── tsconfig.json      # TypeScript 配置
     └── vite.config.ts     # Vite 构建配置
@@ -317,7 +316,7 @@ slog.Error("数据库连接失败", "err", err)
 
 - **页面组件** (`pages/`): 路由对应的页面级组件
 - **布局组件** (`components/layout/`): 页面骨架，当前按 `PublicLayout` / `AuthLayout` / `AppLayout` 分离，Header 也分 Public/App
-- **复用组件** (`components/`): 跨页面复用的组件，`components/ui/` 留给 shadcn 按需引入的成品组件
+- **复用组件** (`components/`): 跨页面复用的组件，复杂交互确有复用需求时再提取
 
 组件先写在使用它的页面里，出现第二个使用者时再提取到 `components/`。
 不预先创建空的分类目录。
@@ -331,74 +330,56 @@ slog.Error("数据库连接失败", "err", err)
 #### 5.1.3 命名与导出
 
 - 组件文件名用 PascalCase，与组件同名：`LoginPage.tsx`、`Header.tsx`
-- 普通组件优先具名导出；React Router route module 按 Framework Mode 约定使用默认 route component 导出。对外暴露的普通组件目录可用 `index.ts` 汇总
+- 普通组件优先具名导出；页面路由模块使用 `withPageMeta(Page, meta)` 默认导出页面并注册 head，可同时导出 `meta(pathname)`。对外暴露的普通组件目录可用 `index.ts` 汇总
 - Props 接口命名为 `<组件名>Props`，与组件放在同一文件
-- 对外可定制样式的组件接收 `className`，用 `cn()` 与内部样式合并
+- 对外可定制样式的组件接收 `class`，用 `cn()` 与内部样式合并
 
 #### 5.1.4 视觉风格
 
 视觉风格以 `src/style.css` 的 `@theme` 变量和其中的语义化类（`.shell`、`.panel`、`.button-primary`、`.button-secondary`、`.field`）为唯一事实来源。新组件复用这些变量和类，不在组件里写死颜色、圆角、字体；需要新增设计变量时，加到 `@theme` 再引用。
 
-#### 5.1.5 按需引入成品组件
+#### 5.1.5 Solid 2 组件规范
 
-下拉菜单、对话框这类交互复杂的组件用 shadcn 按需引入，它会把源码直接写进
-`src/components/ui/` 并补齐依赖：
+- `createSignal`、`createStore`、`For`、`Show`、`Loading` 等从 `solid-js` 导入；DOM、SSR 和 `JSX` 类型从 `@solidjs/web` 导入。
+- 信号读值调用 accessor，例如 `pending()`；传 Props 时传值，组件内通过 `props.value` 访问，避免解构 Props 导致响应性丢失。
+- DOM 元素使用 `class`、`onInput`、`event.currentTarget`；动态类使用数组和对象，例如 `class={["button", { active: selected() }]}`。
+- `createEffect(compute, apply)` 的第一个参数只跟踪依赖，第二个参数执行副作用并可返回清理函数。
+- 一次性 DOM 生命周期用 `onSettled(() => { ...; return cleanup; })`；计时器、事件监听和动画帧必须随组件销毁清理。
+- Solid 2、Router、Vite 插件、测试适配器属于配套版本；升级前核实兼容范围，不混用上一代 API。
 
-```bash
-bunx shadcn@latest add dropdown-menu
-```
+### 5.2 状态管理规范 (Solid Store)
 
-项目保留 `components.json` 供该命令使用，但不预装任何未被使用的组件。
+#### 5.2.1 状态归属
 
-### 5.2 状态管理规范 (Zustand)
+- `authStore.ts` 与 `tenantStore.ts` 是状态工厂，`AppStateProvider` 为每个私有应用实例创建独立状态，不在模块顶层共享用户或租户状态。
+- 登录/注册与后台入口共享同一 `AppStateProvider`，避免跳转时丢失会话或工作区。
+- 公开 SEO 布局保持与认证 API、私有状态隔离。
+- 只有安全的偏好可写入 localStorage；凭据由 HttpOnly Cookie 保存，当前工作区 id 通过服务端 Session 恢复，不另建前端持久化副本。
 
-#### 5.2.1 Store 设计原则
+#### 5.2.2 状态读写
 
-- **按功能模块分割**：每个业务模块一个 store
-- **状态扁平化**：避免深层嵌套的状态结构
-- **不可变更新**：使用展开运算符创建新对象，不要就地修改 state
+通过 `useAuth()`、`useTenant()` 取得状态与操作。在 JSX、memo 或 effect 中读取 `auth.state.user` 等属性，不将响应式字段解构为静态局部变量。
 
-#### 5.2.2 Store 编写规则
+状态更新统一通过 `createStore` 的 draft setter，副作用放在状态工厂的 action 中；组件调用 action，不在组件里重复编排底层状态。
+退出、401 与用户切换必须同步清空租户角色与成员名单；工作区切换的过期响应不能覆盖当前工作区。
 
-以 `src/store/authStore.ts` 为参照，不要把 store 源码复制进文档或其它 store：
+### 5.3 路由管理规范 (Solid Router)
 
-- 状态与操作定义在同一个接口里，`create<T>()(...)` 显式标注类型
-- 需要跨刷新保留的用 `persist` 中间件，并显式指定 `name`
-- 只持久化可安全落盘的数据；凭据是 HttpOnly Cookie，前端不持久化任何 token
-- 副作用（调接口）写在 store 的 action 里，组件只调用 action，不在组件里编排多步状态变更
+- 路由表集中在 `src/routes.tsx`，页面路由模块放在 `src/routes/`。
+- 路由 API 从 `@solidjs/router` 导入，站内链接使用原生 `<a href>`，由 router 接管客户端导航。
+- `vite.config.ts` 使用 `@solidjs/vite-plugin` 的构建期渲染能力；`scripts/prerender.ts` 根据内容数据生成公开 HTML。
+- `Document.tsx` 负责整页 HTML、公共 head、主题初始化和 hydration 脚本；`entry-client.tsx` 与 `entry-server.tsx` 分别负责浏览器与构建期渲染入口。
+- 公开 SEO 页面放在 `PublicLayout` 下，必须保持与认证 state/API 依赖隔离。
+- `/login`、`/register` 放在 `AuthLayout` 下，由 layout 统一套 `PublicRoute`。
+- `/dashboard`、`/settings/*`、`/tenant/*` 放在 `AppLayout` 下，由 layout 统一套 `ProtectedRoute`。
+- 不要在每个后台路由模块里重复包 `ProtectedRoute` / `PublicRoute`。
+- 新增公开 SEO URL 时，同时更新对应 content schema；prerender/sitemap 从同一数据源推导，不维护第二份手写 URL 清单。
+- Tool / Landing 的 canonical、hreflang、meta、JSON-LD 统一从 `src/seo/` 生成，路由通过 `useHead` 维护服务端与客户端 head。
+- 最终发布目录保持 `web/dist/client`；Go 和静态托管仅为认证/后台 URL 使用 `__spa-fallback.html`，未知公开 URL 必须返回真实 HTTP 404。
 
-#### 5.2.3 状态使用规范
-
-- **选择性订阅**：只订阅组件需要的状态片段
-- **避免过度渲染**：使用 shallow 比较或选择器函数
-
-```typescript
-// 好的做法：选择性订阅
-const { user, loading } = useUserStore((state) => ({
-  user: state.user,
-  loading: state.loading,
-}));
-
-// 避免：订阅整个 store
-const userStore = useUserStore(); // 会导致不必要的重渲染
-```
-
-### 5.3 路由管理规范 (React Router Framework Mode)
-
-项目使用 React Router Framework Mode，而不是旧的 Data Mode / `createBrowserRouter`。
-
-- 路由表集中在 `src/routes.ts`，页面 route module 放在 `src/routes/`
-- React Router 应统一从 `react-router` 导入；不要重新引入 `react-router-dom`
-- `react-router.config.ts` 负责 Framework Mode、SSG prerender 与 future flags
-- 公开 SEO 页面放在 `PublicLayout` 下，必须保持与认证 store/API 依赖隔离
-- `/login`、`/register` 放在 `AuthLayout` 下，由 layout 统一套 `PublicRoute`
-- `/dashboard`、`/settings/*`、`/tenant/*` 放在 `AppLayout` 下，由 layout 统一套 `ProtectedRoute`
-- 不要在每个后台 route module 里重复包 `ProtectedRoute` / `PublicRoute`
-- 新增公开 SEO URL 时，同时更新对应 content schema；prerender/sitemap 应由数据源自动推导，不要维护第二份手写 URL 清单
-- Tool / Landing 的 canonical、hreflang、meta、JSON-LD 统一从 `src/seo/` 生成
-- 未知公开 URL 必须保持真实 HTTP 404，不能恢复成全站 SPA 200 fallback
-
-Framework Mode 会自动进行 route-level code splitting。不要为了路由拆包再手写 `React.lazy`；只有工具实现这类页面内大型交互模块，才通过 `src/tools/registry.tsx` 做 lazy import。
+路由模块通过 `solid-js` 的 `lazy` 按需拆包；页面内大型工具实现通过 `src/tools/registry.tsx` 注册 lazy import。
+使用直接的 `lazy(() => import(...))`，具名导出用 `{ export: "ComponentName" }`；不要在 import 后返回新的模块对象，否则会丢失构建期模块标识，导致 hydration 短暂显示加载占位并产生布局位移。
+构建期 server 产物只用于 SSG，生产仍由 Go 提供 API 与静态文件。
 
 ### 5.4 样式开发规范 (TailwindCSS)
 
@@ -416,19 +397,17 @@ Framework Mode 会自动进行 route-level code splitting。不要为了路由�
 
 ```typescript
 // 复用 style.css 中的 .button-primary，只在此处叠加位置相关的原子类
-<button className={cn("button-primary", "w-full sm:w-auto", className)}>
+<button class={cn("button-primary", "w-full sm:w-auto", props.class)}>
   提交
 </button>
 ```
 
 #### 5.4.3 主题系统规范
 
-项目目前只提供明亮主题，未引入主题切换库。颜色与圆角等设计变量集中定义在
-`src/style.css` 的 `@theme` 中，页面通过 `.panel`、`.button-primary`、`.field`
-等语义化类复用样式。
-
-如需暗黑模式，再引入 `next-themes` 并按 TailwindCSS 的 `dark:` 变体扩展，
-不要在未使用前预先安装依赖。
+`components/layout/ThemeProvider.tsx` 管理明亮与深色主题，默认深色，通过根元素
+`data-theme` 与 `toolsmith-theme` localStorage 键同步；文档 head 的初始化脚本在首屏绘制前恢复偏好。
+使用 `useTheme()` 提供的 `theme()`、`setTheme()`，不另建主题状态或引入主题依赖。
+颜色与圆角等设计变量集中定义在 `style.css`；组件复用语义化类，动效尊重减少动态效果偏好。
 
 ### 5.5 移动端适配规范 📱
 
@@ -488,7 +467,7 @@ export const userApi = {
     apiClient.post("/v1/users", userData),
 
   updateUser: (id: string, userData: UpdateUserRequest): Promise<User> =>
-    apiClient.put(`/v1/users/${id}`, userData),
+    apiClient.patch(`/v1/users/${id}`, userData),
 
   deleteUser: (id: string): Promise<void> =>
     apiClient.delete(`/v1/users/${id}`),
@@ -497,10 +476,10 @@ export const userApi = {
 
 #### 5.6.3 表单提交与异步状态
 
-表单提交统一用 `src/lib/useAsyncAction.ts`，不要在页面里自己写 try/catch + loading：
+表单提交统一用 `src/lib/createAsyncAction.ts`，不要在页面里自己写 try/catch + loading：
 
 ```tsx
-const { error, pending, run } = useAsyncAction();
+const { error, pending, run } = createAsyncAction();
 
 const onSubmit = async () => {
   const ok = await run(() => userApi.update(form));
@@ -508,18 +487,17 @@ const onSubmit = async () => {
 };
 ```
 
-- 它一并处理了三件事：捕获错误文案、暴露 `pending`、用 ref 防重复提交
-- 提交中必须用 `pending` 禁用按钮；仅靠状态判断挡不住同一轮事件里的双击
+- 它一并处理了三件事：捕获错误文案、暴露 `pending()`、用同步运行标记防重复提交
+- 提交中必须用 `pending()` 禁用按钮；仅靠状态判断挡不住同一轮事件里的双击
 - 错误以内联红字展示在表单内，不弹全局提示（项目未引入通知组件）
 
 ### 5.7 性能优化
 
-先测量再优化。没有实测到卡顿之前，不要预先加 `React.memo`/`useMemo`/`useCallback`——
-它们本身有成本，且会掩盖真正的性能问题。
+先测量再优化。优先使用细粒度状态与清晰的数据流；只有需要缓存有成本的派生计算时再使用 `createMemo`。
 
-- **路由级代码分割**：Framework Mode 自动拆分 route module，不手写 `React.lazy`。工具实现等大型页面内交互模块可在 `src/tools/registry.tsx` 按需 lazy import
-- **列表渲染**：`key` 用稳定的业务 id，不要用数组下标
-- **其余优化**：定位到具体瓶颈后再针对性处理，并在注释里说明测量结论
+- **代码分割**：路由模块与大型工具使用 `solid-js` 的 `lazy`，不在公开入口导入私有应用依赖。
+- **列表渲染**：使用 `<For>` 保持条目身份；默认按对象身份复用，需要业务 id 时使用 Solid 2 的 `keyed` 参数。默认模式的 index 是 accessor，不使用 `key` 属性模拟列表身份。
+- **其余优化**：定位到具体瓶颈后再针对性处理，并在注释里说明测量结论。
 
 ### 5.8 类型定义规范
 
@@ -544,7 +522,7 @@ export interface CreateUserRequest {
 
 ## 6. 国际化 (i18n) 规范 🌍
 
-项目使用 `i18next` 与 `react-i18next`，英文优先并完整支持简体中文。
+项目使用 `i18next` 与 `src/i18n/context.tsx` 的 Solid Context，英文优先并完整支持简体中文。
 
 - `web/src/i18n/locales.json` 是语言与 URL 前缀的唯一来源，路由、Go SPA 前缀和静态托管重定向从中推导。
 - URL 决定语言；公开内容使用独立本地化 URL、self canonical、reciprocal hreflang 与英文 `x-default`，不按浏览器偏好自动跳转。
@@ -580,12 +558,12 @@ export interface CreateUserRequest {
 
 ## 8. 常用命令
 
-| 命令                 | 用途                                        |
-| -------------------- | ------------------------------------------- |
-| `make dev`           | 同时启动后端与前端开发环境                  |
-| `make lint`          | 前后端全部检查，提交前必跑                  |
-| `make test`          | 运行前后端测试                              |
+| 命令                 | 用途                                         |
+| -------------------- | -------------------------------------------- |
+| `make dev`           | 同时启动后端与前端开发环境                   |
+| `make lint`          | 前后端全部检查，提交前必跑                   |
+| `make test`          | 运行前后端测试                               |
 | `make sqlc-generate` | 改完 `db/query/` 下的 SQL 后重新生成查询代码 |
-| `make sqlc-verify`   | 校验生成代码是否最新（CI 会跑同样的检查）   |
-| `make build`         | 构建前端并打包进 Go 二进制                  |
-| `make tools`         | 安装 air、golangci-lint 等开发工具          |
+| `make sqlc-verify`   | 校验生成代码是否最新（CI 会跑同样的检查）    |
+| `make build`         | 构建前端并打包进 Go 二进制                   |
+| `make tools`         | 安装 air、golangci-lint 等开发工具           |

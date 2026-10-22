@@ -1,15 +1,14 @@
-import { Link } from "react-router";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/useLocale";
+import { useLocale } from "@/i18n/context";
 import { siteConfig } from "@/seo/site";
 import { cn } from "@/lib/utils";
 
-export function Brand({ className }: { className?: string }) {
+export function Brand(props: { class?: string }) {
   const locale = useLocale();
   return (
-    <Link className={cn("design-brand", className)} to={localizedPath("/", locale)}>
-      <span className="design-brand-diamond" aria-hidden="true" />
+    <a class={cn("design-brand", props.class)} href={localizedPath("/", locale())}>
+      <span class="design-brand-diamond" aria-hidden="true" />
       <span>{siteConfig.name}</span>
-    </Link>
+    </a>
   );
 }

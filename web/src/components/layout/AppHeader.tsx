@@ -1,89 +1,100 @@
-import { Link, NavLink, useNavigate } from "react-router";
+import { For } from "solid-js";
+import { useLocation, useNavigate } from "@solidjs/router";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/useLocale";
+import { useLocale } from "@/i18n/context";
 import { toolsmithPrivateCopy } from "@/config/toolsmith-private-copy";
-import { useAuthStore } from "@/store/authStore";
-import { useTenantStore } from "@/store/tenantStore";
-import { useAsyncAction } from "@/lib/useAsyncAction";
+import { useAuth, useTenant } from "@/store/AppState";
+import { createAsyncAction } from "@/lib/createAsyncAction";
 import { Brand } from "./Brand";
 import { ThemeToggle } from "./ThemeToggle";
 import { ShortLanguageToggle } from "./ShortLanguageToggle";
 
 export function AppHeader() {
-  const locale = useLocale(),
-    copy = toolsmithPrivateCopy(locale),
-    navigate = useNavigate();
-  const logout = useAuthStore((state) => state.logout),
-    user = useAuthStore((state) => state.user);
-  const activeTenant = useTenantStore((state) => state.activeTenant),
-    members = useTenantStore((state) => state.members);
-  const { error, pending, run } = useAsyncAction();
+  const locale = useLocale();
+  const copy = () => toolsmithPrivateCopy(locale());
+  const navigate = useNavigate();
+  const location = useLocation();
+  const auth = useAuth();
+  const tenant = useTenant();
+  const { error, pending, run } = createAsyncAction();
   async function signOut() {
-    if (await run(logout)) navigate(localizedPath("/", locale));
+    if (await run(auth.logout)) navigate(localizedPath("/", locale()));
   }
   const paths = ["/dashboard", "/tenant/members", null, "/tenant/settings"];
   return (
-    <aside className="design-sidebar">
+    <aside class="design-sidebar">
       <Brand />
-      <Link className="design-workspace-switcher" to={localizedPath("/dashboard", locale)}>
-        <span className="design-workspace-icon">
-          {activeTenant?.name.slice(0, 1).toUpperCase()}
+      <a class="design-workspace-switcher" href={localizedPath("/dashboard", locale())}>
+        <span class="design-workspace-icon">
+          {tenant.state.activeTenant?.name.slice(0, 1).toUpperCase()}
         </span>
-        <div className="design-workspace-info">
-          <div className="design-workspace-info-name">{activeTenant?.name}</div>
-          <div className="design-workspace-info-meta">
-            {members.length} {copy.seats}
+        <div class="design-workspace-info">
+          <div class="design-workspace-info-name">{tenant.state.activeTenant?.name}</div>
+          <div class="design-workspace-info-meta">
+            {tenant.state.members.length} {copy().seats}
           </div>
         </div>
-        <span className="design-workspace-caret">⌄</span>
-      </Link>
-      <nav className="design-workspace-nav">
-        {copy.ws.map((label, index) =>
-          paths[index] ? (
-            <NavLink
-              key={label}
-              className="design-workspace-link"
-              to={localizedPath(paths[index]!, locale)}
-            >
-              <span className="design-workspace-nav-dot" />
-              {label}
-            </NavLink>
-          ) : (
-            <a
-              key={label}
-              className="design-workspace-link"
-              href="#"
-              onClick={(event) => event.preventDefault()}
-            >
-              <span className="design-workspace-nav-dot" />
-              {label}
-            </a>
-          ),
-        )}
+        <span class="design-workspace-caret">⌄</span>
+      </a>
+      <nav class="design-workspace-nav">
+        <For each={copy().ws}>
+          {(label, index) => (
+            <>
+              {paths[index()] ? (
+                <a
+                  class={[
+                    "design-workspace-link",
+                    { active: location.pathname === localizedPath(paths[index()]!, locale()) },
+                  ]}
+                  aria-current={
+                    location.pathname === localizedPath(paths[index()]!, locale())
+                      ? "page"
+                      : undefined
+                  }
+                  href={localizedPath(paths[index()]!, locale())}
+                >
+                  <span class="design-workspace-nav-dot" />
+                  {label}
+                </a>
+              ) : (
+                <a
+                  class="design-workspace-link"
+                  href="#"
+                  onClick={(event) => event.preventDefault()}
+                >
+                  <span class="design-workspace-nav-dot" />
+                  {label}
+                </a>
+              )}
+            </>
+          )}
+        </For>
       </nav>
-      <div className="design-sidebar-account">
-        <div className="design-sidebar-controls">
+      <div class="design-sidebar-account">
+        <div class="design-sidebar-controls">
           <ShortLanguageToggle />
           <ThemeToggle />
         </div>
-        <div className="design-user-row">
-          <span className="design-user-avatar">{user?.username.slice(0, 1).toUpperCase()}</span>
-          <div className="design-user-info">
-            <div className="design-user-name">{user?.username}</div>
-            <div className="design-user-email">{user?.email}</div>
+        <div class="design-user-row">
+          <span class="design-user-avatar">
+            {auth.state.user?.username.slice(0, 1).toUpperCase()}
+          </span>
+          <div class="design-user-info">
+            <div class="design-user-name">{auth.state.user?.username}</div>
+            <div class="design-user-email">{auth.state.user?.email}</div>
           </div>
           <button
             type="button"
-            className="design-signout"
-            disabled={pending}
+            class="design-signout"
+            disabled={pending()}
             onClick={() => void signOut()}
           >
-            {copy.signOut}
+            {copy().signOut}
           </button>
         </div>
-        {error && (
-          <p className="text-sm text-destructive" role="alert">
-            {error}
+        {error() && (
+          <p class="text-sm text-destructive" role="alert">
+            {error()}
           </p>
         )}
       </div>

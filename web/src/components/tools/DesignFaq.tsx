@@ -1,42 +1,45 @@
-import { useState } from "react";
+import { createSignal, For } from "solid-js";
 import { toolsmithCopy } from "@/config/toolsmith-copy";
-import { useLocale } from "@/i18n/useLocale";
+import { useLocale } from "@/i18n/context";
 
 export function DesignFaq() {
-  const copy = toolsmithCopy(useLocale());
-  const [opened, setOpened] = useState(0);
+  const locale = useLocale();
+  const copy = () => toolsmithCopy(locale());
+  const [opened, setOpened] = createSignal(0);
   return (
-    <section id="faq" className="design-container design-faq" data-screen-label="FAQ">
+    <section id="faq" class="design-container design-faq" data-screen-label="FAQ">
       <div>
-        <div className="design-eyebrow">FAQ</div>
-        <h2>{copy.faqTitle}</h2>
+        <div class="design-eyebrow">FAQ</div>
+        <h2>{copy().faqTitle}</h2>
       </div>
-      <div className="design-faq-list">
-        {copy.faq.map(([question, answer], index) => (
-          <div className="design-faq-item" key={question}>
-            <button
-              type="button"
-              className="design-faq-question"
-              aria-expanded={opened === index}
-              aria-controls={`faq-answer-${index}`}
-              onClick={() => setOpened(opened === index ? -1 : index)}
-            >
-              <span>{question}</span>
-              <span className="design-faq-plus" aria-hidden="true">
-                +
-              </span>
-            </button>
-            <div
-              id={`faq-answer-${index}`}
-              className={`design-faq-answer ${opened === index ? "open" : ""}`}
-              inert={opened !== index}
-            >
-              <div>
-                <div className="design-faq-answer-copy">{answer}</div>
+      <div class="design-faq-list">
+        <For each={copy().faq}>
+          {(item, index) => (
+            <div class="design-faq-item">
+              <button
+                type="button"
+                class="design-faq-question"
+                aria-expanded={opened() === index() ? "true" : "false"}
+                aria-controls={`faq-answer-${index()}`}
+                onClick={() => setOpened(opened() === index() ? -1 : index())}
+              >
+                <span>{item[0]}</span>
+                <span class="design-faq-plus" aria-hidden="true">
+                  +
+                </span>
+              </button>
+              <div
+                id={`faq-answer-${index()}`}
+                class={["design-faq-answer", { open: opened() === index() }]}
+                inert={opened() !== index()}
+              >
+                <div>
+                  <div class="design-faq-answer-copy">{item[1]}</div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )}
+        </For>
       </div>
     </section>
   );

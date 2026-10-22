@@ -1,4 +1,4 @@
-# Go + React 多租户全栈模板
+# Go + Solid 2 多租户全栈模板
 
 一个精简的 SaaS 基础模板，提供邮箱密码认证、数据库 Session、组织型多租户和固定 RBAC。
 
@@ -6,11 +6,13 @@
 
 - Go 1.26、Echo v5、`database/sql`、sqlc
 - SQLite（本地开发）和 PostgreSQL（生产部署）
-- React 19、React Router Framework Mode、TypeScript、Vite、Tailwind CSS、Zustand
+- Solid 2、Solid Router 2、TypeScript、Vite、Tailwind CSS、Solid Store
 - bcrypt 密码哈希、HttpOnly Cookie Session
 
 前端不预装 UI 组件库，页面使用 `style.css` 中的 `.panel`、`.button-primary`、`.field` 等类。
-需要下拉菜单、对话框这类成品组件时用 `bunx shadcn@latest add <组件>` 按需引入。
+优先使用原生 HTML 交互，复杂组件按实际需要选择兼容 Solid 2 的实现。
+
+Solid 2 及配套 Router、Vite 插件目前使用预发布版本，具体版本锁定在 `web/package.json` 与 `bun.lock`，升级时需一起核实兼容性。
 
 ## 核心能力
 
@@ -23,7 +25,7 @@
 - English-first i18next：英文根路径 + 简体中文 `/zh-cn`，包含双语隐私政策与服务条款
 - Public SSG + Private SPA，适合 SEO 工具站
 - Tool Page Schema 自动生成 meta、JSON-LD、sitemap 与相关工具内链
-- 可选“首页即核心工具”模式：默认静态首页，配置后第一屏直接运行主工具
+- 可选“首页即核心工具”模式：公开首页保留主题/导航交互，配置后第一屏直接运行主工具
 - 多语言工具 URL、hreflang 与共享工具实现
 - Use Case / Comparison / Guide 数据驱动 SEO Landing Page
 
@@ -115,6 +117,8 @@ bun run build          # preflight -> SSG build -> SEO 文件生成 -> 产物验
 bun run format         # 格式化（CI 会检查格式）
 ```
 
+前端构建先编译浏览器与构建期渲染入口，再由 `scripts/prerender.ts` 输出公开 HTML；生产仅发布 `web/dist/client`，由 Go 托管 API 与静态文件，无需 JavaScript 服务。
+
 生产构建会先执行 `seo:preflight`。配置错误会在真正打包前失败，避免先跑完整 SSG 后才发现问题。
 
 ## 文档
@@ -122,6 +126,7 @@ bun run format         # 格式化（CI 会检查格式）
 - [新站定制指南](docs/customize-template.md) — 从母模板创建一个新工具站的最短流程
 - [English-first i18n and SEO](docs/i18n-seo.md) — 语言架构、哥飞需求驱动 SEO、多语言发布流程
 - [工具页 SEO / SSG](docs/tool-pages-seo.md) — 新增工具、多语言 URL、关键词配置、预渲染和内链规则
+- [Solid 2 性能消融实验](docs/performance-ablation.md) — 四组对照、原始数据与复现命令
 - [SEO Landing Page](docs/landing-pages-seo.md) — Use Case、Comparison、Guide 与程序化 SEO 页面规则
 - [配置说明](docs/configuration.md) — 全部环境变量
 - [Docker 部署](docs/docker.md) — 镜像构建、生产配置与已知限制
@@ -141,5 +146,5 @@ pkg/service/         业务逻辑
 pkg/repo/            数据访问适配层（在此适配两种数据库方言）
 pkg/middleware/      Session、租户和权限中间件
 pkg/model/           数据结构与 RBAC 权限矩阵
-web/                 React 前端
+web/                 Solid 2 前端
 ```

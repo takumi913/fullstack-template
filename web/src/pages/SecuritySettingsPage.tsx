@@ -1,53 +1,54 @@
-import { useTranslation } from "react-i18next";
+import { createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import { useTranslation, useLocale } from "@/i18n/context";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/useLocale";
-import { useState } from "react";
-import { useNavigate } from "react-router";
 import { userApi } from "@/api";
-import { useAsyncAction } from "@/lib/useAsyncAction";
-import { useAuthStore } from "@/store/authStore";
+import { createAsyncAction } from "@/lib/createAsyncAction";
+import { useAuth } from "@/store/AppState";
 import { Input } from "./LoginPage";
 import { SettingsPage } from "@/components/layout/SettingsPage";
 
 export default function SecuritySettingsPage() {
   const { t } = useTranslation(["app", "common"]);
   const locale = useLocale();
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const { error, pending, run } = useAsyncAction();
+  const [oldPassword, setOldPassword] = createSignal("");
+  const [newPassword, setNewPassword] = createSignal("");
+  const { error, pending, run } = createAsyncAction();
   const navigate = useNavigate();
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const auth = useAuth();
 
-  function submit(event: React.FormEvent) {
+  function submit(event: SubmitEvent) {
     event.preventDefault();
+    const data = { old_password: oldPassword(), new_password: newPassword() };
+    const destination = localizedPath("/login", locale());
     void run(async () => {
-      await userApi.changePassword({ old_password: oldPassword, new_password: newPassword });
-      clearAuth();
-      navigate(localizedPath("/login", locale));
+      await userApi.changePassword(data);
+      auth.clearAuth();
+      navigate(destination);
     });
   }
 
   return (
     <SettingsPage title={t("security.title")} description={t("security.description")}>
-      <form onSubmit={submit} className="panel max-w-2xl p-6">
-        <div className="space-y-5">
+      <form onSubmit={submit} class="panel max-w-2xl p-6">
+        <div class="space-y-5">
           <Input
             label={t("security.currentPassword")}
             type="password"
-            value={oldPassword}
+            value={oldPassword()}
             onChange={setOldPassword}
           />
           <Input
             label={t("security.newPassword")}
             type="password"
-            value={newPassword}
+            value={newPassword()}
             onChange={setNewPassword}
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error() && <p class="text-sm text-destructive">{error()}</p>}
         </div>
-        <div className="mt-6 border-t pt-5">
-          <button className="button-primary" disabled={pending}>
-            {pending ? t("security.updating") : t("security.update")}
+        <div class="mt-6 border-t pt-5">
+          <button class="button-primary" disabled={pending()}>
+            {pending() ? t("security.updating") : t("security.update")}
           </button>
         </div>
       </form>

@@ -1,5 +1,4 @@
-import { create } from "zustand";
-import { onUnauthorized } from "@/lib/auth-events";
+import { createStore } from "solid-js";
 import {
   userApi,
   type AuthResponse,
@@ -7,49 +6,68 @@ import {
   type RegisterRequest,
   type User,
 } from "@/api";
+
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  loadSession: () => Promise<AuthResponse | null>;
-  login: (data: LoginRequest) => Promise<AuthResponse>;
-  register: (data: RegisterRequest) => Promise<AuthResponse>;
-  logout: () => Promise<void>;
-  setUser: (user: User) => void;
-  clearAuth: () => void;
 }
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  loading: true,
-  loadSession: async () => {
+
+export function createAuthState(onClear: () => void) {
+  const [state, setState] = createStore<AuthState>({
+    user: null,
+    isAuthenticated: false,
+    loading: true,
+  });
+
+  function setUser(user: User) {
+    setState((draft) => {
+      draft.user = user;
+      draft.isAuthenticated = true;
+      draft.loading = false;
+    });
+  }
+
+  function clearAuth() {
+    setState((draft) => {
+      draft.user = null;
+      draft.isAuthenticated = false;
+      draft.loading = false;
+    });
+    // 成员名单和角色属于当前会话，登出及 401 必须同时清空租户状态。
+    onClear();
+  }
+
+  async function loadSession(): Promise<AuthResponse | null> {
     try {
-      const r = await userApi.session();
-      set({ user: r.data.user, isAuthenticated: true, loading: false });
-      return r.data;
+      const response = await userApi.session();
+      setUser(response.data.user);
+      return response.data;
     } catch {
-      set({ user: null, isAuthenticated: false, loading: false });
+      clearAuth();
       return null;
     }
-  },
-  login: async (data) => {
-    const r = await userApi.login(data);
-    set({ user: r.data.user, isAuthenticated: true });
-    return r.data;
-  },
-  register: async (data) => {
-    const r = await userApi.register(data);
-    set({ user: r.data.user, isAuthenticated: true });
-    return r.data;
-  },
-  logout: async () => {
+  }
+
+  async function login(data: LoginRequest) {
+    const response = await userApi.login(data);
+    setUser(response.data.user);
+    return response.data;
+  }
+
+  async function register(data: RegisterRequest) {
+    const response = await userApi.register(data);
+    setUser(response.data.user);
+    return response.data;
+  }
+
+  async function logout() {
     try {
       await userApi.logout();
     } finally {
-      set({ user: null, isAuthenticated: false });
+      clearAuth();
     }
-  },
-  setUser: (user) => set({ user, isAuthenticated: true }),
-  clearAuth: () => set({ user: null, isAuthenticated: false, loading: false }),
-}));
-onUnauthorized(() => useAuthStore.getState().clearAuth());
+  }
+
+  return { state, loadSession, login, register, logout, setUser, clearAuth };
+}

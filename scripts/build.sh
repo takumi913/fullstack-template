@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Go + React 全栈项目构建脚本
-# 构建前端静态文件并打包成单一二进制程序
+# Go + Solid 2 全栈项目构建脚本
+# 构建前端静态文件与后端二进制程序
 
 set -e  # 遇到错误立即退出
 
-echo "🚀 开始构建 Go + React 全栈项目..."
+echo "🚀 开始构建 Go + Solid 2 全栈项目..."
 
 # 项目根目录
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -18,7 +18,7 @@ rm -rf "$PROJECT_ROOT/static"
 rm -f "$PROJECT_ROOT/server"
 
 # 构建前端
-echo "🔨 构建前端 React 项目..."
+echo "🔨 构建前端 Solid 2 项目..."
 cd "$PROJECT_ROOT/web"
 bun run build
 

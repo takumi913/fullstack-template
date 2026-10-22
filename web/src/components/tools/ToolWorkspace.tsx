@@ -1,100 +1,90 @@
-import { useState, type ReactNode } from "react";
-import { Check, Copy } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { useAsyncAction } from "@/lib/useAsyncAction";
+import { createSignal, type Element } from "solid-js";
+import { Check, Copy } from "@lucide/solid";
+import { useTranslation } from "@/i18n/context";
+import { createAsyncAction } from "@/lib/createAsyncAction";
 
 interface ToolWorkspaceProps {
-  navigation: ReactNode;
-  options?: ReactNode;
-  input: ReactNode;
+  navigation: Element;
+  options?: Element;
+  input: Element;
   inputLength: number;
   output: string;
-  result?: ReactNode;
+  result?: Element;
   error?: string;
   onSample: () => void;
   onClear: () => void;
   onRun?: () => void;
 }
 
-export function ToolWorkspace({
-  navigation,
-  options,
-  input,
-  inputLength,
-  output,
-  result,
-  error,
-  onSample,
-  onClear,
-  onRun,
-}: ToolWorkspaceProps) {
+export function ToolWorkspace(props: ToolWorkspaceProps) {
   const { t } = useTranslation();
-  const [copiedValue, setCopiedValue] = useState<string | null>(null);
-  const { error: copyError, pending, run } = useAsyncAction();
-  const copied = copiedValue === output && output.length > 0;
+  const [copiedValue, setCopiedValue] = createSignal<string | null>(null);
+  const { error: copyError, pending, run } = createAsyncAction();
+  const copied = () => copiedValue() === props.output && props.output.length > 0;
   async function copyOutput() {
+    const output = props.output;
     const ok = await run(() => navigator.clipboard.writeText(output));
     if (ok) setCopiedValue(output);
   }
   return (
-    <div className="tool-workspace">
-      <div className="tool-toolbar">
-        {navigation}
-        <div className="tool-options">{options}</div>
+    <div class="tool-workspace">
+      <div class="tool-toolbar">
+        {props.navigation}
+        <div class="tool-options">{props.options}</div>
       </div>
-      <div className="tool-columns">
-        <div className="tool-input-pane">
-          {input}
-          <div className="tool-pane-footer">
-            <span className="tool-meta">
-              {inputLength.toLocaleString()} {t("counter.characters").toLowerCase()}
+      <div class="tool-columns">
+        <div class="tool-input-pane">
+          {props.input}
+          <div class="tool-pane-footer">
+            <span class="tool-meta">
+              {props.inputLength.toLocaleString()} {t("counter.characters").toLowerCase()}
             </span>
-            <button type="button" className="button-subtle" onClick={onSample}>
+            <button type="button" class="button-subtle" onClick={() => props.onSample()}>
               {t("workbench.sample")}
             </button>
-            <button type="button" className="button-subtle" onClick={onClear}>
+            <button type="button" class="button-subtle" onClick={() => props.onClear()}>
               {t("workbench.clear")}
             </button>
-            {onRun && (
+            {props.onRun && (
               <button
                 type="button"
-                className="button-primary"
-                onClick={onRun}
-                disabled={!inputLength}
+                class="button-primary"
+                onClick={props.onRun}
+                disabled={!props.inputLength}
               >
                 {t("workbench.run")}
-                <span className="font-mono text-xs opacity-60" aria-hidden="true">
+                <span class="font-mono text-xs opacity-60" aria-hidden="true">
                   ⌘↵
                 </span>
               </button>
             )}
           </div>
         </div>
-        <div className="tool-output-pane">
-          <div className="tool-output-label">
+        <div class="tool-output-pane">
+          <div class="tool-output-label">
             <span>{t("workbench.result").toUpperCase()}</span>
-            <span className="inline-flex items-center gap-2">
+            <span class="inline-flex items-center gap-2">
               <span
-                className={`status-dot ${output && !error ? "active" : ""}`}
+                class={["status-dot", { active: Boolean(props.output && !props.error) }]}
                 aria-hidden="true"
               />
-              {output && !error
-                ? t(onRun ? "workbench.done" : "workbench.live")
+              {props.output && !props.error
+                ? t(props.onRun ? "workbench.done" : "workbench.live")
                 : t("workbench.waiting")}
             </span>
           </div>
-          <div className="tool-result" aria-live="polite" aria-atomic="true">
-            {error ? (
-              <p className="tool-error" role="alert">
-                {error}
+          <div class="tool-result" aria-live="polite" aria-atomic="true">
+            {props.error ? (
+              <p class="tool-error" role="alert">
+                {props.error}
               </p>
             ) : (
-              (result ??
-              (output ? (
-                <pre>{output}</pre>
+              (props.result ??
+              (props.output ? (
+                <pre>{props.output}</pre>
               ) : (
-                <div className="tool-empty">
-                  <span className="empty-mark" aria-hidden="true" />
+                <div class="tool-empty">
+                  <span class="empty-mark" aria-hidden="true" />
                   <p>
                     {t("workbench.empty")}
                     <br />
@@ -104,21 +94,21 @@ export function ToolWorkspace({
               )))
             )}
           </div>
-          {copyError && (
-            <p className="tool-error px-6 pb-3" role="alert">
-              {copyError}
+          {copyError() && (
+            <p class="tool-error px-6 pb-3" role="alert">
+              {copyError()}
             </p>
           )}
-          <div className="tool-pane-footer">
-            <span className="tool-meta">{t("workbench.local")}</span>
+          <div class="tool-pane-footer">
+            <span class="tool-meta">{t("workbench.local")}</span>
             <button
               type="button"
-              className="button-secondary"
+              class="button-secondary"
               onClick={() => void copyOutput()}
-              disabled={!output || Boolean(error) || pending}
+              disabled={!props.output || Boolean(props.error) || pending()}
             >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              {t(copied ? "workbench.copied" : "workbench.copy")}
+              {copied() ? <Check size={14} /> : <Copy size={14} />}
+              {t(copied() ? "workbench.copied" : "workbench.copy")}
             </button>
           </div>
         </div>

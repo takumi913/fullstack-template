@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router";
+import { createSignal, For } from "solid-js";
+import { useLocation } from "@solidjs/router";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/useLocale";
+import { useLocale } from "@/i18n/context";
 import { toolsmithCopy } from "@/config/toolsmith-copy";
 import {
   catalogLanguage,
@@ -11,69 +11,75 @@ import {
 } from "@/content/toolsmith-catalog";
 
 export function ToolMenu() {
-  const locale = useLocale(),
-    language = catalogLanguage(locale),
-    copy = toolsmithCopy(locale);
-  const { pathname } = useLocation();
-  const [toolsOpen, setToolsOpen] = useState(false);
+  const locale = useLocale();
+  const language = () => catalogLanguage(locale());
+  const copy = () => toolsmithCopy(locale());
+  const location = useLocation();
+  const [toolsOpen, setToolsOpen] = createSignal(false);
   const closeMenu = () => setToolsOpen(false);
   return (
     <div
-      className="design-tools-menu-anchor"
+      class="design-tools-menu-anchor"
       onMouseEnter={() => setToolsOpen(true)}
       onMouseLeave={closeMenu}
       onKeyDown={(event) => {
         if (event.key === "Escape") closeMenu();
       }}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
+        if (
+          !(event.relatedTarget instanceof Node) ||
+          !event.currentTarget.contains(event.relatedTarget)
+        )
+          closeMenu();
       }}
     >
       <button
         type="button"
-        className={`design-tools-toggle ${toolsOpen || pathname.includes("/tools") ? "active" : ""}`}
-        aria-expanded={toolsOpen}
+        class={[
+          "design-tools-toggle",
+          { active: toolsOpen() || location.pathname.includes("/tools") },
+        ]}
+        aria-expanded={toolsOpen() ? "true" : "false"}
         aria-controls="tools-mega-menu"
-        onClick={() => setToolsOpen(!toolsOpen)}
+        onClick={() => setToolsOpen((opened) => !opened)}
       >
-        {copy.navTools}
-        <span className={`design-chevron ${toolsOpen ? "open" : ""}`} aria-hidden="true">
+        {copy().navTools}
+        <span class={["design-chevron", { open: toolsOpen() }]} aria-hidden="true">
           ▾
         </span>
       </button>
-      {toolsOpen && (
-        <div className="design-tools-menu-wrap">
-          <div id="tools-mega-menu" className="design-tools-menu">
-            <div className="design-menu-columns">
-              {toolsmithCategories
-                .filter((category) => category.id !== "all")
-                .map((category) => (
-                  <div className="design-menu-column" key={category.id}>
-                    <div className="design-menu-label">{category[language]}</div>
-                    {toolsmithCatalog
-                      .filter((tool) => tool.cat === category.id)
-                      .map((tool) => (
-                        <Link
-                          className="design-menu-tool"
-                          key={tool.id}
-                          to={catalogToolPath(tool.id, locale)}
+      {toolsOpen() && (
+        <div class="design-tools-menu-wrap">
+          <div id="tools-mega-menu" class="design-tools-menu">
+            <div class="design-menu-columns">
+              <For each={toolsmithCategories.filter((category) => category.id !== "all")}>
+                {(category) => (
+                  <div class="design-menu-column">
+                    <div class="design-menu-label">{category[language()]}</div>
+                    <For each={toolsmithCatalog.filter((tool) => tool.cat === category.id)}>
+                      {(tool) => (
+                        <a
+                          class="design-menu-tool"
+                          href={catalogToolPath(tool.id, locale())}
                           onClick={closeMenu}
                         >
-                          <span className="design-menu-glyph">{tool.g}</span>
-                          <span className="design-menu-tool-name">{tool[language][0]}</span>
+                          <span class="design-menu-glyph">{tool.g}</span>
+                          <span class="design-menu-tool-name">{tool[language()][0]}</span>
                           {(tool.hot || tool.isNew) && (
-                            <span className="design-dot" aria-hidden="true" />
+                            <span class="design-dot" aria-hidden="true" />
                           )}
-                        </Link>
-                      ))}
+                        </a>
+                      )}
+                    </For>
                   </div>
-                ))}
+                )}
+              </For>
             </div>
-            <div className="design-menu-bottom">
-              <span>{copy.menuFoot}</span>
-              <Link to={localizedPath("/tools", locale)} onClick={closeMenu}>
-                {copy.viewAll} →
-              </Link>
+            <div class="design-menu-bottom">
+              <span>{copy().menuFoot}</span>
+              <a href={localizedPath("/tools", locale())} onClick={closeMenu}>
+                {copy().viewAll} →
+              </a>
             </div>
           </div>
         </div>

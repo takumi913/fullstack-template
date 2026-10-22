@@ -189,7 +189,7 @@ func trailingSlashRedirectTarget(path, rawQuery string) (string, bool) {
 }
 
 // staticPagePath 解析静态文件和预渲染目录。
-// React Router 会把 /legal/terms 输出为 static/legal/terms/index.html。
+// Solid SSG 会把 /legal/terms 输出为 static/legal/terms/index.html。
 func staticPagePath(staticDir, urlPath string) (string, bool) {
 	filePath := staticFilePath(staticDir, urlPath)
 	if regularFile(filePath) {

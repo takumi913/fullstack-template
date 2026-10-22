@@ -1,0 +1,4173 @@
+{
+  "date": "2026-10-21T15:28:05.070Z",
+  "baselineSnapshot": "143bee05162b12f23c3e7af7e8369d7a0c3ae73e",
+  "environment": {
+    "browser": "Chrome/156.0.8078.47",
+    "javascript": "15.6.75.19",
+    "runtime": "1.3.14",
+    "os": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro"
+  },
+  "profile": {
+    "width": 1280,
+    "height": 800,
+    "cpuSlowdown": 4,
+    "latencyMs": 40,
+    "downloadBytesPerSecond": 200000,
+    "uploadBytesPerSecond": 93750,
+    "observeAfterLoadMs": 1800,
+    "idleWindowMs": 1000,
+    "warmupRounds": 1
+  },
+  "rounds": 7,
+  "paths": ["/", "/tools/json-formatter", "/tools/word-counter"],
+  "bundles": {
+    "solid": {
+      "js": {
+        "files": 55,
+        "rawBytes": 449636,
+        "gzipBytes": 174777
+      },
+      "css": {
+        "files": 1,
+        "rawBytes": 86581,
+        "gzipBytes": 15822
+      },
+      "sha256": "2e873c8f27392f1c55934ad033364b36bf558fd1bd40d7e98f058ed7e0449e3d"
+    },
+    "baseline": {
+      "js": {
+        "files": 55,
+        "rawBytes": 664447,
+        "gzipBytes": 227404
+      },
+      "css": {
+        "files": 1,
+        "rawBytes": 86581,
+        "gzipBytes": 15822
+      },
+      "sha256": "bf6c12366037d4de4f3676c3c8a5f6dd31d8cddfda8b1fccc9b61737e6846bc9"
+    }
+  },
+  "summary": [
+    {
+      "variant": "solid-full",
+      "path": "/",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 624,
+          "p25": 620,
+          "p75": 624,
+          "min": 612,
+          "max": 628
+        },
+        "lcpMs": {
+          "median": 624,
+          "p25": 620,
+          "p75": 624,
+          "min": 612,
+          "max": 628
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 902.0999999046326,
+          "p25": 896.5999999046326,
+          "p75": 903,
+          "min": 893,
+          "max": 906.2000000476837
+        },
+        "blockingMs": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "scriptMs": {
+          "median": 154.681,
+          "p25": 153.774,
+          "p75": 155.65200000000002,
+          "min": 142.904,
+          "max": 168.22799999999998
+        },
+        "taskMs": {
+          "median": 370.801,
+          "p25": 368.065,
+          "p75": 373.99399999999997,
+          "min": 363.085,
+          "max": 392.806
+        },
+        "idleTaskMs": {
+          "median": 72.41999999999999,
+          "p25": 70.26100000000002,
+          "p75": 73.01299999999999,
+          "min": 68.45800000000001,
+          "max": 108.30700000000004
+        },
+        "jsRequests": {
+          "median": 22,
+          "p25": 22,
+          "p75": 22,
+          "min": 22,
+          "max": 22
+        },
+        "jsGzipBytes": {
+          "median": 117627,
+          "p25": 117627,
+          "p75": 117627,
+          "min": 117627,
+          "max": 117627
+        },
+        "htmlBytes": {
+          "median": 26051,
+          "p25": 26051,
+          "p75": 26051,
+          "min": 26051,
+          "max": 26051
+        }
+      }
+    },
+    {
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 636,
+          "p25": 628,
+          "p75": 636,
+          "min": 620,
+          "max": 668
+        },
+        "lcpMs": {
+          "median": 636,
+          "p25": 628,
+          "p75": 636,
+          "min": 620,
+          "max": 668
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 918.2999999523163,
+          "p25": 907.5999999046326,
+          "p75": 919.2000000476837,
+          "min": 906.1000001430511,
+          "max": 930
+        },
+        "blockingMs": {
+          "median": 0,
+          "p25": 0,
+          "p75": 1,
+          "min": 0,
+          "max": 4
+        },
+        "scriptMs": {
+          "median": 76.236,
+          "p25": 74.23299999999999,
+          "p75": 77.08800000000001,
+          "min": 72.299,
+          "max": 81.089
+        },
+        "taskMs": {
+          "median": 282.887,
+          "p25": 272.975,
+          "p75": 286.194,
+          "min": 271.30199999999996,
+          "max": 324.416
+        },
+        "idleTaskMs": {
+          "median": 0.2510000000000012,
+          "p25": 0.17899999999998473,
+          "p75": 0.32799999999999496,
+          "min": 0.15899999999996473,
+          "max": 0.4210000000000047
+        },
+        "jsRequests": {
+          "median": 25,
+          "p25": 25,
+          "p75": 25,
+          "min": 25,
+          "max": 25
+        },
+        "jsGzipBytes": {
+          "median": 119671,
+          "p25": 119671,
+          "p75": 119671,
+          "min": 119671,
+          "max": 119671
+        },
+        "htmlBytes": {
+          "median": 31022,
+          "p25": 31022,
+          "p75": 31022,
+          "min": 31022,
+          "max": 31022
+        },
+        "commitMs": {
+          "median": 5.6000001430511475,
+          "p25": 5.5,
+          "p75": 5.799999952316284,
+          "min": 5.5,
+          "max": 6.299999952316284
+        },
+        "frameMs": {
+          "median": 181.40000009536743,
+          "p25": 169.5,
+          "p75": 181.79999995231628,
+          "min": 167.30000019073486,
+          "max": 183.59999990463257
+        }
+      }
+    },
+    {
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 632,
+          "p25": 628,
+          "p75": 640,
+          "min": 624,
+          "max": 656
+        },
+        "lcpMs": {
+          "median": 632,
+          "p25": 628,
+          "p75": 640,
+          "min": 624,
+          "max": 656
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 922.5,
+          "p25": 915.2000000476837,
+          "p75": 922.5,
+          "min": 914.4000000953674,
+          "max": 928.1000001430511
+        },
+        "blockingMs": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 5
+        },
+        "scriptMs": {
+          "median": 75.465,
+          "p25": 74.659,
+          "p75": 76.24799999999999,
+          "min": 74.247,
+          "max": 86.297
+        },
+        "taskMs": {
+          "median": 275.865,
+          "p25": 270.84200000000004,
+          "p75": 276.502,
+          "min": 269.024,
+          "max": 302.526
+        },
+        "idleTaskMs": {
+          "median": 0.20599999999998397,
+          "p25": 0.20000000000003348,
+          "p75": 0.21499999999996522,
+          "min": 0.18599999999996397,
+          "max": 0.8770000000000167
+        },
+        "jsRequests": {
+          "median": 25,
+          "p25": 25,
+          "p75": 25,
+          "min": 25,
+          "max": 25
+        },
+        "jsGzipBytes": {
+          "median": 119606,
+          "p25": 119606,
+          "p75": 119606,
+          "min": 119606,
+          "max": 119606
+        },
+        "htmlBytes": {
+          "median": 27361,
+          "p25": 27361,
+          "p75": 27361,
+          "min": 27361,
+          "max": 27361
+        },
+        "commitMs": {
+          "median": 15.700000047683716,
+          "p25": 15.299999952316284,
+          "p75": 15.799999952316284,
+          "min": 15.099999904632568,
+          "max": 15.900000095367432
+        },
+        "frameMs": {
+          "median": 120.70000004768372,
+          "p25": 116.90000009536743,
+          "p75": 121.40000009536743,
+          "min": 116.5,
+          "max": 133.59999990463257
+        }
+      }
+    },
+    {
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 624,
+          "p25": 624,
+          "p75": 636,
+          "min": 620,
+          "max": 640
+        },
+        "lcpMs": {
+          "median": 624,
+          "p25": 624,
+          "p75": 636,
+          "min": 620,
+          "max": 640
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 907.2000000476837,
+          "p25": 905.9000000953674,
+          "p75": 907.2999999523163,
+          "min": 902.9000000953674,
+          "max": 913.5
+        },
+        "blockingMs": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "scriptMs": {
+          "median": 85.991,
+          "p25": 84.45400000000001,
+          "p75": 86.533,
+          "min": 81.304,
+          "max": 93.75999999999999
+        },
+        "taskMs": {
+          "median": 228.047,
+          "p25": 222.873,
+          "p75": 230.169,
+          "min": 222.28,
+          "max": 251.772
+        },
+        "idleTaskMs": {
+          "median": 0.3890000000000282,
+          "p25": 0.17000000000000348,
+          "p75": 0.4029999999999867,
+          "min": 0.16900000000000248,
+          "max": 0.4659999999999942
+        },
+        "jsRequests": {
+          "median": 22,
+          "p25": 22,
+          "p75": 22,
+          "min": 22,
+          "max": 22
+        },
+        "jsGzipBytes": {
+          "median": 117627,
+          "p25": 117627,
+          "p75": 117627,
+          "min": 117627,
+          "max": 117627
+        },
+        "htmlBytes": {
+          "median": 26051,
+          "p25": 26051,
+          "p75": 26051,
+          "min": 26051,
+          "max": 26051
+        }
+      }
+    },
+    {
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 636,
+          "p25": 628,
+          "p75": 640,
+          "min": 624,
+          "max": 652
+        },
+        "lcpMs": {
+          "median": 636,
+          "p25": 628,
+          "p75": 640,
+          "min": 624,
+          "max": 652
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 915,
+          "p25": 908.8999998569489,
+          "p75": 921.4000000953674,
+          "min": 906.7999999523163,
+          "max": 923.1000001430511
+        },
+        "blockingMs": {
+          "median": 1,
+          "p25": 0,
+          "p75": 4,
+          "min": 0,
+          "max": 19
+        },
+        "scriptMs": {
+          "median": 75.866,
+          "p25": 74.928,
+          "p75": 75.971,
+          "min": 74.438,
+          "max": 88.824
+        },
+        "taskMs": {
+          "median": 283.146,
+          "p25": 276.306,
+          "p75": 288.479,
+          "min": 272.431,
+          "max": 333.538
+        },
+        "idleTaskMs": {
+          "median": 0.24000000000001798,
+          "p25": 0.21500000000002073,
+          "p75": 0.3110000000000057,
+          "min": 0.17400000000000748,
+          "max": 0.43999999999999595
+        },
+        "jsRequests": {
+          "median": 25,
+          "p25": 25,
+          "p75": 25,
+          "min": 25,
+          "max": 25
+        },
+        "jsGzipBytes": {
+          "median": 119671,
+          "p25": 119671,
+          "p75": 119671,
+          "min": 119671,
+          "max": 119671
+        },
+        "htmlBytes": {
+          "median": 31022,
+          "p25": 31022,
+          "p75": 31022,
+          "min": 31022,
+          "max": 31022
+        },
+        "commitMs": {
+          "median": 5.799999952316284,
+          "p25": 5.700000047683716,
+          "p75": 6.1000001430511475,
+          "min": 5.400000095367432,
+          "max": 6.400000095367432
+        },
+        "frameMs": {
+          "median": 167.70000004768372,
+          "p25": 167.09999990463257,
+          "p75": 167.89999985694885,
+          "min": 167.09999990463257,
+          "max": 178.90000009536743
+        }
+      }
+    },
+    {
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 632,
+          "p25": 628,
+          "p75": 636,
+          "min": 620,
+          "max": 648
+        },
+        "lcpMs": {
+          "median": 632,
+          "p25": 628,
+          "p75": 636,
+          "min": 620,
+          "max": 648
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 922.0999999046326,
+          "p25": 917.5999999046326,
+          "p75": 922.7000000476837,
+          "min": 906.0999999046326,
+          "max": 923.4000000953674
+        },
+        "blockingMs": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "scriptMs": {
+          "median": 75.044,
+          "p25": 74.32900000000001,
+          "p75": 76.02799999999999,
+          "min": 74.283,
+          "max": 77.271
+        },
+        "taskMs": {
+          "median": 275.197,
+          "p25": 271.414,
+          "p75": 276.536,
+          "min": 271.125,
+          "max": 278.777
+        },
+        "idleTaskMs": {
+          "median": 0.20699999999995722,
+          "p25": 0.19500000000000073,
+          "p75": 0.29600000000001847,
+          "min": 0.18899999999999473,
+          "max": 1.2619999999999854
+        },
+        "jsRequests": {
+          "median": 25,
+          "p25": 25,
+          "p75": 25,
+          "min": 25,
+          "max": 25
+        },
+        "jsGzipBytes": {
+          "median": 119606,
+          "p25": 119606,
+          "p75": 119606,
+          "min": 119606,
+          "max": 119606
+        },
+        "htmlBytes": {
+          "median": 27361,
+          "p25": 27361,
+          "p75": 27361,
+          "min": 27361,
+          "max": 27361
+        },
+        "commitMs": {
+          "median": 15.700000047683716,
+          "p25": 15.299999952316284,
+          "p75": 15.799999952316284,
+          "min": 15.200000047683716,
+          "max": 16
+        },
+        "frameMs": {
+          "median": 116,
+          "p25": 115.89999985694885,
+          "p75": 116.29999995231628,
+          "min": 112.59999990463257,
+          "max": 116.79999995231628
+        }
+      }
+    },
+    {
+      "variant": "solid-static",
+      "path": "/",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 280,
+          "p25": 276,
+          "p75": 280,
+          "min": 268,
+          "max": 284
+        },
+        "lcpMs": {
+          "median": 280,
+          "p25": 276,
+          "p75": 280,
+          "min": 268,
+          "max": 284
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 191.10000014305115,
+          "p25": 186.20000004768372,
+          "p75": 247.29999995231628,
+          "min": 183.59999990463257,
+          "max": 265.2000000476837
+        },
+        "blockingMs": {
+          "median": 34,
+          "p25": 31,
+          "p75": 34,
+          "min": 30,
+          "max": 46
+        },
+        "scriptMs": {
+          "median": 1.23,
+          "p25": 0.8019999999999999,
+          "p75": 1.423,
+          "min": 0.225,
+          "max": 1.647
+        },
+        "taskMs": {
+          "median": 194.048,
+          "p25": 188.321,
+          "p75": 194.311,
+          "min": 185.749,
+          "max": 228.269
+        },
+        "idleTaskMs": {
+          "median": 0.9109999999999951,
+          "p25": 0.3039999999999987,
+          "p75": 0.9720000000000006,
+          "min": 0.30300000000002547,
+          "max": 1.0869999999999769
+        },
+        "jsRequests": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "jsGzipBytes": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "htmlBytes": {
+          "median": 21503,
+          "p25": 21503,
+          "p75": 21503,
+          "min": 21503,
+          "max": 21503
+        }
+      }
+    },
+    {
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 288,
+          "p25": 284,
+          "p75": 296,
+          "min": 284,
+          "max": 320
+        },
+        "lcpMs": {
+          "median": 288,
+          "p25": 284,
+          "p75": 296,
+          "min": 284,
+          "max": 320
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 189.10000014305115,
+          "p25": 183.70000004768372,
+          "p75": 268.2000000476837,
+          "min": 183.30000019073486,
+          "max": 289.40000009536743
+        },
+        "blockingMs": {
+          "median": 40,
+          "p25": 32,
+          "p75": 41,
+          "min": 31,
+          "max": 68
+        },
+        "scriptMs": {
+          "median": 1.0579999999999998,
+          "p25": 0.851,
+          "p75": 1.2910000000000001,
+          "min": 0.225,
+          "max": 1.48
+        },
+        "taskMs": {
+          "median": 195.542,
+          "p25": 194.315,
+          "p75": 196.89200000000002,
+          "min": 190.586,
+          "max": 233.602
+        },
+        "idleTaskMs": {
+          "median": 0.17000000000000348,
+          "p25": 0.15199999999998548,
+          "p75": 0.23399999999998422,
+          "min": 0.14899999999998248,
+          "max": 0.8219999999999894
+        },
+        "jsRequests": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "jsGzipBytes": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "htmlBytes": {
+          "median": 26661,
+          "p25": 26661,
+          "p75": 26661,
+          "min": 26661,
+          "max": 26661
+        }
+      }
+    },
+    {
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 288,
+          "p25": 284,
+          "p75": 288,
+          "min": 284,
+          "max": 304
+        },
+        "lcpMs": {
+          "median": 288,
+          "p25": 284,
+          "p75": 288,
+          "min": 284,
+          "max": 304
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 189.79999995231628,
+          "p25": 182.5,
+          "p75": 190.40000009536743,
+          "min": 182.29999995231628,
+          "max": 286.7000000476837
+        },
+        "blockingMs": {
+          "median": 40,
+          "p25": 38,
+          "p75": 40,
+          "min": 28,
+          "max": 48
+        },
+        "scriptMs": {
+          "median": 1.037,
+          "p25": 0.803,
+          "p75": 1.155,
+          "min": 0.752,
+          "max": 1.822
+        },
+        "taskMs": {
+          "median": 192.239,
+          "p25": 188.92000000000002,
+          "p75": 192.859,
+          "min": 187.388,
+          "max": 222.17000000000002
+        },
+        "idleTaskMs": {
+          "median": 0.17699999999998273,
+          "p25": 0.16399999999999748,
+          "p75": 0.23700000000001498,
+          "min": 0.16099999999999448,
+          "max": 0.3469999999999862
+        },
+        "jsRequests": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "jsGzipBytes": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "htmlBytes": {
+          "median": 23085,
+          "p25": 23085,
+          "p75": 23085,
+          "min": 23085,
+          "max": 23085
+        }
+      }
+    },
+    {
+      "variant": "baseline-full",
+      "path": "/",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 684,
+          "p25": 680,
+          "p75": 688,
+          "min": 672,
+          "max": 708
+        },
+        "lcpMs": {
+          "median": 1364,
+          "p25": 1352,
+          "p75": 1368,
+          "min": 1340,
+          "max": 1384
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 1030.3999998569489,
+          "p25": 1025.4000000953674,
+          "p75": 1030.6000001430511,
+          "min": 1023.5,
+          "max": 1038.0999999046326
+        },
+        "blockingMs": {
+          "median": 13,
+          "p25": 12,
+          "p75": 13,
+          "min": 12,
+          "max": 32
+        },
+        "scriptMs": {
+          "median": 202.63400000000001,
+          "p25": 200.004,
+          "p75": 206.509,
+          "min": 199.746,
+          "max": 228.69500000000002
+        },
+        "taskMs": {
+          "median": 415.536,
+          "p25": 413.77000000000004,
+          "p75": 417.427,
+          "min": 411.64,
+          "max": 503.247
+        },
+        "idleTaskMs": {
+          "median": 78.27799999999996,
+          "p25": 71.50600000000001,
+          "p75": 78.36500000000002,
+          "min": 70.60500000000003,
+          "max": 92.65299999999999
+        },
+        "jsRequests": {
+          "median": 23,
+          "p25": 23,
+          "p75": 23,
+          "min": 23,
+          "max": 23
+        },
+        "jsGzipBytes": {
+          "median": 174469,
+          "p25": 174469,
+          "p75": 174469,
+          "min": 174469,
+          "max": 174469
+        },
+        "htmlBytes": {
+          "median": 24760,
+          "p25": 24760,
+          "p75": 24760,
+          "min": 24760,
+          "max": 24760
+        }
+      }
+    },
+    {
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 696,
+          "p25": 680,
+          "p75": 712,
+          "min": 680,
+          "max": 736
+        },
+        "lcpMs": {
+          "median": 712,
+          "p25": 692,
+          "p75": 728,
+          "min": 680,
+          "max": 904
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0.11815213485603587
+        },
+        "loadMs": {
+          "median": 1052.6000001430511,
+          "p25": 1046.2999999523163,
+          "p75": 1054.0999999046326,
+          "min": 1045.8999998569489,
+          "max": 1054.9000000953674
+        },
+        "blockingMs": {
+          "median": 44,
+          "p25": 36,
+          "p75": 47,
+          "min": 0,
+          "max": 76
+        },
+        "scriptMs": {
+          "median": 170.215,
+          "p25": 166.316,
+          "p75": 188.056,
+          "min": 165.366,
+          "max": 205.04
+        },
+        "taskMs": {
+          "median": 334.078,
+          "p25": 329.031,
+          "p75": 387.947,
+          "min": 319.808,
+          "max": 393.03700000000003
+        },
+        "idleTaskMs": {
+          "median": 0.19699999999994722,
+          "p25": 0.16800000000000148,
+          "p75": 0.2510000000000012,
+          "min": 0.16299999999996873,
+          "max": 0.36399999999997545
+        },
+        "jsRequests": {
+          "median": 26,
+          "p25": 26,
+          "p75": 26,
+          "min": 26,
+          "max": 26
+        },
+        "jsGzipBytes": {
+          "median": 174502,
+          "p25": 174502,
+          "p75": 174502,
+          "min": 174502,
+          "max": 174502
+        },
+        "htmlBytes": {
+          "median": 28473,
+          "p25": 28473,
+          "p75": 28473,
+          "min": 28473,
+          "max": 28473
+        },
+        "commitMs": {
+          "median": 7.799999952316284,
+          "p25": 7.599999904632568,
+          "p75": 8,
+          "min": 7.3999998569488525,
+          "max": 9.599999904632568
+        },
+        "frameMs": {
+          "median": 180.5,
+          "p25": 167.89999985694885,
+          "p75": 182.29999995231628,
+          "min": 167.19999980926514,
+          "max": 199.09999990463257
+        }
+      }
+    },
+    {
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "samples": 7,
+      "metrics": {
+        "fcpMs": {
+          "median": 692,
+          "p25": 684,
+          "p75": 692,
+          "min": 676,
+          "max": 692
+        },
+        "lcpMs": {
+          "median": 692,
+          "p25": 684,
+          "p75": 692,
+          "min": 676,
+          "max": 692
+        },
+        "cls": {
+          "median": 0,
+          "p25": 0,
+          "p75": 0,
+          "min": 0,
+          "max": 0
+        },
+        "loadMs": {
+          "median": 1050.3999998569489,
+          "p25": 1044.5,
+          "p75": 1051.2000000476837,
+          "min": 1043.3999998569489,
+          "max": 1052.8999998569489
+        },
+        "blockingMs": {
+          "median": 38,
+          "p25": 20,
+          "p75": 39,
+          "min": 19,
+          "max": 44
+        },
+        "scriptMs": {
+          "median": 163.245,
+          "p25": 161.48100000000002,
+          "p75": 164.002,
+          "min": 161.207,
+          "max": 167.595
+        },
+        "taskMs": {
+          "median": 317.57099999999997,
+          "p25": 314.777,
+          "p75": 317.593,
+          "min": 314.445,
+          "max": 323.662
+        },
+        "idleTaskMs": {
+          "median": 0.33600000000000296,
+          "p25": 0.18499999999999073,
+          "p75": 0.4109999999999947,
+          "min": 0.16499999999997073,
+          "max": 0.5280000000000284
+        },
+        "jsRequests": {
+          "median": 26,
+          "p25": 26,
+          "p75": 26,
+          "min": 26,
+          "max": 26
+        },
+        "jsGzipBytes": {
+          "median": 174392,
+          "p25": 174392,
+          "p75": 174392,
+          "min": 174392,
+          "max": 174392
+        },
+        "htmlBytes": {
+          "median": 25300,
+          "p25": 25300,
+          "p75": 25300,
+          "min": 25300,
+          "max": 25300
+        },
+        "commitMs": {
+          "median": 17.40000009536743,
+          "p25": 17,
+          "p75": 17.700000047683716,
+          "min": 16.799999952316284,
+          "max": 17.899999856948853
+        },
+        "frameMs": {
+          "median": 119.59999990463257,
+          "p25": 118.09999990463257,
+          "p75": 120.70000004768372,
+          "min": 117.70000004768372,
+          "max": 121.90000009536743
+        }
+      }
+    }
+  ],
+  "samples": [
+    {
+      "round": 1,
+      "variant": "solid-full",
+      "path": "/",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 606.6000001430511,
+      "loadMs": 906.2000000476837,
+      "observedMs": 2708.800000190735,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 142.904,
+      "taskMs": 363.085,
+      "idleTaskMs": 72.41999999999999,
+      "interactions": null
+    },
+    {
+      "round": 1,
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 607.6000001430511,
+      "loadMs": 907.2000000476837,
+      "observedMs": 2711.600000143051,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 81.304,
+      "taskMs": 222.873,
+      "idleTaskMs": 0.17000000000000348,
+      "interactions": null
+    },
+    {
+      "round": 1,
+      "variant": "solid-static",
+      "path": "/",
+      "fcpMs": 284,
+      "lcpMs": 284,
+      "cls": 0,
+      "domContentLoadedMs": 76.90000009536743,
+      "loadMs": 265.2000000476837,
+      "observedMs": 2078.2999999523163,
+      "longTaskCount": 1,
+      "blockingMs": 46,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 21503,
+      "scriptMs": 1.647,
+      "taskMs": 228.269,
+      "idleTaskMs": 0.3039999999999987,
+      "interactions": null
+    },
+    {
+      "round": 1,
+      "variant": "baseline-full",
+      "path": "/",
+      "fcpMs": 684,
+      "lcpMs": 1364,
+      "cls": 0,
+      "domContentLoadedMs": 577.7999999523163,
+      "loadMs": 1029,
+      "observedMs": 2833.2999999523163,
+      "longTaskCount": 1,
+      "blockingMs": 12,
+      "jsRequests": 23,
+      "jsGzipBytes": 174469,
+      "htmlBytes": 24760,
+      "scriptMs": 200.004,
+      "taskMs": 413.77000000000004,
+      "idleTaskMs": 78.21499999999997,
+      "interactions": null
+    },
+    {
+      "round": 1,
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 636,
+      "lcpMs": 636,
+      "cls": 0,
+      "domContentLoadedMs": 622.2000000476837,
+      "loadMs": 922.5999999046326,
+      "observedMs": 2727.0999999046326,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 72.299,
+      "taskMs": 271.30199999999996,
+      "idleTaskMs": 0.32799999999999496,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 7.6000001430511475,
+            "frameMs": 185.90000009536743
+          },
+          {
+            "commitMs": 6.5,
+            "frameMs": 199.30000019073486
+          },
+          {
+            "commitMs": 5.400000095367432,
+            "frameMs": 166.29999995231628
+          },
+          {
+            "commitMs": 6,
+            "frameMs": 187.40000009536743
+          },
+          {
+            "commitMs": 5.6000001430511475,
+            "frameMs": 181.40000009536743
+          },
+          {
+            "commitMs": 5.200000047683716,
+            "frameMs": 164.20000004768372
+          },
+          {
+            "commitMs": 5.400000095367432,
+            "frameMs": 166.5
+          }
+        ]
+      }
+    },
+    {
+      "round": 1,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "fcpMs": 652,
+      "lcpMs": 652,
+      "cls": 0,
+      "domContentLoadedMs": 622.7000000476837,
+      "loadMs": 923.1000001430511,
+      "observedMs": 2727.300000190735,
+      "longTaskCount": 1,
+      "blockingMs": 4,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 74.928,
+      "taskMs": 282.32,
+      "idleTaskMs": 0.17400000000000748,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.900000095367432,
+            "frameMs": 185.5
+          },
+          {
+            "commitMs": 7.200000047683716,
+            "frameMs": 165.09999990463257
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 167.89999985694885
+          },
+          {
+            "commitMs": 6.199999809265137,
+            "frameMs": 184.39999985694885
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 182.29999995231628
+          },
+          {
+            "commitMs": 5.400000095367432,
+            "frameMs": 166.40000009536743
+          },
+          {
+            "commitMs": 5.099999904632568,
+            "frameMs": 166.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 1,
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "fcpMs": 288,
+      "lcpMs": 288,
+      "cls": 0,
+      "domContentLoadedMs": 72,
+      "loadMs": 183.70000004768372,
+      "observedMs": 2049.7999999523163,
+      "longTaskCount": 2,
+      "blockingMs": 41,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 26661,
+      "scriptMs": 1.48,
+      "taskMs": 195.311,
+      "idleTaskMs": 0.8219999999999894,
+      "interactions": null
+    },
+    {
+      "round": 1,
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 696,
+      "lcpMs": 696,
+      "cls": 0,
+      "domContentLoadedMs": 675.7999999523163,
+      "loadMs": 1054.9000000953674,
+      "observedMs": 2859.2000000476837,
+      "longTaskCount": 1,
+      "blockingMs": 44,
+      "jsRequests": 26,
+      "jsGzipBytes": 174502,
+      "htmlBytes": 28473,
+      "scriptMs": 170.215,
+      "taskMs": 333.334,
+      "idleTaskMs": 0.16299999999996873,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 11.700000047683716,
+            "frameMs": 190.20000004768372
+          },
+          {
+            "commitMs": 8.299999952316284,
+            "frameMs": 198.20000004768372
+          },
+          {
+            "commitMs": 7.799999952316284,
+            "frameMs": 167.5
+          },
+          {
+            "commitMs": 6.900000095367432,
+            "frameMs": 189.5
+          },
+          {
+            "commitMs": 8.099999904632568,
+            "frameMs": 165.59999990463257
+          },
+          {
+            "commitMs": 6.700000047683716,
+            "frameMs": 177.29999995231628
+          },
+          {
+            "commitMs": 6.6000001430511475,
+            "frameMs": 166.5
+          }
+        ]
+      }
+    },
+    {
+      "round": 1,
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 640,
+      "lcpMs": 640,
+      "cls": 0,
+      "domContentLoadedMs": 627.2999999523163,
+      "loadMs": 922.5,
+      "observedMs": 2726,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 76.24799999999999,
+      "taskMs": 275.865,
+      "idleTaskMs": 0.18599999999996397,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 13.900000095367432,
+            "frameMs": 136.79999995231628
+          },
+          {
+            "commitMs": 15.5,
+            "frameMs": 149.5
+          },
+          {
+            "commitMs": 17,
+            "frameMs": 152.20000004768372
+          },
+          {
+            "commitMs": 17.299999952316284,
+            "frameMs": 113.79999995231628
+          },
+          {
+            "commitMs": 14.900000095367432,
+            "frameMs": 100.70000004768372
+          },
+          {
+            "commitMs": 15.799999952316284,
+            "frameMs": 132.70000004768372
+          },
+          {
+            "commitMs": 15.900000095367432,
+            "frameMs": 99.20000004768372
+          }
+        ]
+      }
+    },
+    {
+      "round": 1,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "fcpMs": 648,
+      "lcpMs": 648,
+      "cls": 0,
+      "domContentLoadedMs": 622.3000001907349,
+      "loadMs": 923.4000000953674,
+      "observedMs": 2726.4000000953674,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 76.02799999999999,
+      "taskMs": 278.777,
+      "idleTaskMs": 0.29600000000001847,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 14.599999904632568,
+            "frameMs": 150.39999985694885
+          },
+          {
+            "commitMs": 16,
+            "frameMs": 115.90000009536743
+          },
+          {
+            "commitMs": 17.09999990463257,
+            "frameMs": 117.5
+          },
+          {
+            "commitMs": 15.599999904632568,
+            "frameMs": 101.59999990463257
+          },
+          {
+            "commitMs": 14.700000047683716,
+            "frameMs": 96.89999985694885
+          },
+          {
+            "commitMs": 17.700000047683716,
+            "frameMs": 117.40000009536743
+          },
+          {
+            "commitMs": 15.700000047683716,
+            "frameMs": 116
+          }
+        ]
+      }
+    },
+    {
+      "round": 1,
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "fcpMs": 288,
+      "lcpMs": 288,
+      "cls": 0,
+      "domContentLoadedMs": 76,
+      "loadMs": 189.79999995231628,
+      "observedMs": 2052.2000000476837,
+      "longTaskCount": 2,
+      "blockingMs": 40,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 23085,
+      "scriptMs": 1.822,
+      "taskMs": 190.35,
+      "idleTaskMs": 0.16499999999999848,
+      "interactions": null
+    },
+    {
+      "round": 1,
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 688,
+      "lcpMs": 688,
+      "cls": 0,
+      "domContentLoadedMs": 670.1000001430511,
+      "loadMs": 1051.2000000476837,
+      "observedMs": 2855.4000000953674,
+      "longTaskCount": 1,
+      "blockingMs": 40,
+      "jsRequests": 26,
+      "jsGzipBytes": 174392,
+      "htmlBytes": 25300,
+      "scriptMs": 163.245,
+      "taskMs": 317.57099999999997,
+      "idleTaskMs": 0.4109999999999947,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 16.200000047683716,
+            "frameMs": 140.10000014305115
+          },
+          {
+            "commitMs": 18.200000047683716,
+            "frameMs": 148.90000009536743
+          },
+          {
+            "commitMs": 18.600000143051147,
+            "frameMs": 167
+          },
+          {
+            "commitMs": 17.899999856948853,
+            "frameMs": 116.09999990463257
+          },
+          {
+            "commitMs": 16.90000009536743,
+            "frameMs": 116.90000009536743
+          },
+          {
+            "commitMs": 16.5,
+            "frameMs": 116.59999990463257
+          },
+          {
+            "commitMs": 17,
+            "frameMs": 118.79999995231628
+          }
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 595.7999999523163,
+      "loadMs": 907.2999999523163,
+      "observedMs": 2711.2999999523163,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 86.737,
+      "taskMs": 230.169,
+      "idleTaskMs": 0.20999999999998797,
+      "interactions": null
+    },
+    {
+      "round": 2,
+      "variant": "solid-static",
+      "path": "/",
+      "fcpMs": 280,
+      "lcpMs": 280,
+      "cls": 0,
+      "domContentLoadedMs": 77.5,
+      "loadMs": 191.10000014305115,
+      "observedMs": 2045.2000000476837,
+      "longTaskCount": 2,
+      "blockingMs": 32,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 21503,
+      "scriptMs": 1.423,
+      "taskMs": 194.311,
+      "idleTaskMs": 1.0869999999999769,
+      "interactions": null
+    },
+    {
+      "round": 2,
+      "variant": "baseline-full",
+      "path": "/",
+      "fcpMs": 688,
+      "lcpMs": 1340,
+      "cls": 0,
+      "domContentLoadedMs": 582.0999999046326,
+      "loadMs": 1032.2999999523163,
+      "observedMs": 2837,
+      "longTaskCount": 1,
+      "blockingMs": 13,
+      "jsRequests": 23,
+      "jsGzipBytes": 174469,
+      "htmlBytes": 24760,
+      "scriptMs": 202.63400000000001,
+      "taskMs": 414.507,
+      "idleTaskMs": 78.27799999999996,
+      "interactions": null
+    },
+    {
+      "round": 2,
+      "variant": "solid-full",
+      "path": "/",
+      "fcpMs": 628,
+      "lcpMs": 628,
+      "cls": 0,
+      "domContentLoadedMs": 609.5999999046326,
+      "loadMs": 893,
+      "observedMs": 2697,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 154.681,
+      "taskMs": 368.276,
+      "idleTaskMs": 70.26100000000002,
+      "interactions": null
+    },
+    {
+      "round": 2,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "fcpMs": 628,
+      "lcpMs": 628,
+      "cls": 0,
+      "domContentLoadedMs": 612.4000000953674,
+      "loadMs": 915,
+      "observedMs": 2721.5,
+      "longTaskCount": 1,
+      "blockingMs": 4,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 75.971,
+      "taskMs": 292.298,
+      "idleTaskMs": 0.3110000000000057,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.900000095367432,
+            "frameMs": 181.60000014305115
+          },
+          {
+            "commitMs": 7.799999952316284,
+            "frameMs": 167.29999995231628
+          },
+          {
+            "commitMs": 5.700000047683716,
+            "frameMs": 166.09999990463257
+          },
+          {
+            "commitMs": 5.199999809265137,
+            "frameMs": 183.5
+          },
+          {
+            "commitMs": 6,
+            "frameMs": 185.5
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 164.09999990463257
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 166.69999980926514
+          }
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "fcpMs": 296,
+      "lcpMs": 296,
+      "cls": 0,
+      "domContentLoadedMs": 76,
+      "loadMs": 189.10000014305115,
+      "observedMs": 2053.7000000476837,
+      "longTaskCount": 2,
+      "blockingMs": 36,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 26661,
+      "scriptMs": 1.2910000000000001,
+      "taskMs": 190.586,
+      "idleTaskMs": 0.15199999999998548,
+      "interactions": null
+    },
+    {
+      "round": 2,
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 692,
+      "lcpMs": 692,
+      "cls": 0,
+      "domContentLoadedMs": 672.1999998092651,
+      "loadMs": 1046.2999999523163,
+      "observedMs": 2849.7999999523163,
+      "longTaskCount": 1,
+      "blockingMs": 47,
+      "jsRequests": 26,
+      "jsGzipBytes": 174502,
+      "htmlBytes": 28473,
+      "scriptMs": 168.646,
+      "taskMs": 329.031,
+      "idleTaskMs": 0.2510000000000012,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 11.899999856948853,
+            "frameMs": 199.89999985694885
+          },
+          {
+            "commitMs": 8.799999952316284,
+            "frameMs": 198.09999990463257
+          },
+          {
+            "commitMs": 8.299999952316284,
+            "frameMs": 166.29999995231628
+          },
+          {
+            "commitMs": 7.599999904632568,
+            "frameMs": 184.39999985694885
+          },
+          {
+            "commitMs": 7.3999998569488525,
+            "frameMs": 167.89999985694885
+          },
+          {
+            "commitMs": 6.799999952316284,
+            "frameMs": 164.40000009536743
+          },
+          {
+            "commitMs": 6.5,
+            "frameMs": 166
+          }
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 636,
+      "lcpMs": 636,
+      "cls": 0,
+      "domContentLoadedMs": 619.4000000953674,
+      "loadMs": 917,
+      "observedMs": 2721,
+      "longTaskCount": 1,
+      "blockingMs": 1,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 76.06599999999999,
+      "taskMs": 282.887,
+      "idleTaskMs": 0.20500000000001073,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.8999998569488525,
+            "frameMs": 186
+          },
+          {
+            "commitMs": 6.400000095367432,
+            "frameMs": 198.5
+          },
+          {
+            "commitMs": 5.6000001430511475,
+            "frameMs": 167.30000019073486
+          },
+          {
+            "commitMs": 5.5,
+            "frameMs": 186.29999995231628
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 164
+          },
+          {
+            "commitMs": 5.400000095367432,
+            "frameMs": 165.90000009536743
+          },
+          {
+            "commitMs": 5.5,
+            "frameMs": 166.20000004768372
+          }
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "fcpMs": 636,
+      "lcpMs": 636,
+      "cls": 0,
+      "domContentLoadedMs": 621.8999998569489,
+      "loadMs": 922.0999999046326,
+      "observedMs": 2726.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 74.48299999999999,
+      "taskMs": 274.847,
+      "idleTaskMs": 0.19900000000000473,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 13.200000047683716,
+            "frameMs": 128.60000014305115
+          },
+          {
+            "commitMs": 16.299999952316284,
+            "frameMs": 109.29999995231628
+          },
+          {
+            "commitMs": 17.200000047683716,
+            "frameMs": 121
+          },
+          {
+            "commitMs": 16,
+            "frameMs": 112.10000014305115
+          },
+          {
+            "commitMs": 14.899999856948853,
+            "frameMs": 99.19999980926514
+          },
+          {
+            "commitMs": 14.5,
+            "frameMs": 120.90000009536743
+          },
+          {
+            "commitMs": 16,
+            "frameMs": 112.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "fcpMs": 288,
+      "lcpMs": 288,
+      "cls": 0,
+      "domContentLoadedMs": 69.89999985694885,
+      "loadMs": 261.7999999523163,
+      "observedMs": 2071.2000000476837,
+      "longTaskCount": 1,
+      "blockingMs": 28,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 23085,
+      "scriptMs": 0.829,
+      "taskMs": 188.92000000000002,
+      "idleTaskMs": 0.16399999999999748,
+      "interactions": null
+    },
+    {
+      "round": 2,
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 676,
+      "lcpMs": 676,
+      "cls": 0,
+      "domContentLoadedMs": 661.6999998092651,
+      "loadMs": 1043.3999998569489,
+      "observedMs": 2847.0999999046326,
+      "longTaskCount": 1,
+      "blockingMs": 38,
+      "jsRequests": 26,
+      "jsGzipBytes": 174392,
+      "htmlBytes": 25300,
+      "scriptMs": 164.002,
+      "taskMs": 315.07099999999997,
+      "idleTaskMs": 0.4790000000000072,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 17.200000047683716,
+            "frameMs": 150.79999995231628
+          },
+          {
+            "commitMs": 18.5,
+            "frameMs": 150.70000004768372
+          },
+          {
+            "commitMs": 18.799999952316284,
+            "frameMs": 165
+          },
+          {
+            "commitMs": 17.700000047683716,
+            "frameMs": 115.70000004768372
+          },
+          {
+            "commitMs": 17.799999952316284,
+            "frameMs": 117.70000004768372
+          },
+          {
+            "commitMs": 16.700000047683716,
+            "frameMs": 115.90000009536743
+          },
+          {
+            "commitMs": 16.40000009536743,
+            "frameMs": 116.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 632,
+      "lcpMs": 632,
+      "cls": 0,
+      "domContentLoadedMs": 618,
+      "loadMs": 915.2000000476837,
+      "observedMs": 2718.899999856949,
+      "longTaskCount": 1,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 74.75800000000001,
+      "taskMs": 276.502,
+      "idleTaskMs": 0.20599999999998397,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 14.5,
+            "frameMs": 139.19999980926514
+          },
+          {
+            "commitMs": 16.299999952316284,
+            "frameMs": 166.70000004768372
+          },
+          {
+            "commitMs": 18.100000143051147,
+            "frameMs": 166.60000014305115
+          },
+          {
+            "commitMs": 15.5,
+            "frameMs": 116
+          },
+          {
+            "commitMs": 15.900000095367432,
+            "frameMs": 116.40000009536743
+          },
+          {
+            "commitMs": 15.900000095367432,
+            "frameMs": 117.10000014305115
+          },
+          {
+            "commitMs": 16.399999856948853,
+            "frameMs": 133.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "variant": "solid-static",
+      "path": "/",
+      "fcpMs": 280,
+      "lcpMs": 280,
+      "cls": 0,
+      "domContentLoadedMs": 73.29999995231628,
+      "loadMs": 186.20000004768372,
+      "observedMs": 2042.0999999046326,
+      "longTaskCount": 2,
+      "blockingMs": 35,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 21503,
+      "scriptMs": 0.8099999999999999,
+      "taskMs": 201.20499999999998,
+      "idleTaskMs": 1.0080000000000089,
+      "interactions": null
+    },
+    {
+      "round": 3,
+      "variant": "baseline-full",
+      "path": "/",
+      "fcpMs": 680,
+      "lcpMs": 1368,
+      "cls": 0,
+      "domContentLoadedMs": 657.9000000953674,
+      "loadMs": 1030.6000001430511,
+      "observedMs": 2835.4000000953674,
+      "longTaskCount": 1,
+      "blockingMs": 26,
+      "jsRequests": 23,
+      "jsGzipBytes": 174469,
+      "htmlBytes": 24760,
+      "scriptMs": 208.487,
+      "taskMs": 415.536,
+      "idleTaskMs": 81.872,
+      "interactions": null
+    },
+    {
+      "round": 3,
+      "variant": "solid-full",
+      "path": "/",
+      "fcpMs": 620,
+      "lcpMs": 620,
+      "cls": 0,
+      "domContentLoadedMs": 601.3999998569489,
+      "loadMs": 902.0999999046326,
+      "observedMs": 2706.399999856949,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 168.22799999999998,
+      "taskMs": 392.806,
+      "idleTaskMs": 108.30700000000004,
+      "interactions": null
+    },
+    {
+      "round": 3,
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "fcpMs": 640,
+      "lcpMs": 640,
+      "cls": 0,
+      "domContentLoadedMs": 622.7000000476837,
+      "loadMs": 913.5,
+      "observedMs": 2716.600000143051,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 93.75999999999999,
+      "taskMs": 251.772,
+      "idleTaskMs": 0.3890000000000282,
+      "interactions": null
+    },
+    {
+      "round": 3,
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "fcpMs": 288,
+      "lcpMs": 288,
+      "cls": 0,
+      "domContentLoadedMs": 72.59999990463257,
+      "loadMs": 269.2000000476837,
+      "observedMs": 2078.399999856949,
+      "longTaskCount": 1,
+      "blockingMs": 31,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 26661,
+      "scriptMs": 0.928,
+      "taskMs": 196.89200000000002,
+      "idleTaskMs": 0.14899999999998248,
+      "interactions": null
+    },
+    {
+      "round": 3,
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 680,
+      "lcpMs": 680,
+      "cls": 0,
+      "domContentLoadedMs": 664.8999998569489,
+      "loadMs": 1045.8999998569489,
+      "observedMs": 2850,
+      "longTaskCount": 1,
+      "blockingMs": 40,
+      "jsRequests": 26,
+      "jsGzipBytes": 174502,
+      "htmlBytes": 28473,
+      "scriptMs": 166.316,
+      "taskMs": 319.808,
+      "idleTaskMs": 0.18800000000002148,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 11.299999952316284,
+            "frameMs": 187.20000004768372
+          },
+          {
+            "commitMs": 8.799999952316284,
+            "frameMs": 197.90000009536743
+          },
+          {
+            "commitMs": 7.700000047683716,
+            "frameMs": 165.30000019073486
+          },
+          {
+            "commitMs": 6.799999952316284,
+            "frameMs": 189.20000004768372
+          },
+          {
+            "commitMs": 8.099999904632568,
+            "frameMs": 161.09999990463257
+          },
+          {
+            "commitMs": 6.200000047683716,
+            "frameMs": 182.29999995231628
+          },
+          {
+            "commitMs": 7.200000047683716,
+            "frameMs": 166.80000019073486
+          }
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 644,
+      "lcpMs": 644,
+      "cls": 0,
+      "domContentLoadedMs": 622.5999999046326,
+      "loadMs": 918.2999999523163,
+      "observedMs": 2722.2000000476837,
+      "longTaskCount": 1,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 77.08800000000001,
+      "taskMs": 287.677,
+      "idleTaskMs": 0.15899999999996473,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.8999998569488525,
+            "frameMs": 180.79999995231628
+          },
+          {
+            "commitMs": 7,
+            "frameMs": 199.90000009536743
+          },
+          {
+            "commitMs": 5.700000047683716,
+            "frameMs": 166.70000004768372
+          },
+          {
+            "commitMs": 5,
+            "frameMs": 187.79999995231628
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 196.29999995231628
+          },
+          {
+            "commitMs": 5.900000095367432,
+            "frameMs": 165.10000014305115
+          },
+          {
+            "commitMs": 5.200000047683716,
+            "frameMs": 167.90000009536743
+          }
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "fcpMs": 640,
+      "lcpMs": 640,
+      "cls": 0,
+      "domContentLoadedMs": 626,
+      "loadMs": 908.8999998569489,
+      "observedMs": 2713.2999999523163,
+      "longTaskCount": 1,
+      "blockingMs": 1,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 76.409,
+      "taskMs": 288.479,
+      "idleTaskMs": 0.22500000000003073,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 7.1000001430511475,
+            "frameMs": 174.29999995231628
+          },
+          {
+            "commitMs": 6.400000095367432,
+            "frameMs": 174
+          },
+          {
+            "commitMs": 6.3999998569488525,
+            "frameMs": 166.79999995231628
+          },
+          {
+            "commitMs": 6,
+            "frameMs": 188.70000004768372
+          },
+          {
+            "commitMs": 6.700000047683716,
+            "frameMs": 179.5
+          },
+          {
+            "commitMs": 9.199999809265137,
+            "frameMs": 201.89999985694885
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 165.29999995231628
+          }
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "fcpMs": 296,
+      "lcpMs": 296,
+      "cls": 0,
+      "domContentLoadedMs": 69.5,
+      "loadMs": 182.5,
+      "observedMs": 2051.7000000476837,
+      "longTaskCount": 2,
+      "blockingMs": 48,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 23085,
+      "scriptMs": 0.752,
+      "taskMs": 200.44500000000002,
+      "idleTaskMs": 0.3469999999999862,
+      "interactions": null
+    },
+    {
+      "round": 3,
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 692,
+      "lcpMs": 692,
+      "cls": 0,
+      "domContentLoadedMs": 577.8999998569489,
+      "loadMs": 1050.3999998569489,
+      "observedMs": 2854.5,
+      "longTaskCount": 1,
+      "blockingMs": 21,
+      "jsRequests": 26,
+      "jsGzipBytes": 174392,
+      "htmlBytes": 25300,
+      "scriptMs": 165.398,
+      "taskMs": 319.896,
+      "idleTaskMs": 0.18499999999999073,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 16.5,
+            "frameMs": 157
+          },
+          {
+            "commitMs": 17.899999856948853,
+            "frameMs": 150.59999990463257
+          },
+          {
+            "commitMs": 18.09999990463257,
+            "frameMs": 165.40000009536743
+          },
+          {
+            "commitMs": 17.40000009536743,
+            "frameMs": 115.5
+          },
+          {
+            "commitMs": 18.100000143051147,
+            "frameMs": 117.10000014305115
+          },
+          {
+            "commitMs": 16.40000009536743,
+            "frameMs": 116.10000014305115
+          },
+          {
+            "commitMs": 18.799999952316284,
+            "frameMs": 118.09999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 628,
+      "lcpMs": 628,
+      "cls": 0,
+      "domContentLoadedMs": 615.8999998569489,
+      "loadMs": 922.8999998569489,
+      "observedMs": 2726.7999999523163,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 75.465,
+      "taskMs": 274.25500000000005,
+      "idleTaskMs": 0.20499999999995522,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 13.300000190734863,
+            "frameMs": 139.80000019073486
+          },
+          {
+            "commitMs": 15,
+            "frameMs": 150
+          },
+          {
+            "commitMs": 17.59999990463257,
+            "frameMs": 150.90000009536743
+          },
+          {
+            "commitMs": 17,
+            "frameMs": 114.79999995231628
+          },
+          {
+            "commitMs": 14.800000190734863,
+            "frameMs": 99.70000004768372
+          },
+          {
+            "commitMs": 15.099999904632568,
+            "frameMs": 120.59999990463257
+          },
+          {
+            "commitMs": 16.5,
+            "frameMs": 112.79999995231628
+          }
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "fcpMs": 648,
+      "lcpMs": 648,
+      "cls": 0,
+      "domContentLoadedMs": 619.6000001430511,
+      "loadMs": 921.1000001430511,
+      "observedMs": 2724.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 74.32900000000001,
+      "taskMs": 277.109,
+      "idleTaskMs": 1.2619999999999854,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 12.799999952316284,
+            "frameMs": 133.40000009536743
+          },
+          {
+            "commitMs": 16.100000143051147,
+            "frameMs": 115.90000009536743
+          },
+          {
+            "commitMs": 17.100000143051147,
+            "frameMs": 120.29999995231628
+          },
+          {
+            "commitMs": 16.100000143051147,
+            "frameMs": 112.60000014305115
+          },
+          {
+            "commitMs": 15.5,
+            "frameMs": 100.60000014305115
+          },
+          {
+            "commitMs": 15.799999952316284,
+            "frameMs": 118.29999995231628
+          },
+          {
+            "commitMs": 15.700000047683716,
+            "frameMs": 115
+          }
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "variant": "baseline-full",
+      "path": "/",
+      "fcpMs": 672,
+      "lcpMs": 1384,
+      "cls": 0,
+      "domContentLoadedMs": 566.2000000476837,
+      "loadMs": 1038.0999999046326,
+      "observedMs": 2841.7000000476837,
+      "longTaskCount": 1,
+      "blockingMs": 12,
+      "jsRequests": 23,
+      "jsGzipBytes": 174469,
+      "htmlBytes": 24760,
+      "scriptMs": 200.06199999999998,
+      "taskMs": 417.427,
+      "idleTaskMs": 78.36500000000002,
+      "interactions": null
+    },
+    {
+      "round": 4,
+      "variant": "solid-full",
+      "path": "/",
+      "fcpMs": 612,
+      "lcpMs": 612,
+      "cls": 0,
+      "domContentLoadedMs": 593.3999998569489,
+      "loadMs": 903,
+      "observedMs": 2706.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 154.614,
+      "taskMs": 373.99399999999997,
+      "idleTaskMs": 73.01299999999999,
+      "interactions": null
+    },
+    {
+      "round": 4,
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 608.7999999523163,
+      "loadMs": 902.9000000953674,
+      "observedMs": 2714.7000000476837,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 84.718,
+      "taskMs": 224.208,
+      "idleTaskMs": 0.16900000000000248,
+      "interactions": null
+    },
+    {
+      "round": 4,
+      "variant": "solid-static",
+      "path": "/",
+      "fcpMs": 284,
+      "lcpMs": 284,
+      "cls": 0,
+      "domContentLoadedMs": 74.89999985694885,
+      "loadMs": 189.29999995231628,
+      "observedMs": 2041.2000000476837,
+      "longTaskCount": 1,
+      "blockingMs": 34,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 21503,
+      "scriptMs": 0.225,
+      "taskMs": 190.732,
+      "idleTaskMs": 0.7069999999999854,
+      "interactions": null
+    },
+    {
+      "round": 4,
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 736,
+      "lcpMs": 756,
+      "cls": 0.11815213485603587,
+      "domContentLoadedMs": 744.9000000953674,
+      "loadMs": 1052.6000001430511,
+      "observedMs": 2856.9000000953674,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 26,
+      "jsGzipBytes": 174502,
+      "htmlBytes": 28473,
+      "scriptMs": 205.04,
+      "taskMs": 388.46000000000004,
+      "idleTaskMs": 0.36399999999997545,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 11.900000095367432,
+            "frameMs": 187
+          },
+          {
+            "commitMs": 8.599999904632568,
+            "frameMs": 197
+          },
+          {
+            "commitMs": 8.400000095367432,
+            "frameMs": 167.40000009536743
+          },
+          {
+            "commitMs": 7,
+            "frameMs": 188.40000009536743
+          },
+          {
+            "commitMs": 8,
+            "frameMs": 163.59999990463257
+          },
+          {
+            "commitMs": 6.700000047683716,
+            "frameMs": 180.5
+          },
+          {
+            "commitMs": 6.299999952316284,
+            "frameMs": 166.29999995231628
+          }
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 632,
+      "lcpMs": 632,
+      "cls": 0,
+      "domContentLoadedMs": 618.2999999523163,
+      "loadMs": 906.1000001430511,
+      "observedMs": 2710.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 76.236,
+      "taskMs": 281.594,
+      "idleTaskMs": 0.17899999999998473,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.5,
+            "frameMs": 183.59999990463257
+          },
+          {
+            "commitMs": 6.6000001430511475,
+            "frameMs": 200.30000019073486
+          },
+          {
+            "commitMs": 5.5,
+            "frameMs": 166
+          },
+          {
+            "commitMs": 5.400000095367432,
+            "frameMs": 189.10000014305115
+          },
+          {
+            "commitMs": 6.099999904632568,
+            "frameMs": 194.40000009536743
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 165.79999995231628
+          },
+          {
+            "commitMs": 5.200000047683716,
+            "frameMs": 167.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "fcpMs": 632,
+      "lcpMs": 632,
+      "cls": 0,
+      "domContentLoadedMs": 616.6999998092651,
+      "loadMs": 906.7999999523163,
+      "observedMs": 2708.899999856949,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 74.438,
+      "taskMs": 276.306,
+      "idleTaskMs": 0.21500000000002073,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 1.7999999523162842,
+            "frameMs": 160.5
+          },
+          {
+            "commitMs": 7.1000001430511475,
+            "frameMs": 173
+          },
+          {
+            "commitMs": 6,
+            "frameMs": 166.39999985694885
+          },
+          {
+            "commitMs": 5.599999904632568,
+            "frameMs": 188.79999995231628
+          },
+          {
+            "commitMs": 5.3999998569488525,
+            "frameMs": 194.39999985694885
+          },
+          {
+            "commitMs": 5.400000095367432,
+            "frameMs": 165.60000014305115
+          },
+          {
+            "commitMs": 4.700000047683716,
+            "frameMs": 167.70000004768372
+          }
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "fcpMs": 284,
+      "lcpMs": 284,
+      "cls": 0,
+      "domContentLoadedMs": 75,
+      "loadMs": 268.2000000476837,
+      "observedMs": 2081.5,
+      "longTaskCount": 1,
+      "blockingMs": 32,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 26661,
+      "scriptMs": 0.851,
+      "taskMs": 194.315,
+      "idleTaskMs": 0.17000000000000348,
+      "interactions": null
+    },
+    {
+      "round": 4,
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 692,
+      "lcpMs": 692,
+      "cls": 0,
+      "domContentLoadedMs": 580.4000000953674,
+      "loadMs": 1044.5,
+      "observedMs": 2848.100000143051,
+      "longTaskCount": 1,
+      "blockingMs": 19,
+      "jsRequests": 26,
+      "jsGzipBytes": 174392,
+      "htmlBytes": 25300,
+      "scriptMs": 161.48100000000002,
+      "taskMs": 314.445,
+      "idleTaskMs": 0.5280000000000284,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 15.599999904632568,
+            "frameMs": 148
+          },
+          {
+            "commitMs": 18.09999990463257,
+            "frameMs": 148.79999995231628
+          },
+          {
+            "commitMs": 18.200000047683716,
+            "frameMs": 165.90000009536743
+          },
+          {
+            "commitMs": 18,
+            "frameMs": 117.5
+          },
+          {
+            "commitMs": 17.40000009536743,
+            "frameMs": 115.79999995231628
+          },
+          {
+            "commitMs": 16.699999809265137,
+            "frameMs": 117.09999990463257
+          },
+          {
+            "commitMs": 16.600000143051147,
+            "frameMs": 120.80000019073486
+          }
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 656,
+      "lcpMs": 656,
+      "cls": 0,
+      "domContentLoadedMs": 629,
+      "loadMs": 915.3999998569489,
+      "observedMs": 2719,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 74.247,
+      "taskMs": 283.985,
+      "idleTaskMs": 0.8770000000000167,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 13.299999952316284,
+            "frameMs": 148
+          },
+          {
+            "commitMs": 16,
+            "frameMs": 148.79999995231628
+          },
+          {
+            "commitMs": 17.59999990463257,
+            "frameMs": 166.89999985694885
+          },
+          {
+            "commitMs": 15.700000047683716,
+            "frameMs": 99.29999995231628
+          },
+          {
+            "commitMs": 15.5,
+            "frameMs": 100.20000004768372
+          },
+          {
+            "commitMs": 15.799999952316284,
+            "frameMs": 115.89999985694885
+          },
+          {
+            "commitMs": 15.799999952316284,
+            "frameMs": 121.40000009536743
+          }
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "fcpMs": 632,
+      "lcpMs": 632,
+      "cls": 0,
+      "domContentLoadedMs": 618.7000000476837,
+      "loadMs": 923.1000001430511,
+      "observedMs": 2725.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 76.292,
+      "taskMs": 275.197,
+      "idleTaskMs": 0.20699999999995722,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 12.799999952316284,
+            "frameMs": 133.70000004768372
+          },
+          {
+            "commitMs": 15.5,
+            "frameMs": 116.79999995231628
+          },
+          {
+            "commitMs": 19.09999990463257,
+            "frameMs": 118.09999990463257
+          },
+          {
+            "commitMs": 16,
+            "frameMs": 115.19999980926514
+          },
+          {
+            "commitMs": 15,
+            "frameMs": 99.90000009536743
+          },
+          {
+            "commitMs": 15.299999952316284,
+            "frameMs": 120.09999990463257
+          },
+          {
+            "commitMs": 15.900000095367432,
+            "frameMs": 95.80000019073486
+          }
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "fcpMs": 284,
+      "lcpMs": 284,
+      "cls": 0,
+      "domContentLoadedMs": 74.90000009536743,
+      "loadMs": 188.70000004768372,
+      "observedMs": 2052.0999999046326,
+      "longTaskCount": 2,
+      "blockingMs": 39,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 23085,
+      "scriptMs": 1.155,
+      "taskMs": 187.388,
+      "idleTaskMs": 0.16099999999999448,
+      "interactions": null
+    },
+    {
+      "round": 5,
+      "variant": "solid-full",
+      "path": "/",
+      "fcpMs": 628,
+      "lcpMs": 628,
+      "cls": 0,
+      "domContentLoadedMs": 599.5999999046326,
+      "loadMs": 899.5999999046326,
+      "observedMs": 2702.399999856949,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 153.774,
+      "taskMs": 368.065,
+      "idleTaskMs": 71.67400000000002,
+      "interactions": null
+    },
+    {
+      "round": 5,
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "fcpMs": 636,
+      "lcpMs": 636,
+      "cls": 0,
+      "domContentLoadedMs": 606.0999999046326,
+      "loadMs": 907.3999998569489,
+      "observedMs": 2711.2000000476837,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 85.991,
+      "taskMs": 222.28,
+      "idleTaskMs": 0.4659999999999942,
+      "interactions": null
+    },
+    {
+      "round": 5,
+      "variant": "solid-static",
+      "path": "/",
+      "fcpMs": 276,
+      "lcpMs": 276,
+      "cls": 0,
+      "domContentLoadedMs": 75.70000004768372,
+      "loadMs": 254.59999990463257,
+      "observedMs": 2068.2999999523163,
+      "longTaskCount": 1,
+      "blockingMs": 31,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 21503,
+      "scriptMs": 0.8019999999999999,
+      "taskMs": 194.048,
+      "idleTaskMs": 0.9109999999999951,
+      "interactions": null
+    },
+    {
+      "round": 5,
+      "variant": "baseline-full",
+      "path": "/",
+      "fcpMs": 708,
+      "lcpMs": 1368,
+      "cls": 0,
+      "domContentLoadedMs": 581,
+      "loadMs": 1025.4000000953674,
+      "observedMs": 2828.9000000953674,
+      "longTaskCount": 1,
+      "blockingMs": 32,
+      "jsRequests": 23,
+      "jsGzipBytes": 174469,
+      "htmlBytes": 24760,
+      "scriptMs": 228.69500000000002,
+      "taskMs": 503.247,
+      "idleTaskMs": 92.65299999999999,
+      "interactions": null
+    },
+    {
+      "round": 5,
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 668,
+      "lcpMs": 668,
+      "cls": 0,
+      "domContentLoadedMs": 652.2999999523163,
+      "loadMs": 930,
+      "observedMs": 2733.4000000953674,
+      "longTaskCount": 1,
+      "blockingMs": 4,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 81.089,
+      "taskMs": 324.416,
+      "idleTaskMs": 0.4210000000000047,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 7.200000047683716,
+            "frameMs": 184.70000004768372
+          },
+          {
+            "commitMs": 6.299999952316284,
+            "frameMs": 183.39999985694885
+          },
+          {
+            "commitMs": 6.3999998569488525,
+            "frameMs": 166.89999985694885
+          },
+          {
+            "commitMs": 5.200000047683716,
+            "frameMs": 182.59999990463257
+          },
+          {
+            "commitMs": 6.1000001430511475,
+            "frameMs": 169.5
+          },
+          {
+            "commitMs": 13.199999809265137,
+            "frameMs": 167.09999990463257
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 163.09999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 5,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "fcpMs": 636,
+      "lcpMs": 636,
+      "cls": 0,
+      "domContentLoadedMs": 622.2999999523163,
+      "loadMs": 921.4000000953674,
+      "observedMs": 2724.9000000953674,
+      "longTaskCount": 1,
+      "blockingMs": 19,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 88.824,
+      "taskMs": 333.538,
+      "idleTaskMs": 0.43999999999999595,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.700000047683716,
+            "frameMs": 183
+          },
+          {
+            "commitMs": 6.799999952316284,
+            "frameMs": 165
+          },
+          {
+            "commitMs": 4.900000095367432,
+            "frameMs": 167.29999995231628
+          },
+          {
+            "commitMs": 5,
+            "frameMs": 183.39999985694885
+          },
+          {
+            "commitMs": 6.599999904632568,
+            "frameMs": 183
+          },
+          {
+            "commitMs": 6.1000001430511475,
+            "frameMs": 170.70000004768372
+          },
+          {
+            "commitMs": 5.900000095367432,
+            "frameMs": 178.90000009536743
+          }
+        ]
+      }
+    },
+    {
+      "round": 5,
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "fcpMs": 320,
+      "lcpMs": 320,
+      "cls": 0,
+      "domContentLoadedMs": 71.29999995231628,
+      "loadMs": 184,
+      "observedMs": 2071.5999999046326,
+      "longTaskCount": 2,
+      "blockingMs": 68,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 26661,
+      "scriptMs": 1.397,
+      "taskMs": 233.602,
+      "idleTaskMs": 0.23399999999998422,
+      "interactions": null
+    },
+    {
+      "round": 5,
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 712,
+      "lcpMs": 712,
+      "cls": 0,
+      "domContentLoadedMs": 697.0999999046326,
+      "loadMs": 1054.0999999046326,
+      "observedMs": 2857.5,
+      "longTaskCount": 1,
+      "blockingMs": 60,
+      "jsRequests": 26,
+      "jsGzipBytes": 174502,
+      "htmlBytes": 28473,
+      "scriptMs": 198.28699999999998,
+      "taskMs": 387.947,
+      "idleTaskMs": 0.16800000000000148,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 16.300000190734863,
+            "frameMs": 204.80000019073486
+          },
+          {
+            "commitMs": 11,
+            "frameMs": 216
+          },
+          {
+            "commitMs": 9.599999904632568,
+            "frameMs": 199.09999990463257
+          },
+          {
+            "commitMs": 10.400000095367432,
+            "frameMs": 218.59999990463257
+          },
+          {
+            "commitMs": 9.5,
+            "frameMs": 183.09999990463257
+          },
+          {
+            "commitMs": 7.800000190734863,
+            "frameMs": 180.60000014305115
+          },
+          {
+            "commitMs": 6.8999998569488525,
+            "frameMs": 166.39999985694885
+          }
+        ]
+      }
+    },
+    {
+      "round": 5,
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 640,
+      "lcpMs": 640,
+      "cls": 0,
+      "domContentLoadedMs": 627.6000001430511,
+      "loadMs": 928.1000001430511,
+      "observedMs": 2732.5,
+      "longTaskCount": 1,
+      "blockingMs": 5,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 86.297,
+      "taskMs": 302.526,
+      "idleTaskMs": 0.21499999999996522,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 14.099999904632568,
+            "frameMs": 136.69999980926514
+          },
+          {
+            "commitMs": 15.400000095367432,
+            "frameMs": 150.80000019073486
+          },
+          {
+            "commitMs": 17,
+            "frameMs": 165.79999995231628
+          },
+          {
+            "commitMs": 15.899999856948853,
+            "frameMs": 100.19999980926514
+          },
+          {
+            "commitMs": 15.299999952316284,
+            "frameMs": 116.90000009536743
+          },
+          {
+            "commitMs": 15.199999809265137,
+            "frameMs": 116.09999990463257
+          },
+          {
+            "commitMs": 15.900000095367432,
+            "frameMs": 116.60000014305115
+          }
+        ]
+      }
+    },
+    {
+      "round": 5,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "fcpMs": 620,
+      "lcpMs": 620,
+      "cls": 0,
+      "domContentLoadedMs": 605.7999999523163,
+      "loadMs": 906.0999999046326,
+      "observedMs": 2710,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 74.283,
+      "taskMs": 271.414,
+      "idleTaskMs": 0.3390000000000337,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 13.900000095367432,
+            "frameMs": 135
+          },
+          {
+            "commitMs": 15.799999952316284,
+            "frameMs": 115.89999985694885
+          },
+          {
+            "commitMs": 17.09999990463257,
+            "frameMs": 118
+          },
+          {
+            "commitMs": 15.599999904632568,
+            "frameMs": 115.39999985694885
+          },
+          {
+            "commitMs": 15.799999952316284,
+            "frameMs": 100.70000004768372
+          },
+          {
+            "commitMs": 14.900000095367432,
+            "frameMs": 121.40000009536743
+          },
+          {
+            "commitMs": 15.799999952316284,
+            "frameMs": 111.69999980926514
+          }
+        ]
+      }
+    },
+    {
+      "round": 5,
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "fcpMs": 288,
+      "lcpMs": 288,
+      "cls": 0,
+      "domContentLoadedMs": 77.29999995231628,
+      "loadMs": 190.40000009536743,
+      "observedMs": 2053.600000143051,
+      "longTaskCount": 2,
+      "blockingMs": 41,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 23085,
+      "scriptMs": 1.485,
+      "taskMs": 192.239,
+      "idleTaskMs": 0.23700000000001498,
+      "interactions": null
+    },
+    {
+      "round": 5,
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 692,
+      "lcpMs": 692,
+      "cls": 0,
+      "domContentLoadedMs": 671.3999998569489,
+      "loadMs": 1052.5,
+      "observedMs": 2855.899999856949,
+      "longTaskCount": 1,
+      "blockingMs": 39,
+      "jsRequests": 26,
+      "jsGzipBytes": 174392,
+      "htmlBytes": 25300,
+      "scriptMs": 161.207,
+      "taskMs": 314.777,
+      "idleTaskMs": 0.33600000000000296,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 15.600000143051147,
+            "frameMs": 154.40000009536743
+          },
+          {
+            "commitMs": 18,
+            "frameMs": 164.20000004768372
+          },
+          {
+            "commitMs": 18.5,
+            "frameMs": 150.59999990463257
+          },
+          {
+            "commitMs": 18.299999952316284,
+            "frameMs": 116.10000014305115
+          },
+          {
+            "commitMs": 17,
+            "frameMs": 102.59999990463257
+          },
+          {
+            "commitMs": 15.700000047683716,
+            "frameMs": 114.90000009536743
+          },
+          {
+            "commitMs": 16.5,
+            "frameMs": 119.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 6,
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "fcpMs": 620,
+      "lcpMs": 620,
+      "cls": 0,
+      "domContentLoadedMs": 604,
+      "loadMs": 906.6000001430511,
+      "observedMs": 2710,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 86.533,
+      "taskMs": 230.519,
+      "idleTaskMs": 0.4029999999999867,
+      "interactions": null
+    },
+    {
+      "round": 6,
+      "variant": "solid-static",
+      "path": "/",
+      "fcpMs": 280,
+      "lcpMs": 280,
+      "cls": 0,
+      "domContentLoadedMs": 69.70000004768372,
+      "loadMs": 247.29999995231628,
+      "observedMs": 2056.2999999523163,
+      "longTaskCount": 1,
+      "blockingMs": 30,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 21503,
+      "scriptMs": 1.618,
+      "taskMs": 185.749,
+      "idleTaskMs": 0.9720000000000006,
+      "interactions": null
+    },
+    {
+      "round": 6,
+      "variant": "baseline-full",
+      "path": "/",
+      "fcpMs": 684,
+      "lcpMs": 1352,
+      "cls": 0,
+      "domContentLoadedMs": 579.3000001907349,
+      "loadMs": 1023.5,
+      "observedMs": 2827.5,
+      "longTaskCount": 1,
+      "blockingMs": 12,
+      "jsRequests": 23,
+      "jsGzipBytes": 174469,
+      "htmlBytes": 24760,
+      "scriptMs": 199.746,
+      "taskMs": 411.64,
+      "idleTaskMs": 71.50600000000001,
+      "interactions": null
+    },
+    {
+      "round": 6,
+      "variant": "solid-full",
+      "path": "/",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 606.4000000953674,
+      "loadMs": 906,
+      "observedMs": 2710,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 155.65200000000002,
+      "taskMs": 370.801,
+      "idleTaskMs": 68.45800000000001,
+      "interactions": null
+    },
+    {
+      "round": 6,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "fcpMs": 648,
+      "lcpMs": 648,
+      "cls": 0,
+      "domContentLoadedMs": 624.6999998092651,
+      "loadMs": 922.1999998092651,
+      "observedMs": 2725.899999856949,
+      "longTaskCount": 1,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 75.322,
+      "taskMs": 283.146,
+      "idleTaskMs": 0.24000000000001798,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.1000001430511475,
+            "frameMs": 165.80000019073486
+          },
+          {
+            "commitMs": 6.400000095367432,
+            "frameMs": 167.09999990463257
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 166.59999990463257
+          },
+          {
+            "commitMs": 5.5,
+            "frameMs": 183.70000004768372
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 181.70000004768372
+          },
+          {
+            "commitMs": 6.5,
+            "frameMs": 167.09999990463257
+          },
+          {
+            "commitMs": 6.400000095367432,
+            "frameMs": 165.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 6,
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "fcpMs": 284,
+      "lcpMs": 284,
+      "cls": 0,
+      "domContentLoadedMs": 70.80000019073486,
+      "loadMs": 183.30000019073486,
+      "observedMs": 2048.300000190735,
+      "longTaskCount": 2,
+      "blockingMs": 40,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 26661,
+      "scriptMs": 1.0579999999999998,
+      "taskMs": 195.542,
+      "idleTaskMs": 0.23700000000001498,
+      "interactions": null
+    },
+    {
+      "round": 6,
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 680,
+      "lcpMs": 904,
+      "cls": 0.11815213485603587,
+      "domContentLoadedMs": 669.5,
+      "loadMs": 1050.4000000953674,
+      "observedMs": 2854.0999999046326,
+      "longTaskCount": 1,
+      "blockingMs": 36,
+      "jsRequests": 26,
+      "jsGzipBytes": 174502,
+      "htmlBytes": 28473,
+      "scriptMs": 165.366,
+      "taskMs": 334.078,
+      "idleTaskMs": 0.2610000000000112,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 11.299999952316284,
+            "frameMs": 186.09999990463257
+          },
+          {
+            "commitMs": 8.800000190734863,
+            "frameMs": 198.70000004768372
+          },
+          {
+            "commitMs": 7.3999998569488525,
+            "frameMs": 165.89999985694885
+          },
+          {
+            "commitMs": 7,
+            "frameMs": 202.09999990463257
+          },
+          {
+            "commitMs": 7.699999809265137,
+            "frameMs": 167.19999980926514
+          },
+          {
+            "commitMs": 6.3999998569488525,
+            "frameMs": 163.5
+          },
+          {
+            "commitMs": 6.799999952316284,
+            "frameMs": 166.5
+          }
+        ]
+      }
+    },
+    {
+      "round": 6,
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 628,
+      "lcpMs": 628,
+      "cls": 0,
+      "domContentLoadedMs": 615.5999999046326,
+      "loadMs": 919.2000000476837,
+      "observedMs": 2722.7999999523163,
+      "longTaskCount": 1,
+      "blockingMs": 3,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 77.13499999999999,
+      "taskMs": 286.194,
+      "idleTaskMs": 0.2510000000000012,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.300000190734863,
+            "frameMs": 184.60000014305115
+          },
+          {
+            "commitMs": 6.299999952316284,
+            "frameMs": 182.09999990463257
+          },
+          {
+            "commitMs": 6.099999904632568,
+            "frameMs": 167.89999985694885
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 187.29999995231628
+          },
+          {
+            "commitMs": 5.5,
+            "frameMs": 181.79999995231628
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 162.89999985694885
+          },
+          {
+            "commitMs": 5,
+            "frameMs": 166.29999995231628
+          }
+        ]
+      }
+    },
+    {
+      "round": 6,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "fcpMs": 628,
+      "lcpMs": 628,
+      "cls": 0,
+      "domContentLoadedMs": 613,
+      "loadMs": 922.7000000476837,
+      "observedMs": 2726.4000000953674,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 75.044,
+      "taskMs": 271.125,
+      "idleTaskMs": 0.18899999999999473,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 13.900000095367432,
+            "frameMs": 148.70000004768372
+          },
+          {
+            "commitMs": 15,
+            "frameMs": 116.29999995231628
+          },
+          {
+            "commitMs": 17.200000047683716,
+            "frameMs": 119.79999995231628
+          },
+          {
+            "commitMs": 16,
+            "frameMs": 100.5
+          },
+          {
+            "commitMs": 14.600000143051147,
+            "frameMs": 96
+          },
+          {
+            "commitMs": 17.399999856948853,
+            "frameMs": 124.09999990463257
+          },
+          {
+            "commitMs": 15.299999952316284,
+            "frameMs": 109.69999980926514
+          }
+        ]
+      }
+    },
+    {
+      "round": 6,
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "fcpMs": 304,
+      "lcpMs": 304,
+      "cls": 0,
+      "domContentLoadedMs": 72.79999995231628,
+      "loadMs": 286.7000000476837,
+      "observedMs": 2107,
+      "longTaskCount": 1,
+      "blockingMs": 38,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 23085,
+      "scriptMs": 0.803,
+      "taskMs": 222.17000000000002,
+      "idleTaskMs": 0.17699999999998273,
+      "interactions": null
+    },
+    {
+      "round": 6,
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 684,
+      "lcpMs": 684,
+      "cls": 0,
+      "domContentLoadedMs": 669.6000001430511,
+      "loadMs": 1046.1000001430511,
+      "observedMs": 2850.100000143051,
+      "longTaskCount": 1,
+      "blockingMs": 44,
+      "jsRequests": 26,
+      "jsGzipBytes": 174392,
+      "htmlBytes": 25300,
+      "scriptMs": 167.595,
+      "taskMs": 323.662,
+      "idleTaskMs": 0.3210000000000157,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 16.200000047683716,
+            "frameMs": 155
+          },
+          {
+            "commitMs": 18.59999990463257,
+            "frameMs": 148.29999995231628
+          },
+          {
+            "commitMs": 17.5,
+            "frameMs": 167
+          },
+          {
+            "commitMs": 17.5,
+            "frameMs": 99.59999990463257
+          },
+          {
+            "commitMs": 16.799999952316284,
+            "frameMs": 116.59999990463257
+          },
+          {
+            "commitMs": 16.299999952316284,
+            "frameMs": 115
+          },
+          {
+            "commitMs": 16.200000047683716,
+            "frameMs": 120.70000004768372
+          }
+        ]
+      }
+    },
+    {
+      "round": 6,
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 609.6000001430511,
+      "loadMs": 914.4000000953674,
+      "observedMs": 2717.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 77.74300000000001,
+      "taskMs": 269.024,
+      "idleTaskMs": 0.20000000000003348,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 14.600000143051147,
+            "frameMs": 139.70000004768372
+          },
+          {
+            "commitMs": 15.700000047683716,
+            "frameMs": 148.79999995231628
+          },
+          {
+            "commitMs": 18.700000047683716,
+            "frameMs": 167.90000009536743
+          },
+          {
+            "commitMs": 16.200000047683716,
+            "frameMs": 99.30000019073486
+          },
+          {
+            "commitMs": 15.399999856948853,
+            "frameMs": 100.19999980926514
+          },
+          {
+            "commitMs": 15.099999904632568,
+            "frameMs": 116
+          },
+          {
+            "commitMs": 15.700000047683716,
+            "frameMs": 120.70000004768372
+          }
+        ]
+      }
+    },
+    {
+      "round": 7,
+      "variant": "solid-static",
+      "path": "/",
+      "fcpMs": 268,
+      "lcpMs": 268,
+      "cls": 0,
+      "domContentLoadedMs": 68.29999995231628,
+      "loadMs": 183.59999990463257,
+      "observedMs": 2035.8999998569489,
+      "longTaskCount": 2,
+      "blockingMs": 34,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 21503,
+      "scriptMs": 1.23,
+      "taskMs": 188.321,
+      "idleTaskMs": 0.30300000000002547,
+      "interactions": null
+    },
+    {
+      "round": 7,
+      "variant": "baseline-full",
+      "path": "/",
+      "fcpMs": 688,
+      "lcpMs": 1356,
+      "cls": 0,
+      "domContentLoadedMs": 581,
+      "loadMs": 1030.3999998569489,
+      "observedMs": 2835.899999856949,
+      "longTaskCount": 1,
+      "blockingMs": 13,
+      "jsRequests": 23,
+      "jsGzipBytes": 174469,
+      "htmlBytes": 24760,
+      "scriptMs": 206.509,
+      "taskMs": 419.46299999999997,
+      "idleTaskMs": 70.60500000000003,
+      "interactions": null
+    },
+    {
+      "round": 7,
+      "variant": "solid-full",
+      "path": "/",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 606.7999999523163,
+      "loadMs": 896.5999999046326,
+      "observedMs": 2709.199999809265,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 157.566,
+      "taskMs": 375.147,
+      "idleTaskMs": 75.278,
+      "interactions": null
+    },
+    {
+      "round": 7,
+      "variant": "solid-reduced-motion",
+      "path": "/",
+      "fcpMs": 636,
+      "lcpMs": 636,
+      "cls": 0,
+      "domContentLoadedMs": 611.1000001430511,
+      "loadMs": 905.9000000953674,
+      "observedMs": 2708.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 22,
+      "jsGzipBytes": 117627,
+      "htmlBytes": 26051,
+      "scriptMs": 84.45400000000001,
+      "taskMs": 228.047,
+      "idleTaskMs": 0.4059999999999897,
+      "interactions": null
+    },
+    {
+      "round": 7,
+      "variant": "solid-static",
+      "path": "/tools/json-formatter",
+      "fcpMs": 308,
+      "lcpMs": 308,
+      "cls": 0,
+      "domContentLoadedMs": 74,
+      "loadMs": 289.40000009536743,
+      "observedMs": 2097.100000143051,
+      "longTaskCount": 1,
+      "blockingMs": 44,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 26661,
+      "scriptMs": 0.225,
+      "taskMs": 228.639,
+      "idleTaskMs": 0.16499999999999848,
+      "interactions": null
+    },
+    {
+      "round": 7,
+      "variant": "baseline-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 728,
+      "lcpMs": 728,
+      "cls": 0,
+      "domContentLoadedMs": 710.2000000476837,
+      "loadMs": 1054.5,
+      "observedMs": 2858.0999999046326,
+      "longTaskCount": 1,
+      "blockingMs": 76,
+      "jsRequests": 26,
+      "jsGzipBytes": 174502,
+      "htmlBytes": 28473,
+      "scriptMs": 188.056,
+      "taskMs": 393.03700000000003,
+      "idleTaskMs": 0.19699999999994722,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 15.599999904632568,
+            "frameMs": 217.59999990463257
+          },
+          {
+            "commitMs": 12.900000095367432,
+            "frameMs": 215.59999990463257
+          },
+          {
+            "commitMs": 9.200000047683716,
+            "frameMs": 182.29999995231628
+          },
+          {
+            "commitMs": 7.299999952316284,
+            "frameMs": 201.70000004768372
+          },
+          {
+            "commitMs": 9.200000047683716,
+            "frameMs": 181.39999985694885
+          },
+          {
+            "commitMs": 8.800000190734863,
+            "frameMs": 166.20000004768372
+          },
+          {
+            "commitMs": 6.799999952316284,
+            "frameMs": 167.40000009536743
+          }
+        ]
+      }
+    },
+    {
+      "round": 7,
+      "variant": "solid-full",
+      "path": "/tools/json-formatter",
+      "fcpMs": 620,
+      "lcpMs": 620,
+      "cls": 0,
+      "domContentLoadedMs": 599,
+      "loadMs": 907.5999999046326,
+      "observedMs": 2712,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 74.23299999999999,
+      "taskMs": 272.975,
+      "idleTaskMs": 0.4049999999999887,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 6.400000095367432,
+            "frameMs": 183.09999990463257
+          },
+          {
+            "commitMs": 8.099999904632568,
+            "frameMs": 199.5
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 166.59999990463257
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 186.79999995231628
+          },
+          {
+            "commitMs": 5.200000047683716,
+            "frameMs": 183.59999990463257
+          },
+          {
+            "commitMs": 5.099999904632568,
+            "frameMs": 162.59999990463257
+          },
+          {
+            "commitMs": 4.900000095367432,
+            "frameMs": 167.20000004768372
+          }
+        ]
+      }
+    },
+    {
+      "round": 7,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/json-formatter",
+      "fcpMs": 624,
+      "lcpMs": 624,
+      "cls": 0,
+      "domContentLoadedMs": 606.7000000476837,
+      "loadMs": 912.5,
+      "observedMs": 2716.5,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119671,
+      "htmlBytes": 31022,
+      "scriptMs": 75.866,
+      "taskMs": 272.431,
+      "idleTaskMs": 0.3250000000000197,
+      "interactions": {
+        "inputBytes": 110421,
+        "latencies": [
+          {
+            "commitMs": 7.299999952316284,
+            "frameMs": 185.40000009536743
+          },
+          {
+            "commitMs": 7.400000095367432,
+            "frameMs": 166.40000009536743
+          },
+          {
+            "commitMs": 5.799999952316284,
+            "frameMs": 167.09999990463257
+          },
+          {
+            "commitMs": 5.6000001430511475,
+            "frameMs": 186.60000014305115
+          },
+          {
+            "commitMs": 5.900000095367432,
+            "frameMs": 180.30000019073486
+          },
+          {
+            "commitMs": 5.299999952316284,
+            "frameMs": 166
+          },
+          {
+            "commitMs": 5,
+            "frameMs": 165.59999990463257
+          }
+        ]
+      }
+    },
+    {
+      "round": 7,
+      "variant": "solid-static",
+      "path": "/tools/word-counter",
+      "fcpMs": 284,
+      "lcpMs": 284,
+      "cls": 0,
+      "domContentLoadedMs": 69.29999995231628,
+      "loadMs": 182.29999995231628,
+      "observedMs": 2046.2999999523163,
+      "longTaskCount": 2,
+      "blockingMs": 40,
+      "jsRequests": 0,
+      "jsGzipBytes": 0,
+      "htmlBytes": 23085,
+      "scriptMs": 1.037,
+      "taskMs": 192.859,
+      "idleTaskMs": 0.3110000000000057,
+      "interactions": null
+    },
+    {
+      "round": 7,
+      "variant": "baseline-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 692,
+      "lcpMs": 692,
+      "cls": 0,
+      "domContentLoadedMs": 580.2999999523163,
+      "loadMs": 1052.8999998569489,
+      "observedMs": 2856.399999856949,
+      "longTaskCount": 1,
+      "blockingMs": 20,
+      "jsRequests": 26,
+      "jsGzipBytes": 174392,
+      "htmlBytes": 25300,
+      "scriptMs": 162.25400000000002,
+      "taskMs": 317.593,
+      "idleTaskMs": 0.16499999999997073,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 16.700000047683716,
+            "frameMs": 152
+          },
+          {
+            "commitMs": 18.59999990463257,
+            "frameMs": 150
+          },
+          {
+            "commitMs": 18,
+            "frameMs": 165.70000004768372
+          },
+          {
+            "commitMs": 18.100000143051147,
+            "frameMs": 116.60000014305115
+          },
+          {
+            "commitMs": 17.700000047683716,
+            "frameMs": 115.70000004768372
+          },
+          {
+            "commitMs": 16.299999952316284,
+            "frameMs": 116.69999980926514
+          },
+          {
+            "commitMs": 17.800000190734863,
+            "frameMs": 121.90000009536743
+          }
+        ]
+      }
+    },
+    {
+      "round": 7,
+      "variant": "solid-full",
+      "path": "/tools/word-counter",
+      "fcpMs": 632,
+      "lcpMs": 632,
+      "cls": 0,
+      "domContentLoadedMs": 617.7999999523163,
+      "loadMs": 922.5,
+      "observedMs": 2726.7000000476837,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 74.659,
+      "taskMs": 270.84200000000004,
+      "idleTaskMs": 0.29799999999996496,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 14.700000047683716,
+            "frameMs": 138
+          },
+          {
+            "commitMs": 15.299999952316284,
+            "frameMs": 149.90000009536743
+          },
+          {
+            "commitMs": 18.799999952316284,
+            "frameMs": 167.29999995231628
+          },
+          {
+            "commitMs": 16.09999990463257,
+            "frameMs": 115.59999990463257
+          },
+          {
+            "commitMs": 15.299999952316284,
+            "frameMs": 102.90000009536743
+          },
+          {
+            "commitMs": 15.200000047683716,
+            "frameMs": 114.20000004768372
+          },
+          {
+            "commitMs": 15.599999904632568,
+            "frameMs": 116.5
+          }
+        ]
+      }
+    },
+    {
+      "round": 7,
+      "variant": "solid-reduced-motion",
+      "path": "/tools/word-counter",
+      "fcpMs": 628,
+      "lcpMs": 628,
+      "cls": 0,
+      "domContentLoadedMs": 612.1999998092651,
+      "loadMs": 917.5999999046326,
+      "observedMs": 2720.7999999523163,
+      "longTaskCount": 0,
+      "blockingMs": 0,
+      "jsRequests": 25,
+      "jsGzipBytes": 119606,
+      "htmlBytes": 27361,
+      "scriptMs": 77.271,
+      "taskMs": 276.536,
+      "idleTaskMs": 0.19500000000000073,
+      "interactions": {
+        "inputBytes": 126976,
+        "latencies": [
+          {
+            "commitMs": 15,
+            "frameMs": 150.59999990463257
+          },
+          {
+            "commitMs": 15.200000047683716,
+            "frameMs": 116.5
+          },
+          {
+            "commitMs": 17.600000143051147,
+            "frameMs": 117.60000014305115
+          },
+          {
+            "commitMs": 16.5,
+            "frameMs": 105.19999980926514
+          },
+          {
+            "commitMs": 15.100000143051147,
+            "frameMs": 110.90000009536743
+          },
+          {
+            "commitMs": 14.099999904632568,
+            "frameMs": 120.09999990463257
+          },
+          {
+            "commitMs": 15.800000190734863,
+            "frameMs": 112.70000004768372
+          }
+        ]
+      }
+    }
+  ]
+}

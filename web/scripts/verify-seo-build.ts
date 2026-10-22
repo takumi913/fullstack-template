@@ -20,6 +20,17 @@ import { toolsmithCopy } from "../src/config/toolsmith-copy";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const clientDir = join(scriptDir, "..", "dist", "client");
+const buildManifest = JSON.parse(
+  await readFile(join(clientDir, ".vite", "manifest.json"), "utf8"),
+) as Record<
+  string,
+  {
+    file: string;
+    imports?: string[];
+  }
+>;
+const clientEntry = buildManifest["src/entry-client.tsx"].file;
+const chunkKeys = new Map(Object.entries(buildManifest).map(([key, chunk]) => [chunk.file, key]));
 
 async function readOutput(...parts: string[]) {
   return readFile(join(clientDir, ...parts), "utf8");
@@ -64,13 +75,49 @@ function assertMatches(content: string, pattern: RegExp, label: string) {
 }
 
 function assertPublicHtmlDoesNotLoadPrivateApp(html: string, label: string) {
-  for (const privateChunk of ["authStore-", "RouteGuards-", "tenantStore-"]) {
-    assertExcludes(html, privateChunk, `${label} private app bundle`);
+  const loaded = new Set<string>();
+  function visit(key: string) {
+    if (loaded.has(key)) return;
+    loaded.add(key);
+    for (const dependency of buildManifest[key].imports ?? []) visit(dependency);
+  }
+  for (const match of html.matchAll(/(?:src|href)="\/([^"]+\.js)"/g)) {
+    const key = chunkKeys.get(match[1]);
+    if (key) visit(key);
+  }
+  for (const key of loaded) {
+    if (/AppState|RouteGuards|(?:private|app|auth)-layout/.test(key)) {
+      throw new Error(`${label}: loads private app dependency ${key}`);
+    }
   }
 }
 
 function assertHydratedHtml(html: string, label: string) {
-  assertIncludes(html, "entry.client-", `${label} client runtime`);
+  assertMatches(
+    html,
+    new RegExp(`<script(?=[^>]*type="module")(?=[^>]*src="/${clientEntry}")[^>]*>`),
+    `${label} client runtime`,
+  );
+}
+
+function assertPreloadedModule(html: string, module: string, label: string) {
+  const preloads = new Set(
+    [...html.matchAll(/<link\b(?=[^>]*rel="modulepreload")[^>]*href="\/([^"]+)"/g)].map(
+      (match) => match[1],
+    ),
+  );
+  if (!preloads.has(buildManifest[module].file)) {
+    throw new Error(`${label}: missing hydration preload for ${module}`);
+  }
+}
+
+function assertToolPreloaded(html: string, componentKey: string, label: string) {
+  const module = {
+    "ai-text": "TextWorkbench",
+    "json-formatter": "JsonFormatterTool",
+    "word-counter": "WordCounterTool",
+  }[componentKey];
+  if (module) assertPreloadedModule(html, `src/tools/${module}.tsx`, label);
 }
 
 const home = await readOutput("index.html");
@@ -81,9 +128,13 @@ assertIncludes(home, 'rel="canonical"', "home HTML");
 assertIncludes(home, `href="${siteConfig.url}/"`, "home canonical");
 assertIncludes(home, "application/ld+json", "home HTML");
 assertPublicHtmlDoesNotLoadPrivateApp(home, "home HTML");
+// Missing lazy metadata briefly replaces prerendered content with a loading placeholder.
+assertPreloadedModule(home, "src/routes/public-layout.tsx", "home layout");
+assertPreloadedModule(home, "src/routes/home.tsx", "home route");
 const homePrimaryTool = resolveHomepageTool(siteConfig.homePrimaryToolSlug);
 if (homePrimaryTool) {
   assertHydratedHtml(home, "home primary tool HTML");
+  assertToolPreloaded(home, homePrimaryTool.componentKey, "home primary tool HTML");
   assertIncludes(home, homePrimaryTool.name, "home primary tool name");
   if (homePrimaryTool.componentKey === "ai-text") {
     const copy = toolsmithCopy("en");
@@ -129,7 +180,7 @@ for (const locale of supportedLocales) {
   for (const page of Object.values(pages)) {
     const html = await readOutput(...htmlOutputParts(page.path));
     assertIncludes(html, `lang="${locale}"`, `${page.path} document language`);
-    assertIncludes(html, `<title>${page.title}</title>`, `${page.path} title`);
+    assertIncludes(html, `>${page.title}</title>`, `${page.path} title`);
     assertIncludes(html, `href="${siteConfig.url}${page.path}"`, `${page.path} canonical`);
     assertIncludes(html, copy.navigation.privacy, `${page.path} privacy navigation`);
     assertIncludes(html, copy.navigation.terms, `${page.path} terms navigation`);
@@ -173,6 +224,8 @@ for (const tool of routableToolPages) {
 
   assertPublicHtmlDoesNotLoadPrivateApp(html, `${tool.slug} HTML`);
   assertHydratedHtml(html, `${tool.slug} HTML`);
+  assertPreloadedModule(html, "src/routes/tool.tsx", `${tool.slug} HTML`);
+  assertToolPreloaded(html, tool.componentKey, `${tool.slug} HTML`);
   assertIncludes(html, tool.title, `${tool.slug} HTML`);
   assertIncludes(html, tool.h1, `${tool.slug} HTML`);
   assertIncludes(html, 'rel="canonical"', `${tool.slug} HTML`);

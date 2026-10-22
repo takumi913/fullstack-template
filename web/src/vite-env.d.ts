@@ -1,3 +1,4 @@
+/// <reference types="@solidjs/vite-plugin/virtual-solid-manifest" />
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {

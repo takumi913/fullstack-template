@@ -1,7 +1,6 @@
 # 第一阶段：前端构建阶段
-# Bun 负责依赖安装与 scripts；React Router/Vite 的 prerender/server build 需要
-# Node 专用的 react-dom/server API。纯 Bun runtime 会按 "bun" condition 解析到
-# server.bun.js（没有 renderToPipeableStream），因此构建镜像必须同时提供 Node。
+# Bun 负责依赖安装、Vite 构建、公开页面预渲染与 SEO 产物校验。
+# 构建期渲染产物不进入最终镜像，生产由 Go 提供 API 与静态文件。
 FROM --platform=$BUILDPLATFORM oven/bun:1.3.14-alpine AS bun-runtime
 
 FROM --platform=$BUILDPLATFORM node:26.10.0-alpine AS frontend-builder

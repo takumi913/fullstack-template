@@ -91,12 +91,6 @@ Sitemap: ${siteUrl}/sitemap.xml
 
 await mkdir(outputDir, { recursive: true });
 const notFound = await readFile(join(outputDir, "404", "index.html"), "utf8");
-const spaFallbackPath = join(outputDir, "__spa-fallback.html");
-const spaFallback = await readFile(spaFallbackPath, "utf8");
-const noindexMeta = '<meta name="robots" content="noindex, nofollow">';
-const protectedSpaFallback = /<meta[^>]+name=["']robots["'][^>]*>/i.test(spaFallback)
-  ? spaFallback.replace(/<meta[^>]+name=["']robots["'][^>]*>/i, noindexMeta)
-  : spaFallback.replace("</head>", `${noindexMeta}</head>`);
 
 // Localized redirects mirror the English routing policy, without a catch-all SPA 200.
 const baseRedirects = await readFile(join(scriptDir, "..", "public", "_redirects"), "utf8");
@@ -127,7 +121,6 @@ const generatedFiles = [
   writeFile(join(outputDir, "robots.txt"), robots),
   writeFile(join(outputDir, "manifest.webmanifest"), manifest + "\n"),
   writeFile(join(outputDir, "404.html"), notFound),
-  writeFile(spaFallbackPath, protectedSpaFallback),
 ];
 
 if (siteImage === "/og-image.svg") {
@@ -140,7 +133,7 @@ if (siteFavicon === "/favicon.svg") {
 
 await Promise.all(generatedFiles);
 
-// /404 只用于生成统一的 React 404 文档，最终不能保留为可返回 200 的静态页面。
+// /404 只用于生成统一的 Solid 2 404 文档，最终不能保留为可返回 200 的静态页面。
 await rm(join(outputDir, "404"), { recursive: true, force: true });
 
 if (!process.env.VITE_SITE_URL) {

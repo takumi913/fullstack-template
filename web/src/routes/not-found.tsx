@@ -1,26 +1,28 @@
-import { useTranslation } from "react-i18next";
-import { useLocale } from "@/i18n/useLocale";
+import { httpStatus } from "@solidjs/web";
+import { useTranslation, useLocale } from "@/i18n/context";
 import { localizedPath } from "@/i18n/locales";
-import { Link } from "react-router";
-import { notFoundPageMeta } from "@/seo/page";
+import { notFoundPageMeta, withPageMeta } from "@/seo/page";
 
 export const meta = () => notFoundPageMeta("404 - Page not found");
 
-export default function NotFoundRoute() {
+function NotFoundRoute() {
+  httpStatus(404);
   const { t } = useTranslation();
   const locale = useLocale();
   return (
-    <section className="shell grid min-h-[60vh] place-items-center px-6 py-20 text-center">
+    <section class="shell grid min-h-[60vh] place-items-center px-6 py-20 text-center">
       <div>
-        <p className="text-sm font-medium text-muted-foreground">404</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-foreground">
+        <p class="text-sm font-medium text-muted-foreground">404</p>
+        <h1 class="mt-2 text-3xl font-semibold tracking-[-0.03em] text-foreground">
           {t("error.notFound")}
         </h1>
-        <p className="mt-3 text-sm text-muted-foreground">{t("error.missing")}</p>
-        <Link className="button-primary mt-6 inline-flex" to={localizedPath("/", locale)}>
+        <p class="mt-3 text-sm text-muted-foreground">{t("error.missing")}</p>
+        <a class="button-primary mt-6 inline-flex" href={localizedPath("/", locale())}>
           {t("error.home")}
-        </Link>
+        </a>
       </div>
     </section>
   );
 }
+
+export default withPageMeta(NotFoundRoute, meta);

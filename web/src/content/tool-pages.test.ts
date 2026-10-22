@@ -36,7 +36,7 @@ describe("tool page definitions", () => {
     }
   });
 
-  it("registers a React implementation for every routable tool", () => {
+  it("registers a Solid 2 implementation for every routable tool", () => {
     for (const tool of routableToolPages) {
       expect(
         toolComponents[tool.componentKey],

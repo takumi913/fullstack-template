@@ -1,14 +1,9 @@
 import { appTranslations } from "@/i18n/private";
-import { localeFromPath, localizedPath, supportedLocales } from "@/i18n/locales";
-import type { Route } from "./+types/profile-settings";
+import { localeFromPath } from "@/i18n/locales";
 import ProfileSettingsPage from "@/pages/ProfileSettingsPage";
-import { privatePageTitleMeta } from "@/seo/page";
+import { privatePageTitleMeta, withPageMeta } from "@/seo/page";
 
-export const meta = ({ location }: Route.MetaArgs) =>
-  privatePageTitleMeta(appTranslations[localeFromPath(location.pathname)].profile.title);
+export const meta = (pathname: string) =>
+  privatePageTitleMeta(appTranslations[localeFromPath(pathname)].profile.title);
 
-export const handle = {
-  languageAlternates: (path: string) =>
-    supportedLocales.map((locale) => ({ hreflang: locale, path: localizedPath(path, locale) })),
-};
-export default ProfileSettingsPage;
+export default withPageMeta(ProfileSettingsPage, meta);

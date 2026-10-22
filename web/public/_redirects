@@ -1,5 +1,5 @@
 # Cloudflare Pages 路由规则
-# 公开 SEO 页面由 React Router 预渲染为真实 HTML，静态文件优先匹配。
+# 公开 SEO 页面由 Solid 构建期预渲染为真实 HTML，静态文件优先匹配。
 # canonical URL 统一不带尾斜杠；只有应用内路由使用 SPA fallback。
 
 /tools/                 /tools                  301

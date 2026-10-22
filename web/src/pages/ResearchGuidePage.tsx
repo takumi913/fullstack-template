@@ -1,59 +1,63 @@
-import { Link } from "react-router";
+import { For } from "solid-js";
 import { toolsmithCopy } from "@/config/toolsmith-copy";
 import { catalogToolPath } from "@/content/toolsmith-catalog";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/useLocale";
+import { useLocale } from "@/i18n/context";
 
 export function ResearchGuidePage() {
   const locale = useLocale(),
-    copy = toolsmithCopy(locale);
+    copy = () => toolsmithCopy(locale());
   const sections = ["intro", "steps", "comparison", "comparison"];
-  const summarizer = catalogToolPath("summarizer", locale);
+  const summarizer = () => catalogToolPath("summarizer", locale());
   return (
-    <section className="design-container design-guide" data-screen-label="Guide">
-      <nav className="design-breadcrumb">
-        <Link to={localizedPath("/", locale)}>{copy.crumbHome}</Link>
+    <section class="design-container design-guide" data-screen-label="Guide">
+      <nav class="design-breadcrumb">
+        <a href={localizedPath("/", locale())}>{copy().crumbHome}</a>
         <span>/</span>
-        <Link to={localizedPath("/resources", locale)}>{copy.navBlog}</Link>
+        <a href={localizedPath("/resources", locale())}>{copy().navBlog}</a>
         <span>/</span>
-        <span>{copy.guideCrumb}</span>
+        <span>{copy().guideCrumb}</span>
       </nav>
-      <h1 className="design-guide-title">{copy.guideTitle}</h1>
-      <div className="design-guide-meta">{copy.guideMeta}</div>
-      <div className="design-guide-grid">
-        <article className="design-guide-article">
-          <p id="intro" className="design-guide-intro">
-            {copy.guideIntro}
+      <h1 class="design-guide-title">{copy().guideTitle}</h1>
+      <div class="design-guide-meta">{copy().guideMeta}</div>
+      <div class="design-guide-grid">
+        <article class="design-guide-article">
+          <p id="intro" class="design-guide-intro">
+            {copy().guideIntro}
           </p>
-          <h2 id="steps">{copy.gStepsTitle}</h2>
-          <div className="design-guide-steps">
-            {copy.gSteps.map((step) => (
-              <div className="design-guide-step" key={step.n}>
-                <span className="design-guide-number">{step.n}</span>
-                <div>
-                  <div className="design-guide-step-title">{step.t}</div>
-                  <div className="design-guide-step-copy">{step.d}</div>
+          <h2 id="steps">{copy().gStepsTitle}</h2>
+          <div class="design-guide-steps">
+            <For each={copy().gSteps}>
+              {(step) => (
+                <div class="design-guide-step">
+                  <span class="design-guide-number">{step.n}</span>
+                  <div>
+                    <div class="design-guide-step-title">{step.t}</div>
+                    <div class="design-guide-step-copy">{step.d}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )}
+            </For>
           </div>
-          <div className="design-guide-tip">
+          <div class="design-guide-tip">
             <div>
-              <div className="design-guide-tip-title">{copy.tipTitle}</div>
-              <div className="design-guide-tip-copy">{copy.tipBody}</div>
+              <div class="design-guide-tip-title">{copy().tipTitle}</div>
+              <div class="design-guide-tip-copy">{copy().tipBody}</div>
             </div>
-            <Link className="design-button primary" to={summarizer}>
-              {copy.tryNow} →
-            </Link>
+            <a class="design-button primary" href={summarizer()}>
+              {copy().tryNow} →
+            </a>
           </div>
-          <h2 id="comparison">{copy.cmpTitle}</h2>
-          <div className="design-comparison">
-            <div className="design-comparison-grid">
-              {copy.cmp.flatMap((row, rowIndex) =>
+          <h2 id="comparison">{copy().cmpTitle}</h2>
+          <div class="design-comparison">
+            <div class="design-comparison-grid">
+              {copy().cmp.flatMap((row, rowIndex) =>
                 row.map((value, index) => (
                   <div
-                    className={`design-comparison-cell ${rowIndex === 0 ? "heading" : ""} ${index === 0 ? "row-label" : ""} ${index === 1 ? "featured" : ""}`}
-                    key={`${rowIndex}-${index}`}
+                    class={[
+                      "design-comparison-cell",
+                      { heading: rowIndex === 0, "row-label": index === 0, featured: index === 1 },
+                    ]}
                   >
                     {value}
                   </div>
@@ -62,23 +66,21 @@ export function ResearchGuidePage() {
             </div>
           </div>
         </article>
-        <aside className="design-guide-aside">
-          <div className="design-guide-toc">
-            <div className="design-guide-toc-title">{copy.tocTitle}</div>
-            <nav className="design-guide-toc-links">
-              {copy.toc.map((title, index) => (
-                <a key={title} href={`#${sections[index]}`}>
-                  {title}
-                </a>
-              ))}
+        <aside class="design-guide-aside">
+          <div class="design-guide-toc">
+            <div class="design-guide-toc-title">{copy().tocTitle}</div>
+            <nav class="design-guide-toc-links">
+              <For each={copy().toc}>
+                {(title, index) => <a href={`#${sections[index()]}`}>{title}</a>}
+              </For>
             </nav>
           </div>
-          <div className="design-guide-side-cta">
-            <div className="design-guide-side-cta-title">{copy.sideCtaTitle}</div>
-            <div className="design-guide-side-cta-copy">{copy.sideCtaBody}</div>
-            <Link className="design-button" to={summarizer}>
-              {copy.tryNow} →
-            </Link>
+          <div class="design-guide-side-cta">
+            <div class="design-guide-side-cta-title">{copy().sideCtaTitle}</div>
+            <div class="design-guide-side-cta-copy">{copy().sideCtaBody}</div>
+            <a class="design-button" href={summarizer()}>
+              {copy().tryNow} →
+            </a>
           </div>
         </aside>
       </div>

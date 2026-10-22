@@ -1,20 +1,18 @@
+import type { JSX } from "@solidjs/web";
 import { PrivateI18nProvider } from "@/i18n/PrivateI18nProvider";
-import { Outlet } from "react-router";
 import { ProtectedRoute } from "@/router/RouteGuards";
 import { AppHeader } from "./AppHeader";
 import { PointerGlow } from "./DesignEffects";
 import { CommandPalette } from "./CommandPalette";
-export function AppLayout() {
+export function AppLayout(props: { children?: JSX.Element }) {
   return (
     <PrivateI18nProvider>
       <ProtectedRoute>
-        <div className="design-site">
+        <div class="design-site">
           <PointerGlow />
-          <section className="design-workspace" data-screen-label="Workspace">
+          <section class="design-workspace" data-screen-label="Workspace">
             <AppHeader />
-            <main className="design-workspace-main">
-              <Outlet />
-            </main>
+            <main class="design-workspace-main">{props.children}</main>
           </section>
           <CommandPalette />
         </div>

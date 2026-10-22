@@ -1,7 +1,5 @@
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { useTranslation } from "react-i18next";
-import { SiteI18nProvider } from "../i18n/SiteI18nProvider";
+import { renderToString } from "@solidjs/web";
+import { SiteI18nProvider, useTranslation } from "../i18n/context";
 import { describe, expect, it } from "vitest";
 import { resolveDocumentLocale } from "./document-locale";
 import { localizedPath, unlocalizedPath } from "../i18n/locales";
@@ -36,12 +34,14 @@ describe("resolveDocumentLocale", () => {
   it("isolates language state across prerendered documents", () => {
     function Navigation() {
       const { t } = useTranslation();
-      return createElement("span", null, t("navigation.privacy"));
+      return <span>{t("navigation.privacy")}</span>;
     }
     const render = (locale: "en" | "zh-CN") =>
-      renderToStaticMarkup(
-        createElement(SiteI18nProvider, { locale, children: createElement(Navigation) }),
-      );
+      renderToString(() => (
+        <SiteI18nProvider locale={locale}>
+          <Navigation />
+        </SiteI18nProvider>
+      )).replace(/<!--.*?-->/g, "");
     expect(render("zh-CN")).toBe("<span>隐私政策</span>");
     expect(render("en")).toBe("<span>Privacy policy</span>");
     expect(render("zh-CN")).toBe("<span>隐私政策</span>");

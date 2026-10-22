@@ -1,11 +1,10 @@
 import js from "@eslint/js";
 import globals from "globals";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
+import solid from "eslint-plugin-solid/configs/v2";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", ".react-router"] },
+  { ignores: ["dist"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -13,14 +12,9 @@ export default tseslint.config(
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    plugins: {
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-    },
+    plugins: solid.plugins,
+    settings: solid.settings,
+    rules: solid.rules,
   },
   {
     // Public shell code is loaded by every prerendered SEO page. Keep private app
@@ -51,20 +45,6 @@ export default tseslint.config(
           ],
         },
       ],
-    },
-  },
-  {
-    // React Router Framework Mode route modules intentionally export meta/links/loaders
-    // next to the route component. Registry/context modules are infrastructure rather
-    // than Fast Refresh leaf components, so the same React Refresh rule is not useful.
-    files: [
-      "src/root.tsx",
-      "src/routes/**/*.tsx",
-      "src/tools/context.tsx",
-      "src/tools/registry.tsx",
-    ],
-    rules: {
-      "react-refresh/only-export-components": "off",
     },
   },
 );

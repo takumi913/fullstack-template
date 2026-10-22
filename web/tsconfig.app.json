@@ -6,16 +6,13 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
-    "rootDirs": [".", "./.react-router/types"],
-
+    "jsx": "preserve",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -23,10 +20,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "ignoreDeprecations": "6.0",
-
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "jsxImportSource": "@solidjs/web"
   },
-  "include": ["src", ".react-router/types/**/*"]
+  "include": ["src"]
 }

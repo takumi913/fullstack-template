@@ -10,19 +10,14 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      # Framework 的构建工具与运行时必须同版本升级。
-      react-router:
-        patterns: ["react-router", "@react-router/*"]
+      # Solid 的编译器、DOM 运行时与路由需要一起校验兼容性。
+      solid:
+        patterns: ["solid-js", "@solidjs/*"]
     ignore:
       # typescript-eslint 尚不支持 TypeScript 7.x
       # https://github.com/typescript-eslint/typescript-eslint/issues/10940
       - dependency-name: "typescript"
         versions: [">=7.0.0"]
-      # Framework 大版本需要迁移配置，不能只升级构建工具。
-      - dependency-name: "react-router"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@react-router/*"
-        update-types: ["version-update:semver-major"]
 
   # Go 依赖
   - package-ecosystem: "gomod"
