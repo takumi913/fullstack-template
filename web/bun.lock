@@ -5,7 +5,7 @@
     "": {
       "name": "fullstack-template",
       "dependencies": {
-        "@lucide/solid": "1.61.0",
+        "@lucide/solid": "1.62.0",
         "@solidjs/router": "2.0.0-next.41",
         "@solidjs/web": "2.0.0-rc.16",
         "@tailwindcss/vite": "^4.1.10",
@@ -194,7 +194,7 @@
 
     "@keyv/serialize": ["@keyv/serialize@1.1.1", "", {}, "sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA=="],
 
-    "@lucide/solid": ["@lucide/solid@1.61.0", "", { "peerDependencies": { "solid-js": "^2.0.0-rc.0" } }, "sha512-3OBEUFrhQc6lPxooZ87KpMus8K3zFkLZ7G4S2xhLMVTivTihV8o2JP06d3LUcBLC3//81eSvRpn5f1Db//Zgpg=="],
+    "@lucide/solid": ["@lucide/solid@1.62.0", "", { "peerDependencies": { "solid-js": "^2.0.0-rc.0" } }, "sha512-KcP0S+cYoDKV2ZgEYZFS/6WmXaqCsb8f2bLLw30GkRjXdYpCp+cljskl9ldgvaQXZb3rb92hbcwX7MdvsT6TPA=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.6", "", { "dependencies": { "@tybys/wasm-util": "^0.10.3" }, "peerDependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1" } }, "sha512-ZLv/JdUfkvOy9eCnnBaGfiO+XimbjebAeO+MRQqD/B+FR1tnRN0tpKSJHRbE8sFfS6aqsXZ67TQjfwfsxULVbg=="],
 
