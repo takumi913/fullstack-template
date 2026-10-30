@@ -3,7 +3,7 @@
 # 构建期渲染产物不进入最终镜像，生产由 Go 提供 API 与静态文件。
 FROM --platform=$BUILDPLATFORM oven/bun:1.3.14-alpine AS bun-runtime
 
-FROM --platform=$BUILDPLATFORM node:26.12.0-alpine AS frontend-builder
+FROM --platform=$BUILDPLATFORM node:26.12.1-alpine AS frontend-builder
 
 # 两个基础镜像都是 Alpine/musl，直接复用固定版本 Bun 二进制，避免 curl 安装和版本漂移。
 COPY --from=bun-runtime /usr/local/bin/bun /usr/local/bin/bun
