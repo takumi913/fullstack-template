@@ -3,20 +3,15 @@ import type { JSX } from "@solidjs/web";
 import { useNavigate } from "@solidjs/router";
 import { useTranslation, useLocale } from "@/i18n/context";
 import { localizedPath } from "@/i18n/locales";
-import { useAuth, useTenant } from "@/store/AppState";
+import { useAuth } from "@/store/AppState";
 
 export function ProtectedRoute(props: { children: JSX.Element }) {
   const { t } = useTranslation();
   const locale = useLocale();
   const auth = useAuth();
-  const tenant = useTenant();
   const navigate = useNavigate();
   onSettled(() => {
-    if (auth.state.loading)
-      void auth.loadSession().then((session) => {
-        // 直接刷新租户页面时，会话响应同时恢复当前工作区。
-        if (session) tenant.hydrate(session);
-      });
+    if (auth.state.loading) void auth.loadSession();
   });
   createEffect(
     () => ({

@@ -9,6 +9,20 @@ import (
 	"context"
 )
 
+const countUsers = `-- name: CountUsers :one
+SELECT COUNT(*) FROM users
+WHERE deleted_at IS NULL
+  AND (strpos(lower(username), lower($1::text)) > 0
+       OR strpos(lower(email), lower($1::text)) > 0)
+`
+
+func (q *Queries) CountUsers(ctx context.Context, search string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countUsers, search)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createUser = `-- name: CreateUser :exec
 INSERT INTO users (id, username, email, password_hash, avatar_url, status) VALUES ($1, $2, $3, $4, $5, $6)
 `
@@ -35,7 +49,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, email, password_hash, avatar_url, status, created_at, updated_at, deleted_at FROM users WHERE email = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, username, email, password_hash, avatar_url, status, created_at, updated_at, deleted_at, is_admin FROM users WHERE email = $1 AND deleted_at IS NULL LIMIT 1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -51,12 +65,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.IsAdmin,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, username, email, password_hash, avatar_url, status, created_at, updated_at, deleted_at FROM users WHERE id = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, username, email, password_hash, avatar_url, status, created_at, updated_at, deleted_at, is_admin FROM users WHERE id = $1 AND deleted_at IS NULL LIMIT 1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
@@ -72,12 +87,13 @@ func (q *Queries) GetUserByID(ctx context.Context, id string) (User, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.IsAdmin,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, email, password_hash, avatar_url, status, created_at, updated_at, deleted_at FROM users WHERE username = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, username, email, password_hash, avatar_url, status, created_at, updated_at, deleted_at, is_admin FROM users WHERE username = $1 AND deleted_at IS NULL LIMIT 1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -93,8 +109,70 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.IsAdmin,
 	)
 	return i, err
+}
+
+const listUsers = `-- name: ListUsers :many
+SELECT id, username, email, password_hash, avatar_url, status, created_at, updated_at, deleted_at, is_admin FROM users
+WHERE deleted_at IS NULL
+  AND (strpos(lower(username), lower($1::text)) > 0
+       OR strpos(lower(email), lower($1::text)) > 0)
+ORDER BY created_at DESC, id DESC
+LIMIT $3::bigint OFFSET $2::bigint
+`
+
+type ListUsersParams struct {
+	Search     string
+	PageOffset int64
+	PageLimit  int64
+}
+
+func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, listUsers, arg.Search, arg.PageOffset, arg.PageLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.Email,
+			&i.PasswordHash,
+			&i.AvatarUrl,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.IsAdmin,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const setUserAdmin = `-- name: SetUserAdmin :execrows
+UPDATE users SET is_admin = TRUE, updated_at = CURRENT_TIMESTAMP WHERE id = $1 AND status = 'active' AND deleted_at IS NULL
+`
+
+func (q *Queries) SetUserAdmin(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, setUserAdmin, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const updateUserPassword = `-- name: UpdateUserPassword :execrows
@@ -132,6 +210,23 @@ func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfilePa
 		arg.AvatarUrl,
 		arg.ID,
 	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const updateUserStatus = `-- name: UpdateUserStatus :execrows
+UPDATE users SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND deleted_at IS NULL AND is_admin = FALSE
+`
+
+type UpdateUserStatusParams struct {
+	Status string
+	ID     string
+}
+
+func (q *Queries) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updateUserStatus, arg.Status, arg.ID)
 	if err != nil {
 		return 0, err
 	}

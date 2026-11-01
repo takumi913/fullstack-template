@@ -1,6 +1,6 @@
-# Go + Solid 2 多租户全栈模板
+# Go + Solid 2 全栈模板
 
-一个精简的 SaaS 基础模板，提供邮箱密码认证、数据库 Session、组织型多租户和固定 RBAC。
+一个精简的个人账号模板，提供邮箱密码认证和数据库 Session。
 
 ## 技术栈
 
@@ -17,11 +17,11 @@ Solid 2 及配套 Router、Vite 插件目前使用预发布版本，具体版本
 ## 核心能力
 
 - 注册、登录、退出、资料和密码管理
-- 注册时自动创建默认工作区
-- 一个用户可以加入多个工作区
-- Owner、Admin、Member 三种租户角色
+- 注册只需邮箱和密码，用户名按邮箱自动生成，之后可在个人资料中修改
+- 账号属于个人，没有工作区或成员角色
+- 平台管理员可查看、搜索、分页与启停普通用户，禁用时清除全部登录会话
 - SQLite/PostgreSQL 独立 migrations 和 sqlc 查询
-- 权限矩阵与租户隔离的接口级测试，前后端均有测试
+- 认证边界的接口级测试，前后端均有测试
 - English-first i18next：英文根路径 + 简体中文 `/zh-cn`，包含双语隐私政策与服务条款
 - Public SSG + Private SPA，适合 SEO 工具站
 - Tool Page Schema 自动生成 meta、JSON-LD、sitemap 与相关工具内链
@@ -92,11 +92,31 @@ TRUST_PROXY=true
 在两个方言目录下各放一个同版本号的文件即可，启动时会按版本号顺序自动执行未应用的迁移：
 
 ```text
-db/migrations/sqlite/000002_add_projects.up.sql
-db/migrations/postgres/000002_add_projects.up.sql
+db/migrations/sqlite/000004_add_projects.up.sql
+db/migrations/postgres/000004_add_projects.up.sql
 ```
 
 改完 `db/query/` 下的 SQL 后运行 `make sqlc-generate` 重新生成代码，CI 会校验生成结果是否最新。
+新增影响查询的表或字段时，同时将对应迁移加入 `sqlc.yaml` 的 schema 来源。
+
+从旧版升级时，`000002_drop_workspaces` 会保留用户与会话，删除工作区、成员关系和会话中的当前工作区字段。
+
+## 平台管理员
+
+所有新旧账号默认都是普通用户。先正常注册账号，再在服务器使用相同的数据库配置授予管理员权限：
+
+```bash
+./server grant-admin --user-id '已注册用户ID'
+# 开发环境
+go run . grant-admin --user-id '已注册用户ID'
+```
+
+用户 ID 可从登录后的 `GET /api/v1/auth/session` 响应 `data.user.id` 取得。
+命令只为已注册且启用的指定账号授予权限，不按邮箱或注册顺序自动授权。
+
+管理员登录后，侧栏会出现“用户管理”，地址为 `/admin/users`（中文 `/zh-cn/admin/users`）。
+支持按用户名或邮箱搜索、分页查看，以及启用和禁用普通账号；重新启用后需重新登录。
+管理员账号不提供网页启停入口。公开注册和个人资料接口都不能修改管理员身份。
 
 ## 常用命令
 
@@ -144,7 +164,7 @@ db/generated/        sqlc 生成代码
 pkg/handler/         HTTP 处理器
 pkg/service/         业务逻辑
 pkg/repo/            数据访问适配层（在此适配两种数据库方言）
-pkg/middleware/      Session、租户和权限中间件
-pkg/model/           数据结构与 RBAC 权限矩阵
+pkg/middleware/      Session 认证中间件
+pkg/model/           用户、会话与请求/响应数据结构
 web/                 Solid 2 前端
 ```

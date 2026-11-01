@@ -4,6 +4,9 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -29,6 +32,13 @@ import (
 func main() {
 	// echo 内部使用 log/slog，应用日志保持一致，避免同一份 stdout 里混两种格式。
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	adminID, err := adminCommandUserID(os.Args[1:])
+	if errors.Is(err, flag.ErrHelp) {
+		return
+	}
+	if err != nil {
+		fatal("命令参数错误", err)
+	}
 	if err := configs.Init(); err != nil {
 		fatal("配置初始化失败", err)
 	}
@@ -41,13 +51,21 @@ func main() {
 	}
 
 	store := repo.NewStore(database.GetDB(), configs.AppConfig.Database.Driver)
+	adminService := service.NewAdminService(store)
+	if adminID != "" {
+		if err := adminService.Grant(context.Background(), adminID); err != nil {
+			_ = database.Close()
+			fatal("授予平台管理员权限失败", err)
+		}
+		if err := database.Close(); err != nil {
+			fatal("关闭数据库失败", err)
+		}
+		return
+	}
 	authService := service.NewAuthService(store)
 	userService := service.NewUserService(store)
-	tenantService := service.NewTenantService(store)
-	memberService := service.NewMemberService(store)
-	handlers := api.Handlers{Auth: handler.NewAuthHandler(authService), User: handler.NewUserHandler(userService), Tenant: handler.NewTenantHandler(tenantService), Member: handler.NewMemberHandler(memberService)}
+	handlers := api.Handlers{Auth: handler.NewAuthHandler(authService), User: handler.NewUserHandler(userService), Admin: handler.NewAdminHandler(adminService)}
 	authMiddleware := middleware2.NewAuthMiddleware(authService)
-	tenantMiddleware := middleware2.NewTenantMiddleware(store)
 
 	e := echo.New()
 	// 限流按客户端 IP 计数。默认只信任连接来源；部署在反向代理后面时必须开启
@@ -69,7 +87,7 @@ func main() {
 	e.Use(middleware.BodyLimit(64 * 1024))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{AllowOrigins: configs.AppConfig.Server.CORSOrigins, AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions}, AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept}, AllowCredentials: true}))
-	api.SetupRoutes(e, handlers, authMiddleware, tenantMiddleware)
+	api.SetupRoutes(e, handlers, authMiddleware)
 	setupStaticFiles(e)
 
 	// SIGINT/SIGTERM 触发优雅关机（默认 10 秒宽限），之后统一关闭数据库连接。
@@ -83,7 +101,7 @@ func main() {
 		return nil
 	}}
 	// Start 会在收到信号后完成优雅关机再返回，正常关机返回 nil。
-	err := sc.Start(ctx, e)
+	err = sc.Start(ctx, e)
 	stop()
 	if closeErr := database.Close(); closeErr != nil {
 		slog.Error("关闭数据库失败", "error", closeErr)
@@ -91,6 +109,25 @@ func main() {
 	if err != nil {
 		fatal("服务器异常退出", err)
 	}
+}
+
+// adminCommandUserID keeps administrator grants explicit and separate from public registration.
+func adminCommandUserID(args []string) (string, error) {
+	if len(args) == 0 {
+		return "", nil
+	}
+	if args[0] != "grant-admin" {
+		return "", fmt.Errorf("用法: ./server [grant-admin --user-id <已注册用户ID>]")
+	}
+	flags := flag.NewFlagSet("grant-admin", flag.ContinueOnError)
+	userID := flags.String("user-id", "", "授予平台管理员权限的已注册用户 ID")
+	if err := flags.Parse(args[1:]); err != nil {
+		return "", err
+	}
+	if strings.TrimSpace(*userID) == "" || flags.NArg() != 0 {
+		return "", fmt.Errorf("用法: ./server grant-admin --user-id <已注册用户ID>")
+	}
+	return strings.TrimSpace(*userID), nil
 }
 
 // fatal 记录错误后退出。不用 log.Fatal 是为了统一走 slog，
@@ -168,10 +205,10 @@ func spaFallbackPath(path string) bool {
 		}
 	}
 	switch path {
-	case "/login", "/register", "/dashboard":
+	case "/login", "/register", "/dashboard", "/admin/users":
 		return true
 	}
-	return strings.HasPrefix(path, "/settings/") || strings.HasPrefix(path, "/tenant/")
+	return strings.HasPrefix(path, "/settings/")
 }
 
 // trailingSlashRedirectTarget 将非根路径统一为无尾斜杠 URL。

@@ -6,36 +6,25 @@ package postgresdb
 
 import (
 	"context"
-	"database/sql"
 )
 
 type Querier interface {
-	ClearSessionsActiveTenant(ctx context.Context, activeTenantID sql.NullString) error
-	CountTenantOwners(ctx context.Context, tenantID string) (int64, error)
-	CreateSession(ctx context.Context, arg CreateSessionParams) error
-	CreateTenant(ctx context.Context, arg CreateTenantParams) error
-	CreateTenantMember(ctx context.Context, arg CreateTenantMemberParams) error
+	CountUsers(ctx context.Context, search string) (int64, error)
+	// Disabling an account must wait for any in-flight session insert before revoking its sessions.
+	CreateSession(ctx context.Context, arg CreateSessionParams) (int64, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) error
 	DeleteExpiredSessions(ctx context.Context) error
 	DeleteSession(ctx context.Context, id string) (int64, error)
 	DeleteSessionsByUserID(ctx context.Context, userID string) error
-	DeleteTenantMember(ctx context.Context, arg DeleteTenantMemberParams) (int64, error)
-	DeleteTenantMemberKeepingOwner(ctx context.Context, arg DeleteTenantMemberKeepingOwnerParams) (int64, error)
 	GetSessionByTokenHash(ctx context.Context, tokenHash string) (Session, error)
-	GetTenantByID(ctx context.Context, id string) (Tenant, error)
-	GetTenantBySlug(ctx context.Context, slug string) (Tenant, error)
-	GetTenantMember(ctx context.Context, arg GetTenantMemberParams) (TenantMember, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id string) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
-	ListTenantMembers(ctx context.Context, tenantID string) ([]ListTenantMembersRow, error)
-	ListTenantsByUserID(ctx context.Context, userID string) ([]Tenant, error)
-	SoftDeleteTenant(ctx context.Context, id string) (int64, error)
-	UpdateSessionTenant(ctx context.Context, arg UpdateSessionTenantParams) (int64, error)
-	UpdateTenant(ctx context.Context, arg UpdateTenantParams) (int64, error)
-	UpdateTenantMemberRole(ctx context.Context, arg UpdateTenantMemberRoleParams) (int64, error)
+	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	SetUserAdmin(ctx context.Context, id string) (int64, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (int64, error)
 	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (int64, error)
+	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

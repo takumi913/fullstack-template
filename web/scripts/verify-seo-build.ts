@@ -312,7 +312,8 @@ for (const locale of supportedLocales) {
     "/register",
     "/dashboard",
     "/settings/profile",
-    "/tenant/members",
+    "/settings/security",
+    "/admin/users",
   ]) {
     const localized = localizedPath(path, locale);
     const rule = redirects

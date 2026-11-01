@@ -9,7 +9,7 @@ export default function PricingPage() {
   const locale = useLocale(),
     copy = () => toolsmithCopy(locale());
   const [yearly, setYearly] = createSignal(false);
-  const prices = () => (locale() === "en" ? [0, 5, 12] : [0, 29, 79]),
+  const prices = () => (locale() === "en" ? [0, 5] : [0, 29]),
     currency = () => (locale() === "en" ? "$" : "¥");
   return (
     <>
@@ -46,9 +46,7 @@ export default function PricingPage() {
                     {currency()}
                     {yearly() ? Math.round(prices()[index()] * 0.8) : prices()[index()]}
                   </span>
-                  <span class="design-plan-unit">
-                    {index() === 2 ? copy().perSeat : copy().perMonth}
-                  </span>
+                  <span class="design-plan-unit">{copy().perMonth}</span>
                 </div>
                 <a class="design-plan-button" href={localizedPath("/register", locale())}>
                   {plan.cta}

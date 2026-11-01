@@ -1034,16 +1034,6 @@
   .app-main > .shell {
     width: min(1040px, calc(100% - 80px));
   }
-  .app-workspace-name {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-top: 28px;
-    padding: 12px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-background);
-  }
   .article-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 270px;
@@ -1170,9 +1160,6 @@
   }
   .sidebar-account {
     display: block;
-    margin-top: 16px;
-  }
-  .app-workspace-name {
     margin-top: 16px;
   }
   .app-main > .shell {
@@ -3257,7 +3244,7 @@ html[data-theme="light"] .design-theme-glyph {
   height: 6px;
   background: var(--at);
 }
-.design-workspace {
+.design-account {
   position: relative;
   z-index: 2;
   min-height: 100vh;
@@ -3286,7 +3273,7 @@ html[data-theme="light"] .design-theme-glyph {
   width: 12px;
   height: 12px;
 }
-.design-workspace-switcher {
+.design-account-profile {
   margin-top: 20px;
   display: flex;
   align-items: center;
@@ -3296,7 +3283,7 @@ html[data-theme="light"] .design-theme-glyph {
   border: 1px solid var(--ln);
   background: var(--bg);
 }
-.design-workspace-icon {
+.design-account-icon {
   width: 32px;
   height: 32px;
   border-radius: 9px;
@@ -3308,32 +3295,31 @@ html[data-theme="light"] .design-theme-glyph {
   font-size: 14px;
   flex: none;
 }
-.design-workspace-info {
+.design-account-info {
   flex: 1;
   min-width: 0;
 }
-.design-workspace-info-name {
+.design-account-info-name {
   font-size: 14px;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.design-workspace-info-meta {
+.design-account-info-meta {
   font-size: 12px;
   color: var(--mut);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.design-workspace-caret {
-  color: var(--mut);
-  font-size: 12px;
-}
-.design-workspace-nav {
+.design-account-nav {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
-.design-workspace-link {
+.design-account-link {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3343,17 +3329,17 @@ html[data-theme="light"] .design-theme-glyph {
   background: transparent;
   color: var(--mut) !important;
 }
-.design-workspace-link.active {
+.design-account-link.active {
   background: var(--c2);
   color: var(--fg) !important;
 }
-.design-workspace-nav-dot {
+.design-account-nav-dot {
   width: 6px;
   height: 6px;
   border-radius: 2px;
   background: var(--ln);
 }
-.design-workspace-link.active > .design-workspace-nav-dot {
+.design-account-link.active > .design-account-nav-dot {
   background: var(--ac);
 }
 .design-sidebar-account {
@@ -3420,236 +3406,10 @@ html[data-theme="light"] .design-theme-glyph {
   border: 0;
   background: transparent;
 }
-.design-workspace-main {
+.design-account-main {
   flex: 1 1 560px;
   min-width: 0;
   padding: 40px clamp(20px, 4vw, 56px) 64px;
-}
-.design-members-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.design-members-crumb {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--mut);
-}
-.design-members-heading h1 {
-  margin-top: 10px;
-  font-size: 36px;
-  letter-spacing: -0.035em;
-  font-weight: 700;
-}
-.design-members-heading p {
-  margin-top: 6px;
-  font-size: 15px;
-  color: var(--mut);
-}
-.design-invite-form {
-  margin-top: 28px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 14px;
-  border-radius: 16px;
-  border: 1px solid var(--ln);
-  background: var(--c1);
-}
-.design-invite-input {
-  flex: 1 1 240px;
-  min-width: 0;
-  height: 42px;
-  padding: 0 14px;
-  border-radius: 10px;
-  border: 1px solid var(--ln);
-  background: var(--bg);
-  font-size: 14px !important;
-  color: var(--fg);
-}
-.design-invite-input:focus {
-  border-color: var(--at);
-}
-.design-invite-role {
-  height: 42px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid var(--ln);
-  background: var(--bg);
-  font-size: 14px;
-  color: var(--fg);
-}
-.design-invite-submit {
-  cursor: pointer;
-  height: 42px;
-  padding: 0 18px;
-  border: 0;
-  border-radius: 10px;
-  background: var(--ac);
-  color: var(--ai) !important;
-  font-size: 14px;
-  font-weight: 700;
-}
-.design-members-table {
-  margin-top: 16px;
-  border-radius: 16px;
-  border: 1px solid var(--ln);
-  overflow: auto;
-}
-.design-members-table-inner {
-  min-width: 640px;
-}
-.design-members-columns {
-  display: grid;
-  grid-template-columns: 2.2fr 1fr 1fr 80px;
-  gap: 12px;
-}
-.design-members-columns.header {
-  padding: 12px 18px;
-  font-size: 12px;
-  font-family: var(--font-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--mut);
-  border-bottom: 1px solid var(--ln);
-  background: var(--c1);
-}
-.design-member-row {
-  align-items: center;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--ln);
-  animation: pop 0.35s both;
-}
-.design-member-identity {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-.design-member-avatar {
-  width: 34px;
-  height: 34px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--avatar-color);
-  color: var(--color-avatar-ink);
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  font-weight: 600;
-}
-.design-member-name {
-  font-size: 15px;
-  font-weight: 600;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.design-member-tag {
-  font-size: 11px;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 6px;
-  border: 1px solid var(--ln);
-  color: var(--mut);
-}
-.design-member-email {
-  font-size: 13px;
-  color: var(--mut);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.design-owner-badge {
-  display: inline-flex;
-  font-size: 13px;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: var(--ac);
-  color: var(--ai);
-  font-weight: 600;
-}
-.design-member-role {
-  height: 32px;
-  padding: 0 8px;
-  border-radius: 8px;
-  border: 1px solid var(--ln);
-  background: var(--c1);
-  font-size: 13px;
-  color: var(--fg);
-}
-.design-member-joined {
-  font-size: 13px;
-  color: var(--mut);
-  font-family: var(--font-mono);
-}
-.design-member-remove {
-  cursor: pointer;
-  border: 0;
-  background: transparent;
-  color: var(--mut) !important;
-  font-size: 13px;
-}
-.design-member-remove:hover {
-  color: var(--color-destructive) !important;
-}
-.design-role-matrix {
-  margin-top: 40px;
-}
-.design-role-matrix h2 {
-  font-size: 22px;
-  letter-spacing: -0.02em;
-}
-.design-success-notice {
-  position: fixed;
-  left: 50%;
-  bottom: calc(28px + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  z-index: 70;
-}
-.design-success-notice > div {
-  padding: 12px 18px;
-  border-radius: 12px;
-  background: var(--fg);
-  color: var(--bg);
-  font-size: 14px;
-  font-weight: 500;
-  animation: rise 0.25s both;
-}
-.design-role-matrix p {
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--mut);
-}
-.design-role-table {
-  margin-top: 16px;
-  border-radius: 16px;
-  border: 1px solid var(--ln);
-  overflow: auto;
-}
-.design-role-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  min-width: 520px;
-  font-size: 14px;
-}
-.design-role-cell {
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--ln);
-  background: transparent;
-  color: var(--fg);
-}
-.design-role-cell.heading {
-  background: var(--c1);
-}
-.design-role-cell.permission {
-  text-align: center;
-  font-family: var(--font-mono);
-  color: var(--at);
-}
-.design-role-cell.denied {
-  color: var(--mut);
 }
 .design-palette-backdrop {
   position: fixed;
@@ -3768,7 +3528,6 @@ html[data-theme="light"] .design-theme-glyph {
 }
 @media (max-width: 880px) {
   .design-auth-input,
-  .design-invite-input,
   .design-search input,
   .design-palette-search input {
     font-size: 16px !important;
@@ -3821,7 +3580,7 @@ html[data-theme="light"] .design-theme-glyph {
     min-height: 0;
     position: static;
   }
-  .design-workspace-nav {
+  .design-account-nav {
     flex-direction: row;
     flex-wrap: wrap;
   }
@@ -3848,7 +3607,7 @@ html[data-theme="light"] .design-theme-glyph {
   .design-filter,
   .design-auth-tab,
   .design-short-language,
-  .design-workspace-link,
+  .design-account-link,
   .design-menu-tool,
   .design-language-item {
     min-height: 44px;

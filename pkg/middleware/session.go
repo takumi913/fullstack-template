@@ -19,12 +19,25 @@ func (m *AuthMiddleware) Require(next echo.HandlerFunc) echo.HandlerFunc {
 		if e != nil || cookie.Value == "" {
 			return echo.NewHTTPError(http.StatusUnauthorized, model.ErrUnauthenticated.ForLanguage(c.Request().Header.Get("Accept-Language")))
 		}
-		_, session, e := m.auth.Session(c.Request().Context(), cookie.Value)
+		response, session, e := m.auth.Session(c.Request().Context(), cookie.Value)
 		if e != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, model.ErrSessionExpired.ForLanguage(c.Request().Header.Get("Accept-Language")))
 		}
 		c.Set("user_id", session.UserID)
-		c.Set("session", session)
+		c.Set("is_admin", response.User.IsAdmin)
+		return next(c)
+	}
+}
+
+// RequireAdmin must follow Require so each request uses the current database privilege.
+func (m *AuthMiddleware) RequireAdmin(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c *echo.Context) error {
+		if c.Get("is_admin") != true {
+			return c.JSON(http.StatusForbidden, map[string]any{
+				"code": 1, "data": nil,
+				"message": model.ErrAdminRequired.ForLanguage(c.Request().Header.Get("Accept-Language")),
+			})
+		}
 		return next(c)
 	}
 }
@@ -32,15 +45,6 @@ func UserID(c *echo.Context) string {
 	v, ok := c.Get("user_id").(string)
 	if !ok {
 		return ""
-	}
-
-	return v
-}
-
-func Session(c *echo.Context) *model.Session {
-	v, ok := c.Get("session").(*model.Session)
-	if !ok {
-		return nil
 	}
 
 	return v

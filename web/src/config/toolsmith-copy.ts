@@ -124,8 +124,8 @@ const en = {
       "20 runs per day, up to 3,000 characters each. Pro is unlimited, up to 20,000 characters per run.",
     ],
     [
-      "Can my team use it together?",
-      "Yes. Create a workspace, invite members and assign Owner, Admin or Member roles, with one shared bill.",
+      "Can I share an account?",
+      "No. Each account belongs to one person. Sign in with your own email.",
     ],
   ],
   ctaTitle: "Working with text every day? There is a faster way.",
@@ -210,13 +210,11 @@ const en = {
   sideCtaBody: "Paste an abstract and see how much fits in one sentence.",
   priceEyebrow: "Pricing",
   priceTitle: "Start free. Upgrade when you need to.",
-  priceSub:
-    "Every plan includes every tool. Plans differ only in limits, length and team features.",
+  priceSub: "Every plan includes every tool. Plans differ only in limits and length.",
   monthly: "Monthly",
   yearly: "Yearly",
   popular: "Most popular",
   perMonth: "/ mo",
-  perSeat: "/ seat / mo",
   plans: [
     {
       name: "Free",
@@ -233,17 +231,6 @@ const en = {
         "Up to 20,000 characters",
         "History and favorites",
         "Priority queue",
-      ],
-    },
-    {
-      name: "Team",
-      desc: "Small teams that need shared billing.",
-      cta: "Create a workspace",
-      feats: [
-        "Everything in Pro",
-        "Multiple workspaces and invites",
-        "Owner / Admin / Member roles",
-        "Shared billing and usage",
       ],
     },
   ],
@@ -373,10 +360,7 @@ const zh = {
       "免费版有什么限制？",
       "免费版每天 20 次处理，单次最多 3,000 字。Pro 不限次数，单次最多 20,000 字。",
     ],
-    [
-      "可以和团队一起使用吗？",
-      "可以。创建工作区后邀请成员，按 Owner / Admin / Member 三种角色分配权限，账单统一管理。",
-    ],
+    ["可以和别人共用账号吗？", "不能。每个账号只属于一个人，请使用自己的邮箱登录。"],
   ],
   ctaTitle: "每天都要处理文字？换个更快的方式。",
   ctaSub: "免费版即可开始，随时升级。",
@@ -460,12 +444,11 @@ const zh = {
   sideCtaBody: "粘贴一段论文摘要，看看一句话能说清多少。",
   priceEyebrow: "定价",
   priceTitle: "先免费用，需要时再升级",
-  priceSub: "所有方案都包含全部工具。区别只在额度、长度和团队功能。",
+  priceSub: "所有方案都包含全部工具。区别只在额度和长度。",
   monthly: "按月",
   yearly: "按年",
   popular: "最受欢迎",
   perMonth: "/ 月",
-  perSeat: "/ 人 / 月",
   plans: [
     {
       name: "免费",
@@ -478,17 +461,6 @@ const zh = {
       desc: "每天都和文字打交道的个人。",
       cta: "升级 Pro",
       feats: ["不限处理次数", "单次最多 20,000 字", "历史记录与收藏", "优先处理队列"],
-    },
-    {
-      name: "团队",
-      desc: "需要统一管理与账单的小团队。",
-      cta: "创建工作区",
-      feats: [
-        "包含 Pro 全部功能",
-        "多工作区与成员邀请",
-        "Owner / Admin / Member 权限",
-        "统一账单与用量",
-      ],
     },
   ],
   palPh: "搜索工具…",

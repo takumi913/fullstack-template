@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "@solidjs/router";
 import { useTranslation, useLocale } from "@/i18n/context";
 import { localizedPath } from "@/i18n/locales";
 import { createAsyncAction } from "@/lib/createAsyncAction";
-import { useAuth, useTenant } from "@/store/AppState";
+import { useAuth } from "@/store/AppState";
 import { toolsmithPrivateCopy } from "@/config/toolsmith-private-copy";
 
 export default function LoginPage() {
@@ -15,14 +15,13 @@ export default function LoginPage() {
   const [password, setPassword] = createSignal("");
   const { error, pending, run } = createAsyncAction();
   const auth = useAuth();
-  const tenant = useTenant();
   const navigate = useNavigate();
   function submit(event: SubmitEvent) {
     event.preventDefault();
     const data = { email: email(), password: password() };
-    const destination = localizedPath("/tenant/members", locale());
+    const destination = localizedPath("/dashboard", locale());
     void run(async () => {
-      tenant.hydrate(await auth.login(data));
+      await auth.login(data);
       navigate(destination);
     });
   }

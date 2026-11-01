@@ -65,7 +65,7 @@
 - **框架**: Solid 2（核心与 `@solidjs/web` 同版本锁定；版本以 `web/package.json` 为准）
 - **构建工具**: Vite
 - **CSS**: TailwindCSS v4+
-- **状态管理**: Solid `createStore` + `AppStateProvider`；当前工作区由服务端 Session 恢复
+- **状态管理**: Solid `createStore` + `AppStateProvider`；登录状态由服务端 Session 恢复
 - **路由**: `@solidjs/router` 2，集中路由表 + `solid-js` lazy 模块
 - **UI 组件**: 页面使用 `style.css` 中的 `.panel`/`.button-primary`/`.field` 等类；优先原生 HTML 交互，复杂组件按实际需要选择兼容 Solid 2 的实现
 - **表单处理**: 原生受控组件 + `createAsyncAction`（未引入表单库），业务校验以后端 service 层为准
@@ -258,18 +258,14 @@ func (h *UserHandler) Update(c *echo.Context) error {
 - **会话有效期**：由 `SESSION_EXPIRE_HOUR` 控制（默认 24 小时），过期后需重新登录；没有刷新机制
 - **中间件保护**：使用 SESSION 中间件保护需要认证的路由
 
-#### 4.3.3 多租户与权限控制
+#### 4.3.3 个人账号与平台管理
 
-租户内资源按角色授权，角色与权限的映射集中在 `pkg/model/permission.go`：
-
-- **角色**：`Owner` / `Admin` / `Member`；权限用 `资源:动作` 常量表示（如 `tenant:update`）
-- **路由必须挂权限**：租户作用域下的路由一律加 `middleware.Require(model.PermissionXxx)`，
-  漏挂即越权。在 `api/routes.go` 新增路由时，先确定它需要哪个权限
-- **新增权限**：在 `permission.go` 定义常量后，必须在 `RolePermissions` 里为三个角色都显式赋值，
-  不要依赖 map 零值——漏写会静默变成"无权限"，且难以排查
-- **授权只在中间件这一层**：不要在 service 或前端重复做权限判断，同一规则散落多处必然发散；
-  前端按角色隐藏入口只是体验优化，不能当作授权手段
-- **认证类路由限流**：登录、注册等接口挂 `authLimiter`
+账号属于个人，没有工作区和成员角色。需要登录的路由挂 `auth.Require`。
+平台管理员由 `users.is_admin` 标识，仅通过服务器本地 `grant-admin --user-id` 命令授予，注册默认普通用户。
+`/api/v1/admin/*` 必须先挂 `auth.Require`，再挂 `auth.RequireAdmin`，每次请求从数据库读取当前权限。
+管理页面只查看、搜索和启停普通账号；禁用必须在同一事务中更新状态并清除该用户所有会话。
+注册和自助资料 DTO 不接受权限字段；管理员账号不能由网页启停，避免关闭所有管理入口。
+登录、注册等认证接口挂 `authLimiter`。不要再引入租户、成员邀请或租户 RBAC。
 
 ### 4.4 数据库与性能优化
 
@@ -279,12 +275,9 @@ func (h *UserHandler) Update(c *echo.Context) error {
 - **连接池**：合理配置数据库连接池参数（SQLite 限制为单连接）
 
 ```sql
--- db/query/sqlite/tenants.sql
--- name: ListTenantsByUserID :many
-SELECT t.* FROM tenants t
-JOIN tenant_members tm ON tm.tenant_id = t.id
-WHERE tm.user_id = ? AND t.deleted_at IS NULL
-ORDER BY t.created_at ASC;
+-- db/query/sqlite/users.sql
+-- name: GetUserByEmail :one
+SELECT * FROM users WHERE email = ? AND deleted_at IS NULL LIMIT 1;
 ```
 
 同一个查询要在 `db/query/sqlite/` 和 `db/query/postgres/` 各写一份（占位符分别是 `?` 和 `$1`），
@@ -351,17 +344,17 @@ slog.Error("数据库连接失败", "err", err)
 
 #### 5.2.1 状态归属
 
-- `authStore.ts` 与 `tenantStore.ts` 是状态工厂，`AppStateProvider` 为每个私有应用实例创建独立状态，不在模块顶层共享用户或租户状态。
-- 登录/注册与后台入口共享同一 `AppStateProvider`，避免跳转时丢失会话或工作区。
+- `authStore.ts` 是状态工厂，`AppStateProvider` 为每个私有应用实例创建独立状态，不在模块顶层共享用户状态。
+- 登录/注册与后台入口共享同一 `AppStateProvider`，避免跳转时丢失会话。
 - 公开 SEO 布局保持与认证 API、私有状态隔离。
-- 只有安全的偏好可写入 localStorage；凭据由 HttpOnly Cookie 保存，当前工作区 id 通过服务端 Session 恢复，不另建前端持久化副本。
+- 只有安全的偏好可写入 localStorage；凭据由 HttpOnly Cookie 保存，不在前端另存会话副本。
 
 #### 5.2.2 状态读写
 
-通过 `useAuth()`、`useTenant()` 取得状态与操作。在 JSX、memo 或 effect 中读取 `auth.state.user` 等属性，不将响应式字段解构为静态局部变量。
+通过 `useAuth()` 取得状态与操作。在 JSX、memo 或 effect 中读取 `auth.state.user` 等属性，不将响应式字段解构为静态局部变量。
 
 状态更新统一通过 `createStore` 的 draft setter，副作用放在状态工厂的 action 中；组件调用 action，不在组件里重复编排底层状态。
-退出、401 与用户切换必须同步清空租户角色与成员名单；工作区切换的过期响应不能覆盖当前工作区。
+退出与 401 必须清空当前用户。
 
 ### 5.3 路由管理规范 (Solid Router)
 
@@ -371,7 +364,7 @@ slog.Error("数据库连接失败", "err", err)
 - `Document.tsx` 负责整页 HTML、公共 head、主题初始化和 hydration 脚本；`entry-client.tsx` 与 `entry-server.tsx` 分别负责浏览器与构建期渲染入口。
 - 公开 SEO 页面放在 `PublicLayout` 下，必须保持与认证 state/API 依赖隔离。
 - `/login`、`/register` 放在 `AuthLayout` 下，由 layout 统一套 `PublicRoute`。
-- `/dashboard`、`/settings/*`、`/tenant/*` 放在 `AppLayout` 下，由 layout 统一套 `ProtectedRoute`。
+- `/dashboard`、`/settings/*`、`/admin/users` 放在 `AppLayout` 下，由 layout 统一套 `ProtectedRoute`；管理页还需检查平台管理员身份，服务端仍独立鉴权。
 - 不要在每个后台路由模块里重复包 `ProtectedRoute` / `PublicRoute`。
 - 新增公开 SEO URL 时，同时更新对应 content schema；prerender/sitemap 从同一数据源推导，不维护第二份手写 URL 清单。
 - Tool / Landing 的 canonical、hreflang、meta、JSON-LD 统一从 `src/seo/` 生成，路由通过 `useHead` 维护服务端与客户端 head。
@@ -526,7 +519,7 @@ export interface CreateUserRequest {
 
 - `web/src/i18n/locales.json` 是语言与 URL 前缀的唯一来源，路由、Go SPA 前缀和静态托管重定向从中推导。
 - URL 决定语言；公开内容使用独立本地化 URL、self canonical、reciprocal hreflang 与英文 `x-default`，不按浏览器偏好自动跳转。
-- `common` 管理通用 UI，`app` 管理认证和工作区文案，仅在私有路由加载；命名空间层级不超过 3 层。
+- `common` 管理通用 UI，`app` 管理认证和账号文案，仅在私有路由加载；命名空间层级不超过 3 层。
 - 各语言字典用 `satisfies typeof en` 保持键同步，SEO 正文使用完整本地化数据，不用 fallback 冒充已完成的翻译。
 - 每次预渲染创建独立 i18next instance，避免并发 SSG 共享可变语言状态。
 - Tool / Landing 用相同 `translationKey` 建立语言关系；仅真实存在且索引状态一致的版本进入 alternate family。

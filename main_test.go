@@ -158,7 +158,7 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	})
 
 	t.Run("private SPA fallback is noindex", func(t *testing.T) {
-		for _, path := range []string{"/dashboard", "/zh-cn/login", "/zh-cn/register", "/zh-cn/dashboard", "/zh-cn/settings/profile", "/zh-cn/tenant/members"} {
+		for _, path := range []string{"/dashboard", "/zh-cn/login", "/zh-cn/register", "/zh-cn/dashboard", "/zh-cn/settings/profile", "/zh-cn/settings/security", "/admin/users", "/zh-cn/admin/users"} {
 			rec := performStaticRequest(e, path)
 			if rec.Code != http.StatusOK {
 				t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
@@ -170,7 +170,7 @@ func TestStaticRoutingSEOBehavior(t *testing.T) {
 	})
 
 	t.Run("unknown public path returns a real 404", func(t *testing.T) {
-		for _, path := range []string{"/definitely-missing", "/zh-cn/missing", "/zh-cn/tools/missing", "/ja/login", "/zh-cnish/login"} {
+		for _, path := range []string{"/definitely-missing", "/zh-cn/missing", "/zh-cn/tools/missing", "/ja/login", "/zh-cnish/login", "/tenant/settings", "/zh-cn/tenant/members"} {
 			rec := performStaticRequest(e, path)
 			if rec.Code != http.StatusNotFound {
 				t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)

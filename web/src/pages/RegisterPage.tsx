@@ -3,7 +3,7 @@ import { useNavigate } from "@solidjs/router";
 import { useTranslation, useLocale } from "@/i18n/context";
 import { localizedPath } from "@/i18n/locales";
 import { createAsyncAction } from "@/lib/createAsyncAction";
-import { useAuth, useTenant } from "@/store/AppState";
+import { useAuth } from "@/store/AppState";
 import { toolsmithPrivateCopy } from "@/config/toolsmith-private-copy";
 import { AuthAgreement, AuthCard, Input } from "./LoginPage";
 
@@ -11,33 +11,23 @@ export default function RegisterPage() {
   const { t } = useTranslation(["app", "common"]);
   const locale = useLocale();
   const copy = () => toolsmithPrivateCopy(locale());
-  const [username, setUsername] = createSignal("");
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
   const { error, pending, run } = createAsyncAction();
   const auth = useAuth();
-  const tenant = useTenant();
   const navigate = useNavigate();
   function submit(event: SubmitEvent) {
     event.preventDefault();
-    const data = { username: username(), email: email(), password: password() };
-    const destination = localizedPath("/tenant/members", locale());
+    const data = { email: email(), password: password() };
+    const destination = localizedPath("/dashboard", locale());
     void run(async () => {
-      tenant.hydrate(await auth.register(data));
+      await auth.register(data);
       navigate(destination);
     });
   }
   return (
     <AuthCard title={copy().authTitleReg} description={copy().authSubReg}>
       <form class="design-auth-form" onSubmit={submit}>
-        <Input
-          design
-          label={copy().name}
-          placeholder="Lin Zhixia"
-          autoComplete="username"
-          value={username()}
-          onChange={setUsername}
-        />
         <Input
           design
           label={copy().email}

@@ -18,7 +18,7 @@ Each translation has a **self-canonical**, not a canonical to English. Reciproca
 - `config/site-config.ts`: shared brand, English SEO defaults, appearance, homepage primary tool.
 - `config/site-copy.ts`: complete English/Chinese homepage and hub copy and local keywords.
 - `i18n/common.ts`: navigation, buttons, tools and generic messages (`common`).
-- `i18n/private.ts`: authentication and workspace UI (`app`), imported only by private/auth routes.
+- `i18n/private.ts`: authentication and account UI (`app`), imported only by private/auth routes.
 - `content/tool-pages.ts`, `content/landing-pages.ts`: localized body, title, description, H1, FAQ, related links and publication state.
 - `content/legal-pages.ts`: complete policies per language, review status and effective date.
 - `pkg/model/messages.go`: bilingual user-facing API messages. Services retain business validation; HTTP boundaries select language using `Accept-Language`. The private Axios client sends the URL language.

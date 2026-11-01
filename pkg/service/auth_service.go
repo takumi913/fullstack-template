@@ -37,8 +37,6 @@ const (
 	maxUsernameLen  = 50
 	maxEmailLen     = 255
 	maxAvatarURLLen = 500
-	maxTenantName   = 100
-	maxTenantSlug   = 100
 	// bcrypt 只处理前 72 字节，超出会直接返回错误。
 	maxPasswordLen = 72
 )
@@ -60,24 +58,7 @@ func validateEmail(email string) error {
 	return nil
 }
 
-func validateTenantName(name string) error {
-	if name == "" {
-		return model.ErrTenantNameRequired
-	}
-	if len(name) > maxTenantName {
-		return model.ErrTenantNameLength.Format(maxTenantName)
-	}
-	return nil
-}
-
-func validateCredentials(username, email, password string) error {
-	username = strings.TrimSpace(username)
-	email = strings.TrimSpace(strings.ToLower(email))
-	// 注册必须要求用户名：空用户名会占用 users.username 的唯一索引，
-	// 之后所有人都无法再用空用户名注册。
-	if err := validateUsername(username); err != nil {
-		return err
-	}
+func validateRegistration(email, password string) error {
 	if err := validateEmail(email); err != nil {
 		return err
 	}
@@ -88,6 +69,66 @@ func validateCredentials(username, email, password string) error {
 		return model.ErrPasswordLong.Format(maxPasswordLen)
 	}
 	return nil
+}
+
+// emailLabel 取出与邮箱相关、可放进用户名的稳定片段。
+// 优先用本地部分（去掉 + 别名）；规整后为空再退回域名，避免生成与邮箱无关的占位名。
+func emailLabel(email string) string {
+	local := email
+	if i := strings.IndexByte(email, '@'); i >= 0 {
+		local = email[:i]
+	}
+	if i := strings.IndexByte(local, '+'); i > 0 {
+		local = local[:i]
+	}
+	if base := slugify(local); base != "" {
+		return base
+	}
+	if i := strings.IndexByte(email, '@'); i >= 0 && i+1 < len(email) {
+		if base := slugify(email[i+1:]); base != "" {
+			return base
+		}
+	}
+	return "user"
+}
+
+func trimLabel(label string, limit int) string {
+	if len(label) > limit {
+		label = strings.TrimRight(label[:limit], "-")
+	}
+	if label == "" {
+		return "user"
+	}
+	return label
+}
+
+func randomHex(n int) (string, error) {
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
+}
+
+// usernameFromLabel 用邮箱片段加随机后缀占住 users.username 的唯一索引。
+// 同一本地部分可以重复注册，不能把空用户名或纯本地部分写进唯一列。
+func usernameFromLabel(label string) (string, error) {
+	suffix, err := randomHex(4)
+	if err != nil {
+		return "", err
+	}
+	return trimLabel(label, maxUsernameLen-len(suffix)-1) + "-" + suffix, nil
+}
+
+func (s *AuthService) emailTaken(ctx context.Context, email string) (bool, error) {
+	_, err := s.store.GetUserByEmail(ctx, email)
+	if err == nil {
+		return true, nil
+	}
+	if errors.Is(err, repo.ErrNotFound) {
+		return false, nil
+	}
+	return false, err
 }
 func slugify(value string) string {
 	value = strings.ToLower(strings.TrimSpace(value))
@@ -107,47 +148,66 @@ func slugify(value string) string {
 }
 func (s *AuthService) Register(ctx context.Context, req model.RegisterRequest) (*model.AuthResponse, string, error) {
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
-	req.Username = strings.TrimSpace(req.Username)
-	if err := validateCredentials(req.Username, req.Email, req.Password); err != nil {
+	if err := validateRegistration(req.Email, req.Password); err != nil {
 		return nil, "", err
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, "", err
 	}
-	user := &model.User{ID: uuid.NewString(), Username: req.Username, Email: req.Email, PasswordHash: string(hash), Status: model.UserStatusActive}
-	tenant := &model.Tenant{ID: uuid.NewString(), Name: req.Username + "'s Workspace", Slug: slugify(req.Username) + "-" + uuid.NewString()[:8], CreatedBy: user.ID}
-	member := &model.TenantMember{ID: uuid.NewString(), TenantID: tenant.ID, UserID: user.ID, Role: model.TenantRoleOwner}
-	err = s.store.WithTx(ctx, func(tx *repo.Store) error {
-		if e := tx.CreateUser(ctx, user); e != nil {
-			return e
-		}
-		if e := tx.CreateTenant(ctx, tenant); e != nil {
-			return e
-		}
-		return tx.CreateMember(ctx, member)
-	})
-	if err != nil {
-		if errors.Is(err, repo.ErrConflict) {
-			return nil, "", model.ErrAccountConflict
-		}
-		// 原始错误只记日志：它会被当作 400 返回，绕过 handler 层的 5xx 脱敏。
-		slog.Error("注册失败", "error", err)
-		return nil, "", model.ErrRegistration
+	if err := s.ensureEmailAvailable(ctx, req.Email); err != nil {
+		return nil, "", err
 	}
-	user, err = s.store.GetUserByID(ctx, user.ID)
+	user, err := s.createRegisteredUser(ctx, req.Email, string(hash), emailLabel(req.Email))
 	if err != nil {
 		return nil, "", err
 	}
-	tenant, err = s.store.GetTenantByID(ctx, tenant.ID)
+	token, err := s.createSession(ctx, user.ID)
 	if err != nil {
 		return nil, "", err
 	}
-	token, err := s.createSession(ctx, user.ID, &tenant.ID)
+	return &model.AuthResponse{User: user.ToResponse()}, token, nil
+}
+
+func (s *AuthService) ensureEmailAvailable(ctx context.Context, email string) error {
+	taken, err := s.emailTaken(ctx, email)
 	if err != nil {
-		return nil, "", err
+		return registrationFailed(err)
 	}
-	return &model.AuthResponse{User: user.ToResponse(), Tenants: []model.Tenant{*tenant}, ActiveTenantID: &tenant.ID}, token, nil
+	if taken {
+		return model.ErrAccountConflict
+	}
+	return nil
+}
+
+// registrationFailed 把驱动错误留在日志里。Register 的失败会按 400 返回，不能把原始错误交给 handler。
+func registrationFailed(err error) error {
+	slog.Error("注册失败", "error", err)
+	return model.ErrRegistration
+}
+
+func (s *AuthService) createRegisteredUser(ctx context.Context, email, hash, label string) (*model.User, error) {
+	var lastErr error
+	// 后缀碰撞（含已软删除账号仍占用唯一索引）时换一个用户名重试。邮箱冲突不是重试能解决的。
+	for range 5 {
+		username, err := usernameFromLabel(label)
+		if err != nil {
+			return nil, err
+		}
+		user := &model.User{ID: uuid.NewString(), Username: username, Email: email, PasswordHash: hash, Status: model.UserStatusActive}
+		err = s.store.CreateUser(ctx, user)
+		if err == nil {
+			return s.store.GetUserByID(ctx, user.ID)
+		}
+		if !errors.Is(err, repo.ErrConflict) {
+			return nil, registrationFailed(err)
+		}
+		if err := s.ensureEmailAvailable(ctx, email); err != nil {
+			return nil, err
+		}
+		lastErr = err
+	}
+	return nil, registrationFailed(lastErr)
 }
 func (s *AuthService) Login(ctx context.Context, req model.LoginRequest) (*model.AuthResponse, string, error) {
 	user, err := s.store.GetUserByEmail(ctx, strings.ToLower(strings.TrimSpace(req.Email)))
@@ -165,29 +225,24 @@ func (s *AuthService) Login(ctx context.Context, req model.LoginRequest) (*model
 	if user.Status != model.UserStatusActive {
 		return nil, "", model.ErrAccountInactive
 	}
-	tenants, err := s.store.ListTenants(ctx, user.ID)
+	token, err := s.createSession(ctx, user.ID)
 	if err != nil {
 		return nil, "", err
 	}
-	var active *string
-	if len(tenants) > 0 {
-		active = &tenants[0].ID
-	}
-	token, err := s.createSession(ctx, user.ID, active)
-	if err != nil {
-		return nil, "", err
-	}
-	return &model.AuthResponse{User: user.ToResponse(), Tenants: tenants, ActiveTenantID: active}, token, nil
+	return &model.AuthResponse{User: user.ToResponse()}, token, nil
 }
-func (s *AuthService) createSession(ctx context.Context, userID string, active *string) (string, error) {
+func (s *AuthService) createSession(ctx context.Context, userID string) (string, error) {
 	raw := make([]byte, 32)
 	if _, err := rand.Read(raw); err != nil {
 		return "", err
 	}
 	token := hex.EncodeToString(raw)
 	sum := sha256.Sum256([]byte(token))
-	v := &model.Session{ID: uuid.NewString(), UserID: userID, TokenHash: hex.EncodeToString(sum[:]), ActiveTenantID: active, ExpiresAt: time.Now().UTC().Add(time.Duration(configs.AppConfig.Session.ExpireHour) * time.Hour)}
+	v := &model.Session{ID: uuid.NewString(), UserID: userID, TokenHash: hex.EncodeToString(sum[:]), ExpiresAt: time.Now().UTC().Add(time.Duration(configs.AppConfig.Session.ExpireHour) * time.Hour)}
 	if err := s.store.CreateSession(ctx, v); err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return "", model.ErrAccountInactive
+		}
 		return "", err
 	}
 	return token, nil
@@ -205,11 +260,7 @@ func (s *AuthService) Session(ctx context.Context, token string) (*model.AuthRes
 	if err != nil || user.Status != model.UserStatusActive {
 		return nil, nil, repo.ErrNotFound
 	}
-	tenants, err := s.store.ListTenants(ctx, user.ID)
-	if err != nil {
-		return nil, nil, err
-	}
-	return &model.AuthResponse{User: user.ToResponse(), Tenants: tenants, ActiveTenantID: session.ActiveTenantID}, session, nil
+	return &model.AuthResponse{User: user.ToResponse()}, session, nil
 }
 func (s *AuthService) Logout(ctx context.Context, token string) error {
 	v, err := s.store.GetSession(ctx, TokenHash(token))

@@ -49,7 +49,6 @@ const en = {
     username: "Username",
     name: "Name",
     avatar: "Avatar URL",
-    role: "Role",
   },
   error: {
     title: "Something went wrong",
@@ -63,7 +62,6 @@ const en = {
   footer: {
     description: "Small, useful tools for people who work with text and data every day.",
     legal: "Legal",
-    workspace: "Workspace",
     note: "Less busywork. More doing.",
   },
   directory: {
@@ -153,7 +151,6 @@ const zh = {
     username: "用户名",
     name: "名称",
     avatar: "头像 URL",
-    role: "角色",
   },
   error: {
     title: "页面出错了",
@@ -167,7 +164,6 @@ const zh = {
   footer: {
     description: "为每天与文字和数据打交道的人，准备的一组小而实用的工具。",
     legal: "法律",
-    workspace: "工作区",
     note: "少一点琐事，多一点专注。",
   },
   directory: {

@@ -10,3 +10,19 @@ SELECT * FROM users WHERE username = ? AND deleted_at IS NULL LIMIT 1;
 UPDATE users SET username = ?, email = ?, avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL;
 -- name: UpdateUserPassword :execrows
 UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL;
+-- name: CountUsers :one
+SELECT COUNT(*) FROM users
+WHERE deleted_at IS NULL
+  AND (instr(lower(username), lower(CAST(sqlc.arg(search) AS TEXT))) > 0
+       OR instr(lower(email), lower(CAST(sqlc.arg(search) AS TEXT))) > 0);
+-- name: ListUsers :many
+SELECT * FROM users
+WHERE deleted_at IS NULL
+  AND (instr(lower(username), lower(CAST(sqlc.arg(search) AS TEXT))) > 0
+       OR instr(lower(email), lower(CAST(sqlc.arg(search) AS TEXT))) > 0)
+ORDER BY created_at DESC, id DESC
+LIMIT sqlc.arg(page_limit) OFFSET sqlc.arg(page_offset);
+-- name: UpdateUserStatus :execrows
+UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL AND is_admin = FALSE;
+-- name: SetUserAdmin :execrows
+UPDATE users SET is_admin = TRUE, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'active' AND deleted_at IS NULL;

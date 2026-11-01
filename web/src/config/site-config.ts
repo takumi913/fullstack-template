@@ -10,7 +10,7 @@ export const templateSiteConfig = {
     primaryKeyword: "AI text tools",
     defaultTitle: "Toolsmith — Rewrite, Summarize and Translate Text",
     defaultDescription:
-      "A set of small AI tools for people who work with words every day. Rewrite, summarize and translate text in one simple workspace.",
+      "A set of small AI tools for people who work with words every day. Rewrite, summarize and translate text in one place.",
     defaultImage: "/og-image.svg",
   },
   appearance: {

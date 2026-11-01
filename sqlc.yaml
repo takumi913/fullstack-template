@@ -1,7 +1,10 @@
 version: "2"
+# v2 rebuilds sessions without changing its current schema, so sqlc only needs v1 and later schema additions.
 sql:
   - engine: "sqlite"
-    schema: "db/migrations/sqlite/000001_init.up.sql"
+    schema:
+      - "db/migrations/sqlite/000001_init.up.sql"
+      - "db/migrations/sqlite/000003_add_user_admin.up.sql"
     queries: "db/query/sqlite"
     gen:
       go:
@@ -11,7 +14,9 @@ sql:
         emit_interface: true
         emit_empty_slices: true
   - engine: "postgresql"
-    schema: "db/migrations/postgres/000001_init.up.sql"
+    schema:
+      - "db/migrations/postgres/000001_init.up.sql"
+      - "db/migrations/postgres/000003_add_user_admin.up.sql"
     queries: "db/query/postgres"
     gen:
       go:

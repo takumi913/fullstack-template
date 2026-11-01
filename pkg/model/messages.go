@@ -30,12 +30,9 @@ func (m LocalizedMessage) Format(values ...any) LocalizedMessage {
 
 // User-facing validation, authentication, and response messages are bilingual at their source.
 var (
-	ErrUserMissing         = LocalizedMessage{English: "User not found. Ask them to register first.", Chinese: "用户不存在，请先注册"}
 	ErrUsernameLength      = LocalizedMessage{English: "Username must be between 3 and %d characters.", Chinese: "用户名长度必须在3-%d个字符之间"}
 	ErrEmailInvalid        = LocalizedMessage{English: "Enter a valid email address.", Chinese: "邮箱格式不正确"}
 	ErrEmailLength         = LocalizedMessage{English: "Email must be at most %d characters.", Chinese: "邮箱长度不能超过 %d 个字符"}
-	ErrTenantNameRequired  = LocalizedMessage{English: "Workspace name is required.", Chinese: "租户名称不能为空"}
-	ErrTenantNameLength    = LocalizedMessage{English: "Workspace name must be at most %d characters.", Chinese: "租户名称长度不能超过 %d 个字符"}
 	ErrPasswordShort       = LocalizedMessage{English: "Password must be at least 6 characters.", Chinese: "密码长度不能少于6个字符"}
 	ErrPasswordLong        = LocalizedMessage{English: "Password must be at most %d bytes.", Chinese: "密码长度不能超过 %d 个字节"}
 	ErrAccountConflict     = LocalizedMessage{English: "Email or username is already in use.", Chinese: "邮箱或用户名已被使用"}
@@ -46,28 +43,21 @@ var (
 	ErrNewPasswordShort    = LocalizedMessage{English: "New password must be at least 6 characters.", Chinese: "新密码长度不能少于6个字符"}
 	ErrNewPasswordLong     = LocalizedMessage{English: "New password must be at most %d bytes.", Chinese: "新密码长度不能超过 %d 个字节"}
 	ErrCurrentPassword     = LocalizedMessage{English: "Incorrect current password.", Chinese: "原密码错误"}
-	ErrSlugLength          = LocalizedMessage{English: "Workspace slug must be at most %d characters.", Chinese: "标识长度不能超过 %d 个字符"}
-	ErrSlugInvalid         = LocalizedMessage{English: "Workspace slug must include a letter or number.", Chinese: "标识必须包含字母或数字"}
-	ErrNotMember           = LocalizedMessage{English: "You are not a member of this workspace.", Chinese: "您不是该租户成员"}
-	ErrRoleInvalid         = LocalizedMessage{English: "Invalid workspace role.", Chinese: "无效角色"}
-	ErrAdminAddOwner       = LocalizedMessage{English: "Only owners can add another owner.", Chinese: "管理员不能添加所有者"}
-	ErrAdminManageOwner    = LocalizedMessage{English: "Only owners can change an owner’s role.", Chinese: "管理员不能管理所有者"}
-	ErrAdminRemoveOwner    = LocalizedMessage{English: "Only owners can remove an owner.", Chinese: "管理员不能删除所有者"}
-	ErrLastOwner           = LocalizedMessage{English: "A workspace must have at least one owner.", Chinese: "租户至少需要一个所有者"}
 	ErrUnauthenticated     = LocalizedMessage{English: "Please log in.", Chinese: "用户未认证"}
 	ErrSessionExpired      = LocalizedMessage{English: "Your session has expired. Please log in again.", Chinese: "Session已失效"}
-	ErrPermission          = LocalizedMessage{English: "You do not have permission for this action.", Chinese: "权限不足"}
 	ErrInternal            = LocalizedMessage{English: "Internal server error.", Chinese: "服务器内部错误"}
 	ErrRateLimit           = LocalizedMessage{English: "Too many requests. Please try again later.", Chinese: "操作过于频繁，请稍后再试"}
+	ErrAdminRequired       = LocalizedMessage{English: "Platform administrator access is required.", Chinese: "仅平台管理员可执行此操作"}
+	ErrPagination          = LocalizedMessage{English: "Page must be positive and page size must be between 1 and 100.", Chinese: "页码必须为正数，每页数量必须在 1–100 之间"}
+	ErrUserStatus          = LocalizedMessage{English: "Account status must be active or disabled.", Chinese: "账号状态必须为启用或禁用"}
+	ErrUserNotFound        = LocalizedMessage{English: "User not found.", Chinese: "用户不存在"}
+	ErrAdminProtected      = LocalizedMessage{English: "Administrator accounts cannot be disabled here.", Chinese: "不能在这里禁用管理员账号"}
+	ErrActiveUserMissing   = LocalizedMessage{English: "An active registered user is required.", Chinese: "请指定已注册且处于启用状态的用户"}
 	MessageHealthy         = LocalizedMessage{English: "Service is healthy.", Chinese: "服务正常运行"}
 	MessageRegistered      = LocalizedMessage{English: "Account created.", Chinese: "注册成功"}
 	MessageLoggedIn        = LocalizedMessage{English: "Logged in.", Chinese: "登录成功"}
 	MessageLoggedOut       = LocalizedMessage{English: "Logged out.", Chinese: "退出成功"}
 	MessageLoaded          = LocalizedMessage{English: "Loaded.", Chinese: "获取成功"}
-	MessageAdded           = LocalizedMessage{English: "Added.", Chinese: "添加成功"}
 	MessageUpdated         = LocalizedMessage{English: "Updated.", Chinese: "更新成功"}
-	MessageDeleted         = LocalizedMessage{English: "Deleted.", Chinese: "删除成功"}
-	MessageCreated         = LocalizedMessage{English: "Created.", Chinese: "创建成功"}
-	MessageSelected        = LocalizedMessage{English: "Workspace selected.", Chinese: "切换成功"}
 	MessagePasswordChanged = LocalizedMessage{English: "Password changed. Please log in again.", Chinese: "密码修改成功，请重新登录"}
 )

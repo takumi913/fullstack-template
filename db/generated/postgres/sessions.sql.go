@@ -7,40 +7,36 @@ package postgresdb
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
-const clearSessionsActiveTenant = `-- name: ClearSessionsActiveTenant :exec
-UPDATE sessions SET active_tenant_id = NULL, updated_at = CURRENT_TIMESTAMP WHERE active_tenant_id = $1
-`
-
-func (q *Queries) ClearSessionsActiveTenant(ctx context.Context, activeTenantID sql.NullString) error {
-	_, err := q.db.ExecContext(ctx, clearSessionsActiveTenant, activeTenantID)
-	return err
-}
-
-const createSession = `-- name: CreateSession :exec
-INSERT INTO sessions (id, user_id, token_hash, active_tenant_id, expires_at) VALUES ($1, $2, $3, $4, $5)
+const createSession = `-- name: CreateSession :execrows
+INSERT INTO sessions (id, user_id, token_hash, expires_at)
+SELECT $1::text, users.id, $2::text, $3::timestamptz
+FROM users
+WHERE users.id = $4 AND status = 'active' AND deleted_at IS NULL
+FOR UPDATE
 `
 
 type CreateSessionParams struct {
-	ID             string
-	UserID         string
-	TokenHash      string
-	ActiveTenantID sql.NullString
-	ExpiresAt      time.Time
+	ID        string
+	TokenHash string
+	ExpiresAt time.Time
+	UserID    string
 }
 
-func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) error {
-	_, err := q.db.ExecContext(ctx, createSession,
+// Disabling an account must wait for any in-flight session insert before revoking its sessions.
+func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createSession,
 		arg.ID,
-		arg.UserID,
 		arg.TokenHash,
-		arg.ActiveTenantID,
 		arg.ExpiresAt,
+		arg.UserID,
 	)
-	return err
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const deleteExpiredSessions = `-- name: DeleteExpiredSessions :exec
@@ -74,7 +70,7 @@ func (q *Queries) DeleteSessionsByUserID(ctx context.Context, userID string) err
 }
 
 const getSessionByTokenHash = `-- name: GetSessionByTokenHash :one
-SELECT id, user_id, token_hash, active_tenant_id, expires_at, created_at, updated_at FROM sessions WHERE token_hash = $1 AND expires_at > CURRENT_TIMESTAMP LIMIT 1
+SELECT id, user_id, token_hash, expires_at, created_at, updated_at FROM sessions WHERE token_hash = $1 AND expires_at > CURRENT_TIMESTAMP LIMIT 1
 `
 
 func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash string) (Session, error) {
@@ -84,27 +80,9 @@ func (q *Queries) GetSessionByTokenHash(ctx context.Context, tokenHash string) (
 		&i.ID,
 		&i.UserID,
 		&i.TokenHash,
-		&i.ActiveTenantID,
 		&i.ExpiresAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
 	return i, err
-}
-
-const updateSessionTenant = `-- name: UpdateSessionTenant :execrows
-UPDATE sessions SET active_tenant_id = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2
-`
-
-type UpdateSessionTenantParams struct {
-	ActiveTenantID sql.NullString
-	ID             string
-}
-
-func (q *Queries) UpdateSessionTenant(ctx context.Context, arg UpdateSessionTenantParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, updateSessionTenant, arg.ActiveTenantID, arg.ID)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
 }

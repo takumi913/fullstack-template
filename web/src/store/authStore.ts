@@ -13,7 +13,7 @@ interface AuthState {
   loading: boolean;
 }
 
-export function createAuthState(onClear: () => void) {
+export function createAuthState() {
   const [state, setState] = createStore<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -34,8 +34,6 @@ export function createAuthState(onClear: () => void) {
       draft.isAuthenticated = false;
       draft.loading = false;
     });
-    // 成员名单和角色属于当前会话，登出及 401 必须同时清空租户状态。
-    onClear();
   }
 
   async function loadSession(): Promise<AuthResponse | null> {

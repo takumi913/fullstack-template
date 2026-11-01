@@ -22,8 +22,7 @@ const privatePages = [
   ["/dashboard", lazy(() => import("./routes/dashboard"))],
   ["/settings/profile", lazy(() => import("./routes/profile-settings"))],
   ["/settings/security", lazy(() => import("./routes/security-settings"))],
-  ["/tenant/settings", lazy(() => import("./routes/tenant-settings"))],
-  ["/tenant/members", lazy(() => import("./routes/tenant-members"))],
+  ["/admin/users", lazy(() => import("./routes/admin-users"))],
 ] as const;
 const localized = (pages: readonly (readonly [string, Component])[]) =>
   supportedLocales.flatMap((locale) =>

@@ -28,6 +28,8 @@ func NewStore(db *sql.DB, driver string) *Store {
 	}
 	return s
 }
+
+// WithTx commits the callback's data changes together and rolls them back on failure.
 func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -39,12 +41,11 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	} else {
 		child.postgres = s.postgres.WithTx(tx)
 	}
-	// fn panic 时必须回滚，否则连接不会归还；
-	// SQLite 只有一个连接（MaxOpenConns=1），泄漏一次即全局死锁。
+	// A panic must release SQLite's single connection before it propagates.
 	defer func() {
 		if r := recover(); r != nil {
-			if rbErr := tx.Rollback(); rbErr != nil {
-				slog.Error("panic 后事务回滚失败", "error", rbErr)
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				slog.Error("panic 后事务回滚失败", "err", rollbackErr)
 			}
 			panic(r)
 		}
@@ -57,6 +58,7 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	}
 	return tx.Commit()
 }
+
 func normalize(err error) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return ErrNotFound
@@ -65,19 +67,6 @@ func normalize(err error) error {
 		return ErrConflict
 	}
 	return err
-}
-func nullableString(v *string) sql.NullString {
-	if v == nil {
-		return sql.NullString{}
-	}
-	return sql.NullString{String: *v, Valid: true}
-}
-func stringPtr(v sql.NullString) *string {
-	if !v.Valid {
-		return nil
-	}
-	x := v.String
-	return &x
 }
 func timePtr(v sql.NullTime) *time.Time {
 	if !v.Valid {

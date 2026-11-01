@@ -10,30 +10,10 @@ import (
 )
 
 type Session struct {
-	ID             string
-	UserID         string
-	TokenHash      string
-	ActiveTenantID sql.NullString
-	ExpiresAt      time.Time
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-}
-
-type Tenant struct {
 	ID        string
-	Name      string
-	Slug      string
-	CreatedBy string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt sql.NullTime
-}
-
-type TenantMember struct {
-	ID        string
-	TenantID  string
 	UserID    string
-	Role      string
+	TokenHash string
+	ExpiresAt time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -48,4 +28,5 @@ type User struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    sql.NullTime
+	IsAdmin      bool
 }

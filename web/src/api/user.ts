@@ -6,22 +6,12 @@ export interface User {
   email: string;
   avatar_url: string;
   status: "active" | "disabled";
-}
-export interface Tenant {
-  id: string;
-  name: string;
-  slug: string;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
+  is_admin: boolean;
 }
 export interface AuthResponse {
   user: User;
-  tenants: Tenant[];
-  active_tenant_id: string | null;
 }
 export interface RegisterRequest {
-  username: string;
   email: string;
   password: string;
 }

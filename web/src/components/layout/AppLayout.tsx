@@ -10,9 +10,9 @@ export function AppLayout(props: { children?: JSX.Element }) {
       <ProtectedRoute>
         <div class="design-site">
           <PointerGlow />
-          <section class="design-workspace" data-screen-label="Workspace">
+          <section class="design-account" data-screen-label="Account">
             <AppHeader />
-            <main class="design-workspace-main">{props.children}</main>
+            <main class="design-account-main">{props.children}</main>
           </section>
           <CommandPalette />
         </div>

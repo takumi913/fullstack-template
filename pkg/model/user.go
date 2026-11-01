@@ -16,6 +16,7 @@ type User struct {
 	PasswordHash string     `json:"-"`
 	AvatarURL    string     `json:"avatar_url"`
 	Status       UserStatus `json:"status"`
+	IsAdmin      bool       `json:"is_admin"`
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`
 	DeletedAt    *time.Time `json:"-"`
@@ -26,14 +27,14 @@ type UserResponse struct {
 	Email     string     `json:"email"`
 	AvatarURL string     `json:"avatar_url"`
 	Status    UserStatus `json:"status"`
+	IsAdmin   bool       `json:"is_admin"`
 }
 
 func (u User) ToResponse() UserResponse {
-	return UserResponse{ID: u.ID, Username: u.Username, Email: u.Email, AvatarURL: u.AvatarURL, Status: u.Status}
+	return UserResponse{ID: u.ID, Username: u.Username, Email: u.Email, AvatarURL: u.AvatarURL, Status: u.Status, IsAdmin: u.IsAdmin}
 }
 
 type RegisterRequest struct {
-	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }

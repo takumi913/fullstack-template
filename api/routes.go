@@ -12,13 +12,12 @@ import (
 )
 
 type Handlers struct {
-	Auth   *handler.AuthHandler
-	User   *handler.UserHandler
-	Tenant *handler.TenantHandler
-	Member *handler.MemberHandler
+	Auth  *handler.AuthHandler
+	User  *handler.UserHandler
+	Admin *handler.AdminHandler
 }
 
-func SetupRoutes(e *echo.Echo, h Handlers, auth *middleware.AuthMiddleware, tenant *middleware.TenantMiddleware) {
+func SetupRoutes(e *echo.Echo, h Handlers, auth *middleware.AuthMiddleware) {
 	v1 := e.Group("/api/v1")
 	v1.GET("/health", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]any{"code": 0, "data": map[string]string{"status": "healthy"}, "message": model.MessageHealthy.ForLanguage(c.Request().Header.Get("Accept-Language"))})
@@ -40,15 +39,7 @@ func SetupRoutes(e *echo.Echo, h Handlers, auth *middleware.AuthMiddleware, tena
 	protected.GET("/user/profile", h.User.Get)
 	protected.PATCH("/user/profile", h.User.Update)
 	protected.POST("/user/change-password", h.User.ChangePassword)
-	protected.GET("/tenants", h.Tenant.List)
-	protected.POST("/tenants", h.Tenant.Create)
-	t := protected.Group("/tenants/:tenantID", tenant.Member)
-	t.GET("", h.Tenant.Get, middleware.Require(model.PermissionTenantRead))
-	t.PATCH("", h.Tenant.Update, middleware.Require(model.PermissionTenantUpdate))
-	t.DELETE("", h.Tenant.Delete, middleware.Require(model.PermissionTenantDelete))
-	t.POST("/select", h.Tenant.Select, middleware.Require(model.PermissionTenantRead))
-	t.GET("/members", h.Member.List, middleware.Require(model.PermissionMemberRead))
-	t.POST("/members", h.Member.Add, middleware.Require(model.PermissionMemberCreate))
-	t.PATCH("/members/:userID", h.Member.Update, middleware.Require(model.PermissionMemberUpdate))
-	t.DELETE("/members/:userID", h.Member.Delete, middleware.Require(model.PermissionMemberDelete))
+	admin := protected.Group("/admin", auth.RequireAdmin)
+	admin.GET("/users", h.Admin.List)
+	admin.PATCH("/users/:userID", h.Admin.SetStatus)
 }

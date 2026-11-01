@@ -1,74 +1,72 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { useLocation, useNavigate } from "@solidjs/router";
 import { localizedPath } from "@/i18n/locales";
-import { useLocale } from "@/i18n/context";
+import { useLocale, useTranslation } from "@/i18n/context";
 import { toolsmithPrivateCopy } from "@/config/toolsmith-private-copy";
-import { useAuth, useTenant } from "@/store/AppState";
+import { useAuth } from "@/store/AppState";
 import { createAsyncAction } from "@/lib/createAsyncAction";
 import { Brand } from "./Brand";
 import { ThemeToggle } from "./ThemeToggle";
 import { ShortLanguageToggle } from "./ShortLanguageToggle";
 
+const paths = ["/dashboard", "/settings/profile", "/settings/security"];
+
 export function AppHeader() {
   const locale = useLocale();
+  const { t } = useTranslation("app");
   const copy = () => toolsmithPrivateCopy(locale());
   const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
-  const tenant = useTenant();
   const { error, pending, run } = createAsyncAction();
   async function signOut() {
     if (await run(auth.logout)) navigate(localizedPath("/", locale()));
   }
-  const paths = ["/dashboard", "/tenant/members", null, "/tenant/settings"];
   return (
     <aside class="design-sidebar">
       <Brand />
-      <a class="design-workspace-switcher" href={localizedPath("/dashboard", locale())}>
-        <span class="design-workspace-icon">
-          {tenant.state.activeTenant?.name.slice(0, 1).toUpperCase()}
+      <a class="design-account-profile" href={localizedPath("/settings/profile", locale())}>
+        <span class="design-account-icon">
+          {auth.state.user?.username.slice(0, 1).toUpperCase()}
         </span>
-        <div class="design-workspace-info">
-          <div class="design-workspace-info-name">{tenant.state.activeTenant?.name}</div>
-          <div class="design-workspace-info-meta">
-            {tenant.state.members.length} {copy().seats}
-          </div>
+        <div class="design-account-info">
+          <div class="design-account-info-name">{auth.state.user?.username}</div>
+          <div class="design-account-info-meta">{auth.state.user?.email}</div>
         </div>
-        <span class="design-workspace-caret">⌄</span>
       </a>
-      <nav class="design-workspace-nav">
-        <For each={copy().ws}>
+      <nav class="design-account-nav">
+        <For each={copy().nav}>
           {(label, index) => (
-            <>
-              {paths[index()] ? (
-                <a
-                  class={[
-                    "design-workspace-link",
-                    { active: location.pathname === localizedPath(paths[index()]!, locale()) },
-                  ]}
-                  aria-current={
-                    location.pathname === localizedPath(paths[index()]!, locale())
-                      ? "page"
-                      : undefined
-                  }
-                  href={localizedPath(paths[index()]!, locale())}
-                >
-                  <span class="design-workspace-nav-dot" />
-                  {label}
-                </a>
-              ) : (
-                <a
-                  class="design-workspace-link"
-                  href="#"
-                  onClick={(event) => event.preventDefault()}
-                >
-                  <span class="design-workspace-nav-dot" />
-                  {label}
-                </a>
-              )}
-            </>
+            <a
+              class={[
+                "design-account-link",
+                { active: location.pathname === localizedPath(paths[index()], locale()) },
+              ]}
+              aria-current={
+                location.pathname === localizedPath(paths[index()], locale()) ? "page" : undefined
+              }
+              href={localizedPath(paths[index()], locale())}
+            >
+              <span class="design-account-nav-dot" />
+              {label}
+            </a>
           )}
         </For>
+        <Show when={auth.state.user?.is_admin}>
+          <a
+            class={[
+              "design-account-link",
+              { active: location.pathname === localizedPath("/admin/users", locale()) },
+            ]}
+            aria-current={
+              location.pathname === localizedPath("/admin/users", locale()) ? "page" : undefined
+            }
+            href={localizedPath("/admin/users", locale())}
+          >
+            <span class="design-account-nav-dot" />
+            {t("adminUsers.title")}
+          </a>
+        </Show>
       </nav>
       <div class="design-sidebar-account">
         <div class="design-sidebar-controls">
