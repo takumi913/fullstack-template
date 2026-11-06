@@ -9,7 +9,7 @@ require (
 	github.com/labstack/echo/v5 v5.4.2
 	golang.org/x/crypto v0.57.0
 	golang.org/x/text v0.42.0
-	modernc.org/sqlite v1.61.0
+	modernc.org/sqlite v1.61.1
 )
 
 require (
