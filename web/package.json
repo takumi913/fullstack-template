@@ -23,7 +23,7 @@
     "@lucide/solid": "1.62.0",
     "@solidjs/router": "2.0.0-next.44",
     "@solidjs/web": "2.0.0-rc.21",
-    "@tailwindcss/vite": "^4.1.10",
+    "@tailwindcss/vite": "^4.3.5",
     "axios": "^1.21.1",
     "clsx": "^2.1.1",
     "i18next": "^27.1.1",
