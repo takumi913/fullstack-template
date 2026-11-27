@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "1323:1323"
+    environment:
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 1323
+      DB_DRIVER: sqlite
+      DB_PATH: /app/data/app.db
+    volumes:
+      # 容器以 uid 1000 运行。Linux 上首次启动前需要: mkdir -p data && sudo chown 1000:1000 data
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:1323/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:17-alpine
+    profiles: [postgres]
+    environment:
+      POSTGRES_DB: fullstack_template
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

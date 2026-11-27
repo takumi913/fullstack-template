@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go + Solid 栈"
+  short_description: "用 Go、Echo、sqlc 和 Solid 2 建项目"
+  default_prompt: "Use $go-solid-stack to scaffold a Go and Solid 2 app with sqlc, SQLite or PostgreSQL, Makefile, and Docker."

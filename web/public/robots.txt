@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-# Production builds replace this file with the canonical sitemap URL.
